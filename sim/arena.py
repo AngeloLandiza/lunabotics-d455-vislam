@@ -261,8 +261,9 @@ def occupancy(boulders, craters, inflate=0.38):
     occ = (X < inflate) | (Y < inflate) | (X > LENGTH - inflate) | (Y > WIDTH - inflate)
     for o in [*boulders, *craters]:
         occ |= np.hypot(X - o.x, Y - o.y) < o.diameter / 2 + inflate + (0.08 if isinstance(o, Crater) else 0)
+    # The column box is ~1 m tall: the D455 mast sticking out front hits it, so keep extra room.
     cx, cy, side = COLUMN
-    occ |= (np.abs(X - cx) < side / 2 + inflate) & (np.abs(Y - cy) < side / 2 + inflate)
+    occ |= (np.abs(X - cx) < side / 2 + inflate + 0.15) & (np.abs(Y - cy) < side / 2 + inflate + 0.15)
     return occ
 
 
