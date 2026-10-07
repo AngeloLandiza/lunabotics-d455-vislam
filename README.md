@@ -138,8 +138,9 @@ Outputs:
 
 How it works:
 1. **Local ground:** a 1 m window around each cell, taken as a low percentile and then a median with bumps and pits removed. Slopes, ducts and crater rims don't shift it.
-2. **Threshold:** cells more than 8 cm above the local ground are bumps; cells more than 6 cm below it are pits.
-3. **Blobs:** a morphological open removes single-cell noise, then connected blobs are sized and labelled:
+2. **Threshold:** cells more than 8 cm above the local ground seed a bump; cells more than 6 cm below it seed a pit. A morphological open removes single-cell noise.
+3. **Outline:** each seed grows out through connected cells to a shallow edge threshold (3 cm for bumps, 1.5 cm for pits; at most 15 cm), and unseen cells inside are filled. Without this, a bowl-shaped crater was sized by its deep middle only, about 60% of its real width.
+4. **Blobs:** connected blobs are sized and labelled:
 
 | Label | RViz colour | Rule |
 |---|---|---|
@@ -153,10 +154,10 @@ Outputs:
 - `/terrain/obstacles`: MarkerArray, a cylinder per obstacle plus a label such as "boulder 34 cm". It is shown in RViz as *Boulders + craters*.
 - `/terrain/obstacle_grid`: OccupancyGrid. Boulders, craters and structures are 100, other known cells 0, unseen cells −1. It is shown in RViz as *Obstacle grid* (off by default).
 
-Offline test on 5 simulated arena rounds:
-- found 30 of 31 boulders and 15 of 16 craters;
-- 1 false positive, at the edge of unseen ground;
-- median centre error 1.3 cm;
+Offline test on 5 simulated arena rounds, with 1 cm map noise:
+- found 30 of 31 boulders and 15 of 16 craters, with no false positives;
+- sizes: craters 88% of true diameter (74–94%), boulders 95% (87–98%);
+- median centre error 1.0 cm;
 - about 110 ms per update.
 
 An obstacle has to be seen before it can be segmented. The camera looks about 0.5–3.5 m ahead.

@@ -46,4 +46,7 @@ obstacle_segmenter:
     ground_window: 1.0                    # m: local ground estimate window (> largest crater)
     boulder_height: 0.08                  # m above local ground: bump -> boulder candidate
     crater_depth: 0.06                    # m below local ground: pit -> crater candidate
+    boulder_edge: 0.03                    # m: a candidate's outline is grown out to here...
+    crater_edge: 0.015                    # m: ...so a bowl-shaped crater is sized rim to rim
+    max_grow: 0.15                        # m: max outline growth beyond the candidate
     changed: 0.04                         # m of change since the baseline: dug pit / dumped pile

@@ -3,7 +3,10 @@
 
 Height relative to the *local* ground (a wide median of the terrain map, so slopes
 and the bed's unevenness cancel) is thresholded into bumps (> boulder_height) and
-pits (< -crater_depth). Connected blobs are sized and labelled:
+pits (< -crater_depth). Those only seed a detection: each one is grown out to its edge
+through connected cells past a shallow threshold (boulder_edge / crater_edge, hysteresis
+like Canny edges) and unseen cells inside are filled, so a bowl-shaped crater is sized
+rim to rim and not just by its deep middle. Connected blobs are sized and labelled:
 
   boulder    bump 12-90 cm across          crater     natural pit 15-110 cm across
   dug pit    pit the robot dug (terrain mapper's change < 0 since the baseline)
@@ -28,7 +31,8 @@ KINDS = {  # rgba
 
 
 def segment(H, change, res, ground_window=1.0, boulder_height=0.08, crater_depth=0.06,
-            changed=0.04, boulder_size=(0.12, 0.9), crater_size=(0.15, 1.1), boulder_max_height=0.6):
+            boulder_edge=0.03, crater_edge=0.015, max_grow=0.15, changed=0.04, boulder_size=(0.12, 0.9),
+            crater_size=(0.15, 1.1), boulder_max_height=0.6):
     """H, change: (nx, ny) grids (NaN = unknown). Returns (list of blob dicts, obstacle mask).
 
     Blob: kind, i, j (centroid cell), diameter (m), height (m, + bump / - pit), cells.
@@ -53,9 +57,14 @@ def segment(H, change, res, ground_window=1.0, boulder_height=0.08, crater_depth
     chg = np.nan_to_num(change, nan=0.0)
     kernel = np.ones((3, 3), np.uint8)
     blobs, mask = [], np.zeros(H.shape, bool)
-    for sign, thresh in ((1, boulder_height), (-1, crater_depth)):
-        m = (sign * rel > thresh).astype(np.uint8)
-        m = cv2.morphologyEx(m, cv2.MORPH_OPEN, kernel)          # drop single-cell noise
+    for sign, thresh, edge in ((1, boulder_height, boulder_edge), (-1, crater_depth, crater_edge)):
+        seed = cv2.morphologyEx((sign * rel > thresh).astype(np.uint8), cv2.MORPH_OPEN, kernel)  # drop noise
+        # Grow each seed to its edge: keep the shallow-threshold regions that contain a seed,
+        # at most max_grow beyond it (noise can't spread an outline along a trench).
+        _, lab = cv2.connectedComponents(((sign * rel > edge) | (seed > 0)).astype(np.uint8), connectivity=8)
+        reach = cv2.dilate(seed, kernel, iterations=max(int(round(max_grow / res)), 1))
+        m = np.isin(lab, np.unique(lab[seed > 0])) & (lab > 0) & (reach > 0)
+        m = ndimage.binary_fill_holes(m).astype(np.uint8)       # unseen floor behind a crater's lip
         n, lab, stats, cent = cv2.connectedComponentsWithStats(m, connectivity=8)
         for b in range(1, n):
             cells = lab == b
@@ -102,7 +111,9 @@ def main():
             p = lambda n, d: self.declare_parameter(n, d).value
             self.res = p('resolution', 0.05)
             self.kw = dict(ground_window=p('ground_window', 1.0), boulder_height=p('boulder_height', 0.08),
-                           crater_depth=p('crater_depth', 0.06), changed=p('changed', 0.04))
+                           crater_depth=p('crater_depth', 0.06), boulder_edge=p('boulder_edge', 0.03),
+                           crater_edge=p('crater_edge', 0.015), max_grow=p('max_grow', 0.15),
+                           changed=p('changed', 0.04))
             self.latest = None
             self.create_subscription(PointCloud2, '/terrain/cloud', lambda m: setattr(self, 'latest', m), 1)
             self.marker_pub = self.create_publisher(MarkerArray, '/terrain/obstacles', 1)
