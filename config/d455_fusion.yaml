@@ -1,0 +1,108 @@
+# D455 fusion mapping: visual-inertial tracking + ICP-refined dense "LiDAR" map.
+#
+# The IR projector alternates on/off every frame. scripts/emitter_splitter.py routes
+# projector-OFF IR pairs to stereo visual-inertial odometry (robust tracking) and
+# projector-ON depth to a dense point cloud. RTAB-Map uses the visual odometry as the
+# guess and refines every keyframe link and loop closure with ICP on those clouds.
+#
+# RTAB-Map's own parameters ("Group/Name") must be quoted strings.
+
+camera:                                   # realsense2_camera_node
+  ros__parameters:
+    enable_color: false
+    enable_infra1: true
+    enable_infra2: true
+    enable_depth: true
+    depth_module.infra_profile: "848,480,30"
+    depth_module.depth_profile: "848,480,30"
+    enable_sync: true
+
+    # Projector on every other frame (each stream gets 15 Hz of its kind).
+    depth_module.emitter_enabled: 1
+    depth_module.emitter_on_off: true
+
+    # Short fixed exposure against motion blur; raise gain (16-248) in dim rooms.
+    depth_module.enable_auto_exposure: false
+    depth_module.exposure: 5000           # microseconds
+    depth_module.gain: 64
+
+    enable_gyro: true
+    enable_accel: true
+    gyro_fps: 200
+    accel_fps: 200
+    unite_imu_method: 2
+
+imu_filter_madgwick:
+  ros__parameters:
+    use_mag: false
+    world_frame: enu
+    publish_tf: false
+
+stereo_odometry:                          # visual-inertial odometry on projector-off IR
+  ros__parameters:
+    frame_id: camera_link
+    approx_sync: false                    # split IR pair keeps identical stamps
+    wait_imu_to_init: true
+    Odom/ResetCountdown: "5"
+    Vis/MaxFeatures: "500"
+    OdomF2M/MaxSize: "1500"
+
+point_cloud_xyz:                          # projector-on depth -> dense cloud (/lidar/points)
+  ros__parameters:
+    approx_sync: false
+    decimation: 2                         # denser than LiDAR mode; ICP only runs per keyframe
+    voxel_size: 0.03                      # m
+    min_depth: 0.3                        # m
+    max_depth: 5.0                        # m
+    filter_nans: true
+
+stereo_sync:                              # packs the split IR pair into /rgbd_image for rtabmap
+  ros__parameters:
+    approx_sync: false
+
+rtabmap:
+  ros__parameters:
+    frame_id: camera_link
+    subscribe_rgbd: true                  # stereo pair (via stereo_sync): visual loop closures
+    subscribe_scan_cloud: true            # dense cloud for ICP + the map
+                                          # (rtabmap can't sync raw stereo topics with a cloud)
+    subscribe_odom_info: true
+    approx_sync: true                     # cloud comes from the frame after the IR pair
+    odom_sensor_sync: true                # shift the cloud by odometry for that 33 ms gap
+
+    Rtabmap/DetectionRate: "3"            # Hz
+    RGBD/LinearUpdate: "0.05"             # m
+    RGBD/AngularUpdate: "0.05"            # rad
+
+    # Accuracy: visual guess, then ICP refinement of every new odometry link and of
+    # loop closures. Where the scan is too flat (structural complexity below
+    # Icp/PointToPlaneMinComplexity) ICP only corrects the constrained axes and keeps
+    # the visual estimate for the rest (Icp/PointToPlaneLowComplexityStrategy=1).
+    Reg/Strategy: "2"                     # 2 = visual, then ICP
+    RGBD/NeighborLinkRefining: "true"
+    RGBD/ProximityBySpace: "true"
+
+    Icp/Strategy: "1"                     # libpointmatcher
+    Icp/PointToPlane: "true"
+    Icp/PointToPlaneK: "20"
+    Icp/PointToPlaneRadius: "0"
+    Icp/PointToPlaneMinComplexity: "0.02"
+    Icp/PointToPlaneLowComplexityStrategy: "1"
+    Icp/Iterations: "10"
+    Icp/Epsilon: "0.001"
+    # Tested on this D455: 3 cm / 10 cm rejected every refinement (inlier ratio 0.18 <
+    # 0.2, depth noise is several cm at 2-4 m); 5 cm / 15 cm accepted 100% (ratio 0.34)
+    # and keeps a full update ~0.3 s, inside the 3 Hz budget.
+    Icp/VoxelSize: "0.05"
+    Icp/MaxCorrespondenceDistance: "0.15" # still tight: the visual guess is already close
+    Icp/MaxTranslation: "0.2"             # reject refinements that jump far from the guess
+    Icp/MaxRotation: "0.2"                # rad
+    Icp/OutlierRatio: "0.7"
+    Icp/CorrespondenceRatio: "0.2"
+
+    # Map built from the dense clouds.
+    RGBD/CreateOccupancyGrid: "true"
+    Grid/Sensor: "0"                      # 0 = scan clouds
+    Grid/3D: "true"
+    Grid/CellSize: "0.03"
+    Grid/RangeMax: "5.0"

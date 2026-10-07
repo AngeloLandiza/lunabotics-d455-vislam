@@ -73,6 +73,29 @@ To swap in a real LiDAR later, publish its cloud on `/lidar/points` and drop the
 
 ICP needs geometry to lock onto. A flat floor plus one wall, or a scene with nothing within 6 m, can make it slide. The visual mode (`./run.sh`) is the more robust tracker; this mode gives the denser, LiDAR-style map.
 
+## Fusion mode (most accurate)
+
+```bash
+./run_fusion.sh                     # map with both windows (saved to ~/.ros/d455_fusion.db)
+./run_fusion.sh viz:=false          # headless
+./run_fusion.sh localization:=true  # localize in the saved fusion map
+```
+
+This mode combines the strengths of the other two using one D455:
+
+1. The IR projector switches on every other frame (`depth_module.emitter_on_off`). [scripts/emitter_splitter.py](scripts/emitter_splitter.py) reads each frame's `frame_emitter_mode` metadata and splits the stream by projector state:
+   - Projector-off IR pairs go to `/split/infra*`. They feed stereo visual-inertial odometry, the robust tracker from `./run.sh`, at 15 Hz.
+   - Projector-on depth goes to `/split/depth`. It becomes a dense point cloud on `/lidar/points`.
+2. RTAB-Map uses the visual odometry as the motion guess. ICP on the dense clouds then refines every new keyframe link (`RGBD/NeighborLinkRefining`), and adds local loop closures by matching nearby scans (`RGBD/ProximityBySpace`). Visual loop closures are refined with ICP too (`Reg/Strategy 2`). The map is built from the dense clouds.
+3. Where a scan is too flat to constrain every direction (a wall plus floor), ICP corrects only the constrained axes and keeps the visual estimate for the rest (`Icp/PointToPlaneLowComplexityStrategy`). That's RTAB-Map's answer to ICP degeneracy, and it covers the weakness of the LiDAR mode.
+
+Measured on this D455:
+- 15 Hz on each half of the split.
+- Every ICP refinement was accepted, with an average inlier ratio of 0.34.
+- About 0.3 s per map update, even with a keyframe on every update.
+
+Settings are in [config/d455_fusion.yaml](config/d455_fusion.yaml). The next accuracy step is a wheel odometry + IMU guess, from `robot_localization` on the robot.
+
 ## Tuning notes
 
 - **Exposure:** IR auto-exposure picks 15–20 ms indoors with the projector off. That motion-blurs features and loses tracking. The firmware ignores `auto_exposure_limit`, so the config fixes exposure at 5 ms and raises gain to 64 to keep the same brightness. In a dim room, raise `depth_module.gain` (about 160). To go back to auto-exposure, set `depth_module.enable_auto_exposure: true`.
