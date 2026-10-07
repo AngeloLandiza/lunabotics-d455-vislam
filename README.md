@@ -119,6 +119,78 @@ Outputs:
 
 Settings are in [config/lunabotics_terrain.yaml](config/lunabotics_terrain.yaml). The two-step workflow is the arena version of anchoring to a prior map, which is how the [DEM-anchored lunar SLAM paper](https://arxiv.org/abs/2603.17229) limits drift.
 
+## Lunabotics arena simulation + dig tool
+
+```bash
+./run_arena.sh                    # arena + SLAM + dig tool; drive with the keyboard in this terminal
+./run_arena.sh --survey           # the rover drives survey loops on its own
+./run_arena.sh --seed 4           # another round: new boulders, craters and start pose
+./run_arena.sh --start-heading N  # start facing N/E/S/W (default: random, like the direction wheel)
+./run_arena.sh --eval --headless  # check SLAM vs. ground truth: survey lap, dig + dump, second lap, report
+```
+
+This is a recreation of the Artemis Arena at KSC, built from the 2027 guidebook (sec. 11) plus NASA photos and 2024–2026 run footage. [sim/arena.py](sim/arena.py) holds the layout, [sim/arena_scene.py](sim/arena_scene.py) builds it in Isaac Sim.
+
+**Bed and zones (guidebook):**
+- 6.88 × 5.0 m of BP-1 between 17 cm PVC perimeter ducts, 45 cm deep.
+- Zones:
+  - starting zone: 2 × 2 m corner;
+  - excavation zone: the first 2.5 m;
+  - obstacle zone: the remaining 4.38 m;
+  - construction zone: a 1.5 m strip along the far end.
+- Berm target box: 2.2 × 0.9 m centred at (5.38, 0.9).
+
+**Obstacles:** re-drawn every round from `--seed`.
+- Boulders 30–40 cm, at least 3 in the obstacle zone and some in the excavation zone.
+- Craters at most 50 cm wide, with a raised rim of the dug-out material.
+- Nothing in the starting or construction zones, and a robot-sized path to the berm is guaranteed.
+
+**Start pose:** random position in the starting zone, heading N/E/S/W.
+
+**Looks (footage):**
+- Light tan-grey BP-1 with old track prints, small mounds and faint rake lines.
+- Light tan boulders.
+- Beige bin walls about 0.45 m tall, with grey ducts at their base.
+- A black-framed glass enclosure on the walls.
+- A white box truss on a grid; the central leg stands in a grey box, which is the guidebook's support column.
+- An 80/20 rail on the starting-zone walls.
+- Cyclone dust collectors in the corners.
+- Diffuse hall LED strips.
+
+**Physics:** Earth gravity (the arena is at KSC).
+
+**Viewport cameras:** at the guidebook's static and PTZ positions, plus an overhead view. Pick them from the Isaac viewport's camera menu.
+
+Wall, duct and glass heights cross-check against Purdue Lunabotics' arena model (BSD-3).
+
+**Digging.** The regolith is a deformable 2 cm heightmap, split into tiles so an edit re-meshes and re-collides only what it touches. Material slumps to BP-1's angle of repose (38°). Any node can edit it by publishing `[x, y, radius, depth]` on `/arena/dig` (depth > 0 digs, < 0 dumps). The sim publishes the true terrain (`/arena/heightmap`) and true volumes (`/arena/volume`: dug, dumped, and inside the berm box).
+
+**Dig tool** ([sim/dig_tool.py](sim/dig_tool.py)). Two top-down panels:
+- **Left, the true terrain,** with zones, obstacles, the rover and the D455's ground footprint, so you can see whether a dig is in view.
+- **Right, SLAM's terrain map** placed in the arena frame. **E** cycles through:
+  - `elevation`;
+  - `change`: SLAM's own dug (blue) and dumped (red) map;
+  - `error`: SLAM minus truth.
+
+Controls:
+- Left-drag digs, right-drag dumps. The wheel sets the brush size, `-` and `=` the depth per stroke.
+
+The status bar shows true vs. SLAM dug and dumped volume, map error and camera drift. The SLAM map is placed using ground truth once (one instant of the camera's true pose). After that the panel shows only SLAM's own estimate, so drift and missed terrain changes appear as error.
+
+**What the dig tool found and fixed** (the arena run, rover in the starting zone):
+- **Height lock-in:** the terrain mapper's height-drift compensation could lock onto a burst of bad scans and keep the whole map about 1.5 m off. It now only follows slow drift (at most 5 cm per scan); sudden jumps are re-mapped by change detection instead. Map error went from 1.6 m to 0.3–0.8 cm median.
+- **Gradual digging uncounted:** digging in shallow strokes didn't count as volume, because a cell's baseline kept tracking its height until its first "change" event. Baselines now freeze once a cell is well observed (σ < 1.2 cm). A 4 × 3 cm stroke dig went from about 50% to 81% of the true volume.
+- **Hidden hole floors:** seen from one spot, the near part of a hole's floor is hidden behind its lip, so some volume only appears once the rover sees the hole from another side.
+- **Tilt while driving:** SLAM's attitude is off by about 0.7–1.3° (up to ~3°) while driving, which smeared fan-shaped height errors into the map (up to ~20 cm at range). Each scan is now fitted to the map for a height offset *and* a small tilt (robust, rate-limited), removing those wedges in synthetic tests with ±2° of tilt error.
+- **Odometry losses:** with a too-smooth regolith texture, stereo odometry lost track during turns. With footage-like clods, gravel and boot prints (image contrast σ 16 → 29) and a turn controller that doesn't overshoot, a lap ran with no losses and ≤ 9 cm position error.
+
+`--eval` ([sim/arena_eval.py](sim/arena_eval.py)) automates this check and prints pose, map and volume errors as JSON.
+
+Sim notes:
+- **Turning:** pivot turns reach only about half the commanded rate in Earth gravity, even with the sim's gyro (yaw-rate) feedback loop. They no longer stall.
+- **Camera locks:** robot and arena cameras are locked against viewport navigation. Orbiting while looking through the robot's D455 would otherwise move the sensor itself.
+- **Speed:** about 0.37× real time on an 8 GB RTX 4060 laptop. Long runs are heavy: keep the laptop plugged in and cooled.
+
 ## Simulation (Isaac Sim 6)
 
 ```bash

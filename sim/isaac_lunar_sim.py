@@ -1,10 +1,17 @@
-"""Isaac Sim 6.0: tank-drive rover with a down-pitched RealSense D455 on lunar terrain.
+"""Isaac Sim 6.0: tank-drive rover with a down-pitched RealSense D455.
+
+Worlds (--world):
+  arena   the Lunabotics Artemis Arena (2027 guidebook; sim/arena.py, sim/arena_scene.py),
+          Earth gravity, indoor lighting, random obstacles and start pose per round
+  lunar   procedural lunar terrain, lunar gravity
 
 Publishes what the real D455 driver does, so the SLAM stack runs unchanged (sim:=true):
   /camera/infra1|infra2/image_rect_raw + camera_info   stereo pair (with stereo baseline)
   /camera/depth/image_rect_raw + camera_info           depth (32FC1, m)
   /camera/imu (200 Hz, gravity included)   /clock   /ground_truth/odom
-and drives from /cmd_vel. Lunar gravity (1.62 m/s^2).
+  /ground_truth/camera_pose (camera_link in the world frame, for checking SLAM)
+  /arena/heightmap (true terrain, 32FC1 rows = x)   /arena/volume ([cut, fill, berm] m^3)
+drives from /cmd_vel, and digs/dumps where told on /arena/dig ([x, y, radius, depth]).
 
 Run via ./run_sim.sh (Isaac Sim's own Python + internal ROS 2 libraries):  python sim/isaac_lunar_sim.py [--headless]
   --dig-at T     at sim time T, dig a hole at --dig-xy (tests terrain re-mapping)
@@ -17,9 +24,12 @@ import time
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--headless', action='store_true')
-parser.add_argument('--seed', type=int, default=0)
+parser.add_argument('--world', choices=['arena', 'lunar'], default='lunar')
+parser.add_argument('--seed', type=int, default=0, help='terrain / obstacle layout / start pose')
+parser.add_argument('--start-heading', default='random', help='arena: N, E, S, W or random')
+parser.add_argument('--view', default='', help='viewport camera prim (arena default: overview)')
 parser.add_argument('--dig-at', type=float, default=-1.0, help='sim time (s) of the dig event; <0 = never')
-parser.add_argument('--dig-xy', type=float, nargs=2, default=[1.5, 0.8])  # beside the survey loop's first side
+parser.add_argument('--dig-xy', type=float, nargs=2, default=[1.5, 0.8])  # lunar: beside the survey loop's first side
 parser.add_argument('--dig-radius', type=float, default=0.4)
 parser.add_argument('--dig-depth', type=float, default=0.25)
 parser.add_argument('--profile', action='store_true', help='print loop timings')
@@ -61,10 +71,12 @@ for key, value in RENDER_SETTINGS:
 app.update()
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import arena as A  # noqa: E402
 import lunar_terrain  # noqa: E402
+from terrain_tiles import TerrainTiles  # noqa: E402
 
 # ---------------------------------------------------------------- config
-SIZE, RES = 20.0, 0.05            # terrain extent / mesh spacing (m)
+SIZE, RES = 20.0, 0.05            # lunar terrain extent / mesh spacing (m)
 CAM_RES = (640, 400)              # IR render resolution (D455 IR is 16:10)
 DEPTH_RES = (640, 400)            # same 16:10 aperture as the IR cameras
 ROVER_USD = '/Isaac/Robots/Clearpath/Jackal/jackal.usd'
@@ -81,95 +93,9 @@ stage = world.stage
 assets = get_assets_root_path()
 scene = UsdPhysics.Scene.Get(stage, world.get_physics_context().prim_path)
 scene.CreateGravityDirectionAttr(Gf.Vec3f(0, 0, -1))
-scene.CreateGravityMagnitudeAttr(1.62)
-
-# ---------------------------------------------------------------- terrain
-X, Y, H = lunar_terrain.heightmap(SIZE, RES, args.seed)
-n = H.shape[0]
-tex_path = os.path.join(CACHE, f'regolith_v2_{args.seed}.png')
-if not os.path.exists(tex_path):
-    from PIL import Image
-    Image.fromarray(lunar_terrain.albedo(4096, args.seed)).save(tex_path)
-
-mesh = UsdGeom.Mesh.Define(stage, '/World/terrain')
-points = np.stack([X.ravel(), Y.ravel(), H.ravel()], 1)
-mesh.CreatePointsAttr(Vt.Vec3fArray.FromNumpy(points.astype(np.float32)))
-i, j = np.meshgrid(np.arange(n - 1), np.arange(n - 1), indexing='ij')
-v0 = (i * n + j).ravel()
-quads = np.stack([v0, v0 + n, v0 + n + 1, v0 + 1], 1)
-mesh.CreateFaceVertexCountsAttr(Vt.IntArray.FromNumpy(np.full(len(quads), 4, np.int32)))
-mesh.CreateFaceVertexIndicesAttr(Vt.IntArray.FromNumpy(quads.ravel().astype(np.int32)))
-uv = np.stack([(X.ravel() + SIZE / 2) / SIZE, (Y.ravel() + SIZE / 2) / SIZE], 1) * 4  # 5 m tiles
-st = UsdGeom.PrimvarsAPI(mesh).CreatePrimvar('st', Sdf.ValueTypeNames.TexCoord2fArray,
-                                             UsdGeom.Tokens.vertex)
-st.Set(Vt.Vec2fArray.FromNumpy(uv.astype(np.float32)))
-mesh.CreateSubdivisionSchemeAttr('none')
-gx, gy = np.gradient(H, RES)  # smooth per-vertex normals (otherwise every triangle is flat-shaded)
-normals = np.stack([-gx.ravel(), -gy.ravel(), np.ones(H.size)], 1)
-mesh.CreateNormalsAttr(Vt.Vec3fArray.FromNumpy((normals / np.linalg.norm(normals, axis=1, keepdims=True)).astype(np.float32)))
-mesh.SetNormalsInterpolation(UsdGeom.Tokens.vertex)
-UsdPhysics.CollisionAPI.Apply(mesh.GetPrim())
-UsdPhysics.MeshCollisionAPI.Apply(mesh.GetPrim()).CreateApproximationAttr('none')
-# Regolith-like friction so the tank drive has traction in lunar gravity.
-ground = UsdShade.Material.Define(stage, '/World/Looks/regolith_physics')
-ground_phys = UsdPhysics.MaterialAPI.Apply(ground.GetPrim())
-ground_phys.CreateStaticFrictionAttr(0.8)
-ground_phys.CreateDynamicFrictionAttr(0.7)
-ground_phys.CreateRestitutionAttr(0.0)
-UsdShade.MaterialBindingAPI.Apply(mesh.GetPrim()).Bind(ground, UsdShade.Tokens.weakerThanDescendants, 'physics')
+scene.CreateGravityMagnitudeAttr(9.81 if args.world == 'arena' else 1.62)
 
 
-def regolith_material(path, texture, tint=1.0):
-    mat = UsdShade.Material.Define(stage, path)
-    pbr = UsdShade.Shader.Define(stage, path + '/pbr')
-    pbr.CreateIdAttr('UsdPreviewSurface')
-    pbr.CreateInput('roughness', Sdf.ValueTypeNames.Float).Set(0.95)
-    reader = UsdShade.Shader.Define(stage, path + '/st')
-    reader.CreateIdAttr('UsdPrimvarReader_float2')
-    reader.CreateInput('varname', Sdf.ValueTypeNames.Token).Set('st')
-    tex = UsdShade.Shader.Define(stage, path + '/tex')
-    tex.CreateIdAttr('UsdUVTexture')
-    tex.CreateInput('file', Sdf.ValueTypeNames.Asset).Set(texture)
-    tex.CreateInput('wrapS', Sdf.ValueTypeNames.Token).Set('repeat')
-    tex.CreateInput('wrapT', Sdf.ValueTypeNames.Token).Set('repeat')
-    tex.CreateInput('scale', Sdf.ValueTypeNames.Float4).Set(Gf.Vec4f(tint, tint, tint, 1))
-    tex.CreateInput('st', Sdf.ValueTypeNames.Float2).ConnectToSource(reader.ConnectableAPI(), 'result')
-    pbr.CreateInput('diffuseColor', Sdf.ValueTypeNames.Color3f).ConnectToSource(tex.ConnectableAPI(), 'rgb')
-    mat.CreateSurfaceOutput().ConnectToSource(pbr.ConnectableAPI(), 'surface')
-    return mat
-
-
-UsdShade.MaterialBindingAPI.Apply(mesh.GetPrim()).Bind(regolith_material('/World/Looks/regolith', tex_path))
-rock_mat = regolith_material('/World/Looks/rock', tex_path, tint=0.7)
-
-
-def height_at(x, y):
-    ix = int(np.clip(round((x + SIZE / 2) / RES), 0, n - 1))
-    iy = int(np.clip(round((y + SIZE / 2) / RES), 0, n - 1))
-    return float(H[ix, iy])
-
-
-rng = np.random.default_rng(args.seed)
-for k, (x, y, r) in enumerate(lunar_terrain.rocks(SIZE, args.seed)):
-    rock = UsdGeom.Sphere.Define(stage, f'/World/rocks/rock_{k}')
-    rock.CreateRadiusAttr(1.0)
-    xf = UsdGeom.Xformable(rock)
-    xf.AddTranslateOp().Set(Gf.Vec3d(x, y, height_at(x, y) + 0.2 * r))
-    xf.AddRotateXYZOp().Set(Gf.Vec3f(*rng.uniform(0, 360, 3)))
-    xf.AddScaleOp().Set(Gf.Vec3f(r * rng.uniform(0.8, 1.3), r * rng.uniform(0.8, 1.3), r * rng.uniform(0.5, 0.8)))
-    UsdPhysics.CollisionAPI.Apply(rock.GetPrim())
-    UsdShade.MaterialBindingAPI.Apply(rock.GetPrim()).Bind(rock_mat)
-
-# Sun: low (35 deg) so craters and rocks cast shadows; faint fill (no atmosphere).
-sun = UsdLux.DistantLight.Define(stage, '/World/sun')
-sun.CreateIntensityAttr(700.0)
-sun.CreateAngleAttr(0.53)
-UsdGeom.Xformable(sun).AddRotateXYZOp().Set(Gf.Vec3f(55.0, 0.0, 30.0))
-fill = UsdLux.DomeLight.Define(stage, '/World/fill')
-fill.CreateIntensityAttr(60.0)
-fill.CreateColorAttr(Gf.Vec3f(0.8, 0.85, 1.0))
-
-# ---------------------------------------------------------------- rover + D455
 def place(path, translate, rotate_xyz=(0.0, 0.0, 0.0)):
     """Replace a prim's transform (referenced assets often carry their own xform ops)."""
     xf = UsdGeom.Xformable(stage.GetPrimAtPath(path))
@@ -178,9 +104,88 @@ def place(path, translate, rotate_xyz=(0.0, 0.0, 0.0)):
     xf.AddRotateXYZOp(UsdGeom.XformOp.PrecisionDouble).Set(Gf.Vec3d(*rotate_xyz))
 
 
+if args.world == 'arena':
+    import arena_scene  # noqa: E402
+    terrain, H0, _ = arena_scene.build(stage, args.seed)
+    xs, ys, H = terrain.xs, terrain.ys, terrain.H
+    start_x, start_y, start_yaw = A.start_pose(args.seed, args.start_heading)
+    WORLD_FRAME = 'arena'
+else:
+    terrain = None
+    start_x, start_y, start_yaw = 0.0, 0.0, 0.0
+    WORLD_FRAME = 'world'
+print(f'[sim] world={args.world} start=({start_x:.2f}, {start_y:.2f}) heading={np.degrees(start_yaw):.0f} deg',
+      flush=True)
+
+# ---------------------------------------------------------------- lunar terrain
+if args.world == 'lunar':
+    X, Y, H_lunar = lunar_terrain.heightmap(SIZE, RES, args.seed)
+    tex_path = os.path.join(CACHE, f'regolith_v2_{args.seed}.png')
+    if not os.path.exists(tex_path):
+        from PIL import Image
+        Image.fromarray(lunar_terrain.albedo(4096, args.seed)).save(tex_path)
+
+    # Regolith-like friction so the tank drive has traction in lunar gravity.
+    ground = UsdShade.Material.Define(stage, '/World/Looks/regolith_physics')
+    ground_phys = UsdPhysics.MaterialAPI.Apply(ground.GetPrim())
+    ground_phys.CreateStaticFrictionAttr(0.8)
+    ground_phys.CreateDynamicFrictionAttr(0.7)
+    ground_phys.CreateRestitutionAttr(0.0)
+
+
+    def regolith_material(path, texture, tint=1.0):
+        mat = UsdShade.Material.Define(stage, path)
+        pbr = UsdShade.Shader.Define(stage, path + '/pbr')
+        pbr.CreateIdAttr('UsdPreviewSurface')
+        pbr.CreateInput('roughness', Sdf.ValueTypeNames.Float).Set(0.95)
+        reader = UsdShade.Shader.Define(stage, path + '/st')
+        reader.CreateIdAttr('UsdPrimvarReader_float2')
+        reader.CreateInput('varname', Sdf.ValueTypeNames.Token).Set('st')
+        tex = UsdShade.Shader.Define(stage, path + '/tex')
+        tex.CreateIdAttr('UsdUVTexture')
+        tex.CreateInput('file', Sdf.ValueTypeNames.Asset).Set(texture)
+        tex.CreateInput('wrapS', Sdf.ValueTypeNames.Token).Set('repeat')
+        tex.CreateInput('wrapT', Sdf.ValueTypeNames.Token).Set('repeat')
+        tex.CreateInput('scale', Sdf.ValueTypeNames.Float4).Set(Gf.Vec4f(tint, tint, tint, 1))
+        tex.CreateInput('st', Sdf.ValueTypeNames.Float2).ConnectToSource(reader.ConnectableAPI(), 'result')
+        pbr.CreateInput('diffuseColor', Sdf.ValueTypeNames.Color3f).ConnectToSource(tex.ConnectableAPI(), 'rgb')
+        mat.CreateSurfaceOutput().ConnectToSource(pbr.ConnectableAPI(), 'surface')
+        return mat
+
+
+    terrain = TerrainTiles(stage, '/World/terrain', X[:, 0], Y[0, :], H_lunar, tile=40, uv_size=SIZE / 4,
+                           material=regolith_material('/World/Looks/regolith', tex_path), physics_material=ground)
+    xs, ys, H = terrain.xs, terrain.ys, terrain.H
+    H0 = H.copy()
+    rock_mat = regolith_material('/World/Looks/rock', tex_path, tint=0.7)
+
+
+    height_at = terrain.height_at
+    rng = np.random.default_rng(args.seed)
+    for k, (x, y, r) in enumerate(lunar_terrain.rocks(SIZE, args.seed)):
+        rock = UsdGeom.Sphere.Define(stage, f'/World/rocks/rock_{k}')
+        rock.CreateRadiusAttr(1.0)
+        xf = UsdGeom.Xformable(rock)
+        xf.AddTranslateOp().Set(Gf.Vec3d(x, y, height_at(x, y) + 0.2 * r))
+        xf.AddRotateXYZOp().Set(Gf.Vec3f(*rng.uniform(0, 360, 3)))
+        xf.AddScaleOp().Set(Gf.Vec3f(r * rng.uniform(0.8, 1.3), r * rng.uniform(0.8, 1.3), r * rng.uniform(0.5, 0.8)))
+        UsdPhysics.CollisionAPI.Apply(rock.GetPrim())
+        UsdShade.MaterialBindingAPI.Apply(rock.GetPrim()).Bind(rock_mat)
+
+    # Sun: low (35 deg) so craters and rocks cast shadows; faint fill (no atmosphere).
+    sun = UsdLux.DistantLight.Define(stage, '/World/sun')
+    sun.CreateIntensityAttr(700.0)
+    sun.CreateAngleAttr(0.53)
+    UsdGeom.Xformable(sun).AddRotateXYZOp().Set(Gf.Vec3f(55.0, 0.0, 30.0))
+    fill = UsdLux.DomeLight.Define(stage, '/World/fill')
+    fill.CreateIntensityAttr(60.0)
+    fill.CreateColorAttr(Gf.Vec3f(0.8, 0.85, 1.0))
+
+# ---------------------------------------------------------------- rover + D455
 ROVER = '/World/rover'
 add_reference_to_stage(assets + ROVER_USD, ROVER)
-place(ROVER, (0, 0, height_at(0, 0) + 0.08))  # base origin sits ~6.5 cm above the wheel bottoms
+place(ROVER, (start_x, start_y, terrain.height_at(start_x, start_y) + 0.08),  # base ~6.5 cm above wheel bottoms
+      (0.0, 0.0, float(np.degrees(start_yaw))))
 app.update()
 
 
@@ -193,6 +198,12 @@ def find_prim(root, name_contains):
 
 
 BASE = find_prim(ROVER, 'base_link')
+sensor_prims = [p.GetPath() for p in stage.Traverse() if str(p.GetPath()).startswith(ROVER)
+                and any(k in p.GetName().lower() for k in ('lidar', 'laser', 'sick', 'lms1'))]
+for path in sensor_prims:
+    prim = stage.GetPrimAtPath(path)
+    if prim and prim.IsActive():
+        prim.SetActive(False)
 CAM = BASE + '/d455'
 add_reference_to_stage(assets + D455_USD, CAM)
 place(CAM, CAM_MOUNT, (0.0, CAM_PITCH_DEG, 0.0))  # +pitch about Y tilts +X (forward) down
@@ -348,7 +359,18 @@ for child, (R, pos) in frames.items():
     static_tfs.append((child, rel_t, quat_xyzw(rel_R)))
     print(f'[sim] tf camera_link -> {child}: t={np.round(rel_t, 4)}', flush=True)
 
+# Lock every camera against viewport navigation: looking through the robot's D455 in the
+# GUI and orbiting would otherwise move the sensor itself (and corrupt SLAM's input).
+for prim in stage.Traverse():
+    if prim.IsA(UsdGeom.Camera) and prim.GetName() != 'overview':   # overview stays free to orbit
+        prim.CreateAttribute('omni:kit:cameraLock', Sdf.ValueTypeNames.Bool).Set(True)
+
 # ---------------------------------------------------------------- run
+if not args.headless:
+    from omni.kit.viewport.utility import get_active_viewport  # noqa: E402
+    view = args.view or ('/World/arena/cameras/overview' if args.world == 'arena' else '')
+    if view:
+        get_active_viewport().camera_path = view
 world.reset()
 for key, value in RENDER_SETTINGS:  # re-apply: render products / reset can restore defaults
     carb.settings.get_settings().set(key, value)
@@ -369,7 +391,9 @@ import rclpy  # noqa: E402  (Isaac's bundled Humble rclpy, loaded by the ROS 2 b
 from builtin_interfaces.msg import Time  # noqa: E402
 from geometry_msgs.msg import TransformStamped  # noqa: E402
 from rclpy.qos import DurabilityPolicy, QoSProfile  # noqa: E402
+from geometry_msgs.msg import PoseStamped  # noqa: E402
 from sensor_msgs.msg import CameraInfo, Image  # noqa: E402
+from std_msgs.msg import Float32MultiArray  # noqa: E402
 from tf2_msgs.msg import TFMessage  # noqa: E402
 
 rclpy.init()
@@ -389,6 +413,68 @@ pubs = {n: (ros.create_publisher(Image, f'/camera/{n}/image_rect_raw', 5),
 frame_ids = {'infra1': 'camera_infra1_optical_frame', 'infra2': 'camera_infra2_optical_frame',
              'depth': 'camera_depth_optical_frame'}
 baseline = float(np.linalg.norm(world_frame(RIGHT)[1] - world_frame(LEFT)[1]))
+
+# Ground truth + terrain editing (test harness only; SLAM never subscribes to these).
+latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
+gt_cam_pub = ros.create_publisher(PoseStamped, '/ground_truth/camera_pose', 10)
+gt_base_pub = ros.create_publisher(PoseStamped, '/ground_truth/base_pose', 10)
+height_pub = ros.create_publisher(Image, '/arena/heightmap', latched)
+volume_pub = ros.create_publisher(Float32MultiArray, '/arena/volume', latched)
+dig_queue = []
+ros.create_subscription(Float32MultiArray, '/arena/dig', lambda m: dig_queue.append(list(m.data)[:4]), 50)
+# camera_link pose in base_link (fixed): lets the camera's GT pose follow the physics base pose.
+base_m = np.array(UsdGeom.Xformable(stage.GetPrimAtPath(BASE)).ComputeLocalToWorldTransform(0)).T
+cam_m = np.eye(4)
+cam_m[:3, :3], cam_m[:3, 3] = R_link, p_link
+T_base_cam = np.linalg.inv(base_m) @ cam_m
+
+
+def quat_wxyz_to_R(q):
+    w, x, y, z = q
+    return np.array([[1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+                     [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+                     [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)]])
+
+
+def pose_msg(T, stamp):
+    msg = PoseStamped()
+    msg.header.stamp, msg.header.frame_id = stamp, WORLD_FRAME
+    msg.pose.position.x, msg.pose.position.y, msg.pose.position.z = map(float, T[:3, 3])
+    qx, qy, qz, qw = quat_xyzw(T[:3, :3])
+    msg.pose.orientation.x, msg.pose.orientation.y, msg.pose.orientation.z, msg.pose.orientation.w = \
+        float(qx), float(qy), float(qz), float(qw)
+    return msg
+
+
+def publish_gt_camera(stamp):
+    pos, q = rover.get_world_pose()
+    T = np.eye(4)
+    T[:3, :3], T[:3, 3] = quat_wxyz_to_R(np.asarray(q, float)), np.asarray(pos, float)
+    gt_base_pub.publish(pose_msg(T, stamp))
+    gt_cam_pub.publish(pose_msg(T @ T_base_cam, stamp))
+
+
+def publish_terrain(stamp):
+    img = Image()
+    img.header.stamp, img.header.frame_id = stamp, WORLD_FRAME
+    img.height, img.width = H.shape                     # rows = x index, cols = y index
+    img.encoding, img.step = '32FC1', H.shape[1] * 4
+    img.data = array.array('B', np.ascontiguousarray(H, np.float32).tobytes())
+    height_pub.publish(img)
+    vol = Float32MultiArray()
+    vol.data = [float(v) for v in A.volumes(H, H0)] if args.world == 'arena' else \
+        [float(np.clip(H0 - H, 0, None).sum() * RES * RES), float(np.clip(H - H0, 0, None).sum() * RES * RES), 0.0]
+    volume_pub.publish(vol)
+
+
+def apply_digs(requests):
+    """Edit the terrain: [x, y, radius, depth] (+depth digs, -depth dumps); re-mesh touched tiles."""
+    lo, hi = [10 ** 9, 10 ** 9], [-1, -1]
+    for x, y, r, d in requests:
+        (i0, i1, j0, j1), moved = A.dig(H, xs, ys, x, y, max(r, 0.03), d)
+        lo, hi = [min(lo[0], i0), min(lo[1], j0)], [max(hi[0], i1), max(hi[1], j1)]
+    tiles = terrain.update(lo[0], hi[0], lo[1], hi[1])
+    print(f'[sim] terrain edit x{len(requests)} (last {requests[-1]}) -> {tiles} tiles re-meshed', flush=True)
 
 
 def camera_info(name, prim, res):
@@ -438,12 +524,19 @@ def publish_cameras(t):
 
 SUBSTEPS = int(round((1.0 / 30.0) / (1.0 / 200.0)))  # physics steps per camera frame (~29 Hz)
 dug = False
+yaw_i = 0.0
+terrain_dirty, last_terrain_pub = True, -1e9
 prof, n_prof = np.zeros(3), 0
 print('[sim] running', flush=True)
 while app.is_running():
-    # Skid-steer (tank) drive: same speed for every wheel on a side.
+    # Skid-steer (tank) drive: same speed for every wheel on a side. Skid turns slip by an
+    # amount that depends on gravity and ground, so a PI loop on the measured yaw rate
+    # (like a motor controller with a gyro) makes the rover turn at the commanded rate.
     v, w = float(twist_lin.get()[0]), float(twist_ang.get()[2])
-    wl, wr = (v - w * SKID_TRACK / 2) / WHEEL_RADIUS, (v + w * SKID_TRACK / 2) / WHEEL_RADIUS
+    w_meas = float(np.asarray(rover.get_angular_velocity())[2])
+    yaw_i = float(np.clip(yaw_i + (w - w_meas) * SUBSTEPS * 0.005, -1.5, 1.5)) if abs(w) > 1e-3 else 0.0
+    w_cmd = w + 0.4 * (w - w_meas) + 1.0 * yaw_i if abs(w) > 1e-3 else 0.0
+    wl, wr = (v - w_cmd * SKID_TRACK / 2) / WHEEL_RADIUS, (v + w_cmd * SKID_TRACK / 2) / WHEEL_RADIUS
     rover.apply_action(ArticulationAction(joint_velocities=np.array([wl] * len(left_idx) + [wr] * len(right_idx)),
                                           joint_indices=np.array(left_idx + right_idx)))
     t0 = time.perf_counter()
@@ -455,6 +548,22 @@ while app.is_running():
         world.render()  # same pose, no physics: lets temporal history settle
     t2 = time.perf_counter()
     publish_cameras(world.current_time)
+    now = world.current_time
+    stamp = Time(sec=int(now), nanosec=int((now % 1) * 1e9))
+    publish_gt_camera(stamp)
+    for _ in range(20):                       # non-blocking: handle queued /arena/dig requests
+        rclpy.spin_once(ros, timeout_sec=0.0)
+    if not dug and 0 <= args.dig_at <= now:
+        dig_queue.append([*args.dig_xy, args.dig_radius, args.dig_depth])
+        print(f'[sim] dug {args.dig_depth} m hole at {args.dig_xy} (t={now:.1f}s)', flush=True)
+        dug = True
+    if dig_queue:
+        apply_digs(dig_queue)
+        dig_queue.clear()
+        terrain_dirty = True
+    if (terrain_dirty and now - last_terrain_pub > 0.3) or now - last_terrain_pub > 5.0:
+        publish_terrain(stamp)
+        terrain_dirty, last_terrain_pub = False, now
     t3 = time.perf_counter()
     if args.debug_poses and n_prof % 30 == 0:
         from isaacsim.core.prims import XFormPrim
@@ -469,15 +578,6 @@ while app.is_running():
         if n_prof % 60 == 0:
             ms = prof / n_prof * 1000
             print(f'[sim] per frame: physics-only steps {ms[0]:.1f} ms, render step {ms[1]:.1f} ms, publish {ms[2]:.1f} ms', flush=True)
-    if not dug and 0 <= args.dig_at <= world.current_time:
-        cx, cy = args.dig_xy
-        r = np.hypot(X - cx, Y - cy)
-        bowl = args.dig_depth * np.clip(1 - (r / args.dig_radius) ** 2, 0, None)
-        H -= bowl.astype(np.float32)
-        mesh.GetPointsAttr().Set(Vt.Vec3fArray.FromNumpy(
-            np.stack([X.ravel(), Y.ravel(), H.ravel()], 1).astype(np.float32)))
-        print(f'[sim] dug {args.dig_depth} m hole at {args.dig_xy} (t={world.current_time:.1f}s)', flush=True)
-        dug = True
 ros.destroy_node()
 rclpy.try_shutdown()
 app.close()
