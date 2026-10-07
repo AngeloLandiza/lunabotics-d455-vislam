@@ -142,6 +142,7 @@ def generate_launch_description():
     viewer = ExecuteProcess(
         condition=IfCondition(viz),
         cmd=['python3', os.path.join(repo, 'scripts', 'vislam_viewer.py')],
+        additional_env={'GDK_BACKEND': 'x11'},  # same XWayland path as RViz
         output='screen',
     )
 

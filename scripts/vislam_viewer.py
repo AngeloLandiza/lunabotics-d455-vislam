@@ -203,7 +203,9 @@ def main():
             node.tick()
             if node.show_window:
                 key = cv2.waitKey(1) & 0xFF
-                if key == ord('q') or cv2.getWindowProperty(WINDOW, cv2.WND_PROP_VISIBLE) < 1:
+                # No window-closed check: on OpenCV 4.5 GTK, WND_PROP_VISIBLE is always
+                # -1 (which used to close the window on the first frame).
+                if key in (ord('q'), 27):
                     node.show_window = False
                     cv2.destroyAllWindows()
     except KeyboardInterrupt:

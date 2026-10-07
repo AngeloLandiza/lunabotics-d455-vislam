@@ -39,7 +39,7 @@ The udev rules are required for the IMU. Without them, the camera's HID/IIO sens
   - **Amber ring:** matched but rejected as an outlier.
   - **Grey dot:** detected but unmatched.
 
-  The top bar shows tracking state, inlier and feature counts, odometry rate, latency and distance travelled. The frame turns red when tracking is lost. Press `q` to close it.
+  The top bar shows tracking state, inlier and feature counts, odometry rate, latency and distance travelled. The frame turns red when tracking is lost. Press `q` or Esc to close it.
 
 The annotated camera image is also published on `/vislam/feature_image`, so you can view it remotely (e.g. in RViz on a laptop while the robot runs `viz:=false`).
 
