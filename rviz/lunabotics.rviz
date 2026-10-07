@@ -1,144 +1,235 @@
+Panels:
+  []
 Visualization Manager:
   Class: ""
   Displays:
-    - Class: rviz_default_plugins/Grid
-      Name: Grid
-      Enabled: true
-      Reference Frame: map
-      Plane: XY
-      Plane Cell Count: 40
+    - Alpha: 0.6000000238418579
       Cell Size: 0.5
-      Line Style:
-        Line Width: 0.03
-        Value: Lines
+      Class: rviz_default_plugins/Grid
       Color: 58; 62; 72
-      Alpha: 0.6
+      Enabled: true
+      Line Style:
+        Line Width: 0.029999999329447746
+        Value: Lines
+      Name: Grid
       Normal Cell Count: 0
       Offset:
         X: 0
         Y: 0
         Z: 0
-    - Class: rviz_default_plugins/PointCloud2
-      Name: SLAM cloud
+      Plane: XY
+      Plane Cell Count: 40
+      Reference Frame: map
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: AxisColor
+      Decay Time: 0
       Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: SLAM cloud
+      Position Transformer: XYZ
+      Selectable: false
+      Size (Pixels): 3
+      Size (m): 0.04500000178813934
+      Style: Squares
       Topic:
-        Value: /cloud_map
         Depth: 1
         Durability Policy: Transient Local
+        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-      Style: Squares
-      Size (m): 0.045
-      Size (Pixels): 3
-      Alpha: 1
-      Decay Time: 0
-      Position Transformer: XYZ
-      Color Transformer: AxisColor
-      Axis: Z
+        Value: /cloud_map
       Use Fixed Frame: true
       Use rainbow: true
-      Invert Rainbow: false
-      Autocompute Value Bounds: true
-      Queue Size: 2
-      Selectable: false
-    - Class: rviz_default_plugins/PointCloud2
-      Name: Terrain height
-      Enabled: true
-      Topic:
-        Value: /terrain/cloud
-        Depth: 1
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-      Style: Squares
-      Size (m): 0.05
-      Alpha: 1
-      Decay Time: 0
-      Position Transformer: XYZ
-      Color Transformer: Intensity
-      Channel Name: elevation
-      Use rainbow: true
-      Invert Rainbow: false
+      Value: false
+    - Alpha: 1
       Autocompute Intensity Bounds: true
-      Queue Size: 2
-      Selectable: false
-    - Class: rviz_default_plugins/PointCloud2
-      Name: Dig (blue) / dump (red)
-      Enabled: false
-      Topic:
-        Value: /terrain/cloud
-        Depth: 1
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-      Style: Squares
-      Size (m): 0.05
-      Alpha: 1
-      Decay Time: 0
-      Position Transformer: XYZ
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: elevation
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
       Color Transformer: Intensity
-      Channel Name: change
-      Use rainbow: true
-      Invert Rainbow: true
-      Autocompute Intensity Bounds: false
-      Min Intensity: -0.3
-      Max Intensity: 0.3
-      Queue Size: 2
-      Selectable: false
-    - Class: rviz_default_plugins/PointCloud2
-      Name: Live scan
-      Enabled: false
-      Topic:
-        Value: /lidar/points
-        Depth: 1
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-      Style: Points
-      Size (Pixels): 2
-      Alpha: 0.9
       Decay Time: 0
-      Position Transformer: XYZ
-      Color Transformer: FlatColor
-      Color: 235; 240; 255
-      Queue Size: 2
-      Selectable: false
-    - Class: rviz_default_plugins/Path
-      Name: Trajectory
       Enabled: true
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: -0.04310626536607742
+      Min Color: 0; 0; 0
+      Min Intensity: -0.6707735061645508
+      Name: Terrain height
+      Position Transformer: XYZ
+      Selectable: false
+      Size (Pixels): 3
+      Size (m): 0.05000000074505806
+      Style: Squares
       Topic:
-        Value: /vislam/trajectory
+        Depth: 1
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /terrain/cloud
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: true
+    - Alpha: 1
+      Autocompute Intensity Bounds: false
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: change
+      Class: rviz_default_plugins/PointCloud2
+      Color: 255; 255; 255
+      Color Transformer: Intensity
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: true
+      Max Color: 255; 255; 255
+      Max Intensity: 0.30000001192092896
+      Min Color: 0; 0; 0
+      Min Intensity: -0.30000001192092896
+      Name: Dig (blue) / dump (red)
+      Position Transformer: XYZ
+      Selectable: false
+      Size (Pixels): 3
+      Size (m): 0.05000000074505806
+      Style: Squares
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /terrain/cloud
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
+    - Alpha: 0.8999999761581421
+      Autocompute Intensity Bounds: true
+      Autocompute Value Bounds:
+        Max Value: 10
+        Min Value: -10
+        Value: true
+      Axis: Z
+      Channel Name: intensity
+      Class: rviz_default_plugins/PointCloud2
+      Color: 235; 240; 255
+      Color Transformer: FlatColor
+      Decay Time: 0
+      Enabled: false
+      Invert Rainbow: false
+      Max Color: 255; 255; 255
+      Max Intensity: 4096
+      Min Color: 0; 0; 0
+      Min Intensity: 0
+      Name: Live scan
+      Position Transformer: XYZ
+      Selectable: false
+      Size (Pixels): 2
+      Size (m): 0.009999999776482582
+      Style: Points
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /lidar/points
+      Use Fixed Frame: true
+      Use rainbow: true
+      Value: false
+    - Alpha: 0.5
+      Class: rviz_default_plugins/Map
+      Color Scheme: costmap
+      Draw Behind: false
+      Enabled: false
+      Name: Obstacle grid
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /terrain/obstacle_grid
+      Use Timestamp: false
+      Value: false
+    - Class: rviz_default_plugins/MarkerArray
+      Enabled: true
+      Name: Boulders + craters
+      Namespaces: {}
+      Topic:
         Depth: 1
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-      Line Style: Billboards
-      Line Width: 0.03
-      Color: 255; 70; 160
-      Alpha: 1
+        Value: /terrain/obstacles
+      Value: true
+    - Alpha: 1
       Buffer Length: 1
-      Pose Style: None
+      Class: rviz_default_plugins/Path
+      Color: 255; 70; 160
+      Enabled: true
+      Head Diameter: 0.30000001192092896
+      Head Length: 0.20000000298023224
+      Length: 0.30000001192092896
+      Line Style: Billboards
+      Line Width: 0.029999999329447746
+      Name: Trajectory
       Offset:
         X: 0
         Y: 0
         Z: 0
-    - Class: rviz_default_plugins/Marker
-      Name: Camera
-      Enabled: true
+      Pose Color: 255; 85; 255
+      Pose Style: None
+      Radius: 0.029999999329447746
+      Shaft Diameter: 0.10000000149011612
+      Shaft Length: 0.10000000149011612
       Topic:
-        Value: /vislam/camera_marker
         Depth: 1
         Durability Policy: Volatile
+        Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
+        Value: /vislam/trajectory
+      Value: true
+    - Class: rviz_default_plugins/Marker
+      Enabled: true
+      Name: Camera
       Namespaces:
         camera: true
+      Topic:
+        Depth: 1
+        Durability Policy: Volatile
+        Filter size: 10
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+        Value: /vislam/camera_marker
+      Value: true
     - Class: rviz_default_plugins/Axes
-      Name: Camera axes
       Enabled: true
+      Length: 0.15000000596046448
+      Name: Camera axes
+      Radius: 0.012000000104308128
       Reference Frame: camera_link
-      Length: 0.15
-      Radius: 0.012
       Value: true
   Enabled: true
   Global Options:
@@ -157,24 +248,31 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Name: Current View
-      Target Frame: <Fixed Frame>
-      Distance: 7
+      Distance: 4.848474502563477
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
       Focal Point:
-        X: 1.5
-        Y: 0
-        Z: 0
+        X: 1.601361632347107
+        Y: 1.7163327932357788
+        Z: 0.051610540598630905
       Focal Shape Fixed Size: false
-      Focal Shape Size: 0.05
-      Near Clip Distance: 0.01
-      Pitch: 0.75
-      Yaw: 3.6
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.29499882459640503
+      Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
+      Yaw: 3.176283121109009
     Saved: ~
 Window Geometry:
+  Height: 1016
   Hide Left Dock: true
   Hide Right Dock: true
-  Height: 760
-  Width: 1100
-  X: 60
-  Y: 60
+  QMainWindow State: 000000ff00000000fd000000000000039d0000039e00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  Width: 925
+  X: 995
+  Y: 27

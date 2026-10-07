@@ -1,6 +1,19 @@
 # lunabotics-d455-vislam
 
-Stereo visual-inertial SLAM on an Intel RealSense D455. It runs entirely on stock ROS 2 Humble packages, so nothing has to be compiled:
+Stereo visual-inertial SLAM on an Intel RealSense D455, plus a Lunabotics terrain map with boulder and crater detection. It runs entirely on stock ROS 2 Humble packages, so nothing has to be compiled.
+
+```bash
+./run.sh                      # the physical D455: the full Lunabotics pipeline, same as the sim and arena runs
+./run.sh localization:=true   # competition runs: localize in the surveyed map
+./run.sh viz:=false           # headless, e.g. on the robot
+```
+
+`./run.sh` runs [Lunabotics terrain mode](#lunabotics-terrain-mode-semi-dynamic-map-for-digging):
+- [fusion](#fusion-mode-most-accurate) tracking, i.e. visual-inertial odometry refined by ICP on dense depth;
+- the terrain height map;
+- [boulder / crater segmentation](#boulder-and-crater-segmentation).
+
+The basic stereo VISLAM pipeline below is still available as `./run_vislam.sh`:
 
 | Stage | Package | What it does |
 |---|---|---|
@@ -19,17 +32,17 @@ sudo ./setup.sh   # installs any missing apt packages + RealSense udev rules
 
 The udev rules are required for the IMU. Without them, the camera's HID/IIO sensor nodes stay root-only. The driver then fails with `Failed to open scan_element` / `Hid device is busy` and keeps resetting the USB device.
 
-## Run
+## Basic stereo VISLAM (`./run_vislam.sh`)
 
 ```bash
-./run.sh                                     # new map with both windows (saved to ~/.ros/d455_vislam.db)
-./run.sh viz:=false                          # headless, e.g. on the robot
-./run.sh new_map:=false                      # extend the saved map instead of starting over
-./run.sh localization:=true                  # localize in the saved map, no new mapping
-./run.sh database_path:=$HOME/arena.db       # use a specific map file
-./run.sh dynamic_map:=true                   # map forgets surfaces that are gone (e.g. dug terrain)
-./run.sh config:=config/my_room.yaml         # use a different settings file
-./run.sh rtabmap_viz:=true                   # also open the stock RTAB-Map GUI
+./run_vislam.sh                              # new map with both windows (saved to ~/.ros/d455_vislam.db)
+./run_vislam.sh viz:=false                   # headless, e.g. on the robot
+./run_vislam.sh new_map:=false               # extend the saved map instead of starting over
+./run_vislam.sh localization:=true           # localize in the saved map, no new mapping
+./run_vislam.sh database_path:=$HOME/arena.db # use a specific map file
+./run_vislam.sh dynamic_map:=true            # map forgets surfaces that are gone (e.g. dug terrain)
+./run_vislam.sh config:=config/my_room.yaml  # use a different settings file
+./run_vislam.sh rtabmap_viz:=true            # also open the stock RTAB-Map GUI
 ```
 
 ### Settings
@@ -71,7 +84,7 @@ This mode treats the D455 like a 3D LiDAR. Its depth stream is converted into a 
 
 To swap in a real LiDAR later, publish its cloud on `/lidar/points` and drop the camera and `point_cloud_xyz` nodes. Settings live in [config/d455_lidar.yaml](config/d455_lidar.yaml).
 
-ICP needs geometry to lock onto. A flat floor plus one wall, or a scene with nothing within 6 m, can make it slide. The visual mode (`./run.sh`) is the more robust tracker; this mode gives the denser, LiDAR-style map.
+ICP needs geometry to lock onto. A flat floor plus one wall, or a scene with nothing within 6 m, can make it slide. The visual mode (`./run_vislam.sh`) is the more robust tracker; this mode gives the denser, LiDAR-style map.
 
 ## Fusion mode (most accurate)
 
@@ -84,7 +97,7 @@ ICP needs geometry to lock onto. A flat floor plus one wall, or a scene with not
 This mode combines the strengths of the other two using one D455:
 
 1. The IR projector switches on every other frame (`depth_module.emitter_on_off`). [scripts/emitter_splitter.py](scripts/emitter_splitter.py) reads each frame's `frame_emitter_mode` metadata and splits the stream by projector state:
-   - Projector-off IR pairs go to `/split/infra*`. They feed stereo visual-inertial odometry, the robust tracker from `./run.sh`, at 15 Hz.
+   - Projector-off IR pairs go to `/split/infra*`. They feed stereo visual-inertial odometry, the robust tracker from `./run_vislam.sh`, at 15 Hz.
    - Projector-on depth goes to `/split/depth`. It becomes a dense point cloud on `/lidar/points`.
 2. RTAB-Map uses the visual odometry as the motion guess. ICP on the dense clouds then refines every new keyframe link (`RGBD/NeighborLinkRefining`), and adds local loop closures by matching nearby scans (`RGBD/ProximityBySpace`). Visual loop closures are refined with ICP too (`Reg/Strategy 2`). The map is built from the dense clouds.
 3. Where a scan is too flat to constrain every direction (a wall plus floor), ICP corrects only the constrained axes and keeps the visual estimate for the rest (`Icp/PointToPlaneLowComplexityStrategy`). That's RTAB-Map's answer to ICP degeneracy, and it covers the weakness of the LiDAR mode.
@@ -99,9 +112,11 @@ Settings are in [config/d455_fusion.yaml](config/d455_fusion.yaml). The next acc
 ## Lunabotics terrain mode (semi-dynamic map for digging)
 
 ```bash
-./run_lunabotics.sh                      # survey: map the arena + record the terrain baseline
-./run_lunabotics.sh localization:=true   # runs: localize in that map, load the terrain, report dug volume
+./run.sh                      # survey: map the arena + record the terrain baseline
+./run.sh localization:=true   # runs: localize in that map, load the terrain, report dug volume
 ```
+
+`./run_lunabotics.sh` is the same command under its old name.
 
 This mode runs fusion localization (above) plus [scripts/terrain_mapper.py](scripts/terrain_mapper.py). The mapper keeps a 2.5D height map (5 cm cells) that **re-maps areas that change**, such as a hole being dug or a berm being built. Each cell is updated with these existing techniques:
 - **Height fusion:** Kalman fusion of height measurements, with noise that grows with range² (Fankhauser et al. 2018, ETH `elevation_mapping`).
@@ -116,6 +131,39 @@ Outputs:
 - `/terrain/elevation`: a 32FC1 grid image.
 - `/terrain/volume`: `[cut, fill]` in m³.
 - Services `/terrain/reset_baseline` and `/terrain/clear`.
+
+### Boulder and crater segmentation
+
+[scripts/obstacle_segmenter.py](scripts/obstacle_segmenter.py) runs on the terrain map twice a second. It shows the driver where the obstacles are and gives a planner an occupancy grid.
+
+How it works:
+1. **Local ground:** a 1 m window around each cell, taken as a low percentile and then a median with bumps and pits removed. Slopes, ducts and crater rims don't shift it.
+2. **Threshold:** cells more than 8 cm above the local ground are bumps; cells more than 6 cm below it are pits.
+3. **Blobs:** a morphological open removes single-cell noise, then connected blobs are sized and labelled:
+
+| Label | RViz colour | Rule |
+|---|---|---|
+| boulder | orange | bump 12–90 cm across |
+| crater | blue | pit 15–110 cm across |
+| dug pit | cyan | pit the robot dug (terrain change < −4 cm since the baseline) |
+| pile | yellow | bump the robot dumped (change > +4 cm), e.g. the berm |
+| structure | grey | long, large or taller than 60 cm: ducts, the column box |
+
+Outputs:
+- `/terrain/obstacles`: MarkerArray, a cylinder per obstacle plus a label such as "boulder 34 cm". It is shown in RViz as *Boulders + craters*.
+- `/terrain/obstacle_grid`: OccupancyGrid. Boulders, craters and structures are 100, other known cells 0, unseen cells −1. It is shown in RViz as *Obstacle grid* (off by default).
+
+Offline test on 5 simulated arena rounds:
+- found 30 of 31 boulders and 15 of 16 craters;
+- 1 false positive, at the edge of unseen ground;
+- median centre error 1.3 cm;
+- about 110 ms per update.
+
+An obstacle has to be seen before it can be segmented. The camera looks about 0.5–3.5 m ahead.
+
+Settings are in the `obstacle_segmenter` section of [config/lunabotics_terrain.yaml](config/lunabotics_terrain.yaml).
+
+### Terrain settings
 
 Settings are in [config/lunabotics_terrain.yaml](config/lunabotics_terrain.yaml). The two-step workflow is the arena version of anchoring to a prior map, which is how the [DEM-anchored lunar SLAM paper](https://arxiv.org/abs/2603.17229) limits drift.
 

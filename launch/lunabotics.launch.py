@@ -4,6 +4,9 @@
 #                            gravity-constrained pose graph on dense depth (projector-on)
 #   terrain_mapper.py     -> 2.5D height map in the map frame that re-maps dug/dumped
 #                            areas and reports dug (cut) and dumped (fill) volume
+#   obstacle_segmenter.py -> boulders / craters / dug pits / piles on that map, as RViz
+#                            markers (/terrain/obstacles) and an occupancy grid
+#                            (/terrain/obstacle_grid) for driving and path planning
 #
 # Competition workflow (prior-map anchoring, the arena analogue of DEM anchoring):
 #   1. ./run_lunabotics.sh                      survey: map the arena + terrain baseline
@@ -38,6 +41,13 @@ def generate_launch_description():
         output='screen',
     )
 
+    obstacles = ExecuteProcess(
+        cmd=['python3', os.path.join(REPO, 'scripts', 'obstacle_segmenter.py'), '--ros-args',
+             '--params-file', LaunchConfiguration('terrain_config'),
+             '-p', ['use_sim_time:=', LaunchConfiguration('sim')]],
+        output='screen',
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument('viz', default_value='true'),
         DeclareLaunchArgument('localization', default_value='false',
@@ -59,4 +69,5 @@ def generate_launch_description():
                               description='Use Isaac Sim (./run_sim.sh) instead of the real D455.'),
         slam,
         terrain,
+        obstacles,
     ])
