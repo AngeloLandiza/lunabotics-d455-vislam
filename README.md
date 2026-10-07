@@ -11,7 +11,7 @@ Stereo visual-inertial SLAM on an Intel RealSense D455, plus a Lunabotics terrai
 `./run.sh` runs [Lunabotics terrain mode](#lunabotics-terrain-mode-semi-dynamic-map-for-digging):
 - [fusion](#fusion-mode-most-accurate) tracking, i.e. visual-inertial odometry refined by ICP on dense depth;
 - the terrain height map;
-- [boulder / crater segmentation](#boulder-and-crater-segmentation).
+- [obstacle segmentation](#obstacle-segmentation-boulders-craters-walls-pillar): boulders, craters, walls and the pillar.
 
 The basic stereo VISLAM pipeline below is still available as `./run_vislam.sh`:
 
@@ -132,11 +132,11 @@ Outputs:
 - `/terrain/volume`: `[cut, fill]` in m³.
 - Services `/terrain/reset_baseline` and `/terrain/clear`.
 
-### Boulder and crater segmentation
+### Obstacle segmentation (boulders, craters, walls, pillar)
 
-[scripts/obstacle_segmenter.py](scripts/obstacle_segmenter.py) runs on the terrain map twice a second. It shows the driver where the obstacles are and gives a planner an occupancy grid.
+[scripts/obstacle_segmenter.py](scripts/obstacle_segmenter.py) runs twice a second. It shows the driver where the obstacles are and gives a planner an occupancy grid. It uses only OpenCV and SciPy (connected components, contours, `minAreaRect`, image filters), which the pipeline already needs.
 
-How it works:
+**Boulders and craters,** from the terrain map:
 1. **Local ground:** a 1 m window around each cell, taken as a low percentile and then a median with bumps and pits removed. Slopes, ducts and crater rims don't shift it.
 2. **Threshold:** cells more than 8 cm above the local ground seed a bump; cells more than 6 cm below it seed a pit. A morphological open removes single-cell noise.
 3. **Outline:** each seed grows out through connected cells to a shallow edge threshold (3 cm for bumps, 1.5 cm for pits; at most 15 cm), and unseen cells inside are filled. Without this, a bowl-shaped crater was sized by its deep middle only, about 60% of its real width.
@@ -148,17 +148,40 @@ How it works:
 | crater | blue | pit 15–110 cm across |
 | dug pit | cyan | pit the robot dug (terrain change < −4 cm since the baseline) |
 | pile | yellow | bump the robot dumped (change > +4 cm), e.g. the berm |
-| structure | grey | long, large or taller than 60 cm: ducts, the column box |
+| structure | (not drawn) | long, large or taller than 60 cm; kept out of the boulders, drawn as wall / pillar below |
+
+**Walls and the pillar,** from RTAB-Map's 3D map (`/cloud_map`). The terrain map holds one height per cell, so it averages vertical faces into a blur; the 3D map keeps them.
+1. **Ground:** the lowest map point per cell, through the same local-ground filter. Taking it from the same cloud means drift between the two maps doesn't matter.
+2. **Tall cells:** cells with at least 2 map points more than 12 cm above that ground.
+3. **Blobs:** connected tall blobs are sized with `cv2.minAreaRect` and labelled:
+
+| Label | RViz colour | Rule |
+|---|---|---|
+| wall | light grey | longer than 1 m: bin walls with their ducts |
+| pillar | magenta | compact (20–90 cm) and higher than 35 cm; pieces less than one pillar apart are merged |
+
+Terrain bumps that touch a wall or the pillar (duct pieces, the column's foot) are dropped from the boulders.
+
+The D455 is pitched down, so it sees things more than 35 cm high only within about 1.3 m. Until the rover passes the column that close, the column shows as a large bump, not a pillar.
 
 Outputs:
-- `/terrain/obstacles`: MarkerArray, a cylinder per obstacle plus a label such as "boulder 34 cm". It is shown in RViz as *Boulders + craters*.
-- `/terrain/obstacle_grid`: OccupancyGrid. Boulders, craters and structures are 100, other known cells 0, unseen cells −1. It is shown in RViz as *Obstacle grid* (off by default).
+- `/terrain/obstacles`: MarkerArray. Each obstacle is drawn as its segmented cells:
+  - boulders and craters as tiles draped on the terrain;
+  - walls and the pillar as columns up to their seen height.
+
+  Each also gets an outline and a label such as "crater 41 cm". It is shown in RViz as *Obstacles*.
+- `/terrain/obstacle_grid`: OccupancyGrid. Boulders, craters, walls and the pillar are 100, other known cells 0, unseen cells −1. It is shown in RViz as *Obstacle grid* (off by default).
 
 Offline test on 5 simulated arena rounds, with 1 cm map noise:
 - found 30 of 31 boulders and 15 of 16 craters, with no false positives;
 - sizes: craters 88% of true diameter (74–94%), boulders 95% (87–98%);
 - median centre error 1.0 cm;
-- about 110 ms per update.
+- about 110 ms per update; walls and the pillar about 0.3 s per new 3D map, at 400k points.
+
+Walls and the pillar, synthetic 3D points on the same 5 rounds:
+- wall ring found every time;
+- pillar found every time once seen more than 35 cm up, centre within 14 cm;
+- no boulder labelled a pillar.
 
 An obstacle has to be seen before it can be segmented. The camera looks about 0.5–3.5 m ahead.
 
