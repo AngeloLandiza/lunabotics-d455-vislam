@@ -170,7 +170,7 @@ Settings are in [config/lunabotics_terrain.yaml](config/lunabotics_terrain.yaml)
 ## Lunabotics arena simulation + dig tool
 
 ```bash
-./run_arena.sh                    # arena + SLAM + dig tool; drive with the keyboard in this terminal
+./run_arena.sh                    # arena + SLAM + dig tool; drive with W A S D in the dig tool window
 ./run_arena.sh --survey           # the rover drives survey loops on its own
 ./run_arena.sh --seed 4           # another round: new boulders, craters and start pose
 ./run_arena.sh --start-heading N  # start facing N/E/S/W (default: random, like the direction wheel)
@@ -220,8 +220,16 @@ Wall, duct and glass heights cross-check against Purdue Lunabotics' arena model 
   - `change`: SLAM's own dug (blue) and dumped (red) map;
   - `error`: SLAM minus truth.
 
-Controls:
-- Left-drag digs, right-drag dumps. The wheel sets the brush size, `-` and `=` the depth per stroke.
+Controls (the dig tool window needs keyboard focus):
+- **Driving, tank drive:** hold the keys; the rover stops when you let go or the window loses focus.
+  - `W` / `S`: both tracks forward / back.
+  - `A` / `D`: tracks in opposite directions, so the rover pivots in place.
+  - `W+A` / `W+D`: one track stopped, so the rover arcs.
+  - `1` `2` `3`: speed, 0.15 / 0.3 / 0.5 m/s (default 2).
+- **Digging:** left-drag digs, right-drag dumps. The wheel or `[` `]` sets the brush size, `-` and `=` the depth per stroke.
+- **Other keys:** `E` cycles the SLAM view, `R` re-aligns the SLAM map to the arena, `Q` quits and ends the run.
+
+SLAM re-maps a dug hole or dumped pile once the D455 sees it: the cyan footprint in the left panel shows what the camera sees. The *change* view shows SLAM's own dug/dumped map, and RViz labels the new pits and piles.
 
 The status bar shows true vs. SLAM dug and dumped volume, map error and camera drift. The SLAM map is placed using ground truth once (one instant of the camera's true pose). After that the panel shows only SLAM's own estimate, so drift and missed terrain changes appear as error.
 

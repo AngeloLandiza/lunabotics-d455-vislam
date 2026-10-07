@@ -2,7 +2,7 @@
 # The Lunabotics Artemis Arena in Isaac Sim (2027 guidebook) with the full SLAM + terrain
 # pipeline and the dig tool: edit the regolith with the mouse and watch SLAM re-map it.
 #
-#   ./run_arena.sh                   arena + SLAM + dig tool; drive with the keyboard (this terminal)
+#   ./run_arena.sh                   arena + SLAM + dig tool; drive with W A S D in the dig tool window
 #   ./run_arena.sh --survey          the rover drives survey loops on its own instead
 #   ./run_arena.sh --eval --headless check SLAM against ground truth: survey lap, dig + dump,
 #                                    second lap, then pose / map / volume errors (sim/arena_eval.py)
@@ -10,8 +10,9 @@
 #   ./run_arena.sh --start-heading N start facing N/E/S/W (default: random, like the direction wheel)
 #   ./run_arena.sh --headless        no Isaac window
 #
-# Dig tool: left-drag digs, right-drag dumps, wheel = brush size, E cycles the SLAM view
-# (elevation / change / error vs. truth).
+# Dig tool window: hold W A S D to drive (tank drive: W/S forward/back, A/D pivot, W+A/W+D
+# arc; 1 2 3 speed), left-drag digs, right-drag dumps, wheel = brush size, E cycles the SLAM
+# view (elevation / change / error vs. truth), R re-aligns, Q quits.
 set -eo pipefail
 REPO="$(dirname "$(readlink -f "$0")")"
 sim_args=(--world arena); mode=teleop; seed=0
@@ -47,12 +48,12 @@ if [ "$mode" = eval ]; then
   python3 "$REPO/sim/arena_eval.py" --ros-args -p use_sim_time:=true -p seed:="$seed"
   exit
 fi
-GDK_BACKEND=x11 python3 "$REPO/sim/dig_tool.py" --ros-args -p use_sim_time:=true -p seed:="$seed" &
-pids+=($!)
-
+dig_tool=(python3 "$REPO/sim/dig_tool.py" --ros-args -p use_sim_time:=true -p seed:="$seed")
 if [ "$mode" = teleop ]; then
-  ros2 run teleop_twist_keyboard teleop_twist_keyboard
+  "${dig_tool[@]}" -p drive:=true                  # closing the window ends the run
 else
+  "${dig_tool[@]}" &
+  pids+=($!)
   python3 "$REPO/sim/arena_driver.py" --ros-args -p use_sim_time:=true -p seed:="$seed" &
   pids+=($!)
   wait "${pids[0]}"
