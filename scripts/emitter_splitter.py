@@ -16,6 +16,7 @@ import collections
 import struct
 
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from realsense2_camera_msgs.msg import Metadata
@@ -98,7 +99,7 @@ def main():
     node = EmitterSplitter()
     try:
         rclpy.spin(node)
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):  # Ctrl-C / ros2 launch stop
         pass
     finally:
         node.destroy_node()

@@ -96,6 +96,69 @@ Measured on this D455:
 
 Settings are in [config/d455_fusion.yaml](config/d455_fusion.yaml). The next accuracy step is a wheel odometry + IMU guess, from `robot_localization` on the robot.
 
+## Lunabotics terrain mode (semi-dynamic map for digging)
+
+```bash
+./run_lunabotics.sh                      # survey: map the arena + record the terrain baseline
+./run_lunabotics.sh localization:=true   # runs: localize in that map, load the terrain, report dug volume
+```
+
+This mode runs fusion localization (above) plus [scripts/terrain_mapper.py](scripts/terrain_mapper.py). The mapper keeps a 2.5D height map (5 cm cells) that **re-maps areas that change**, such as a hole being dug or a berm being built. Each cell is updated with these existing techniques:
+- **Height fusion:** Kalman fusion of height measurements, with noise that grows with range² (Fankhauser et al. 2018, ETH `elevation_mapping`).
+- **Change detection:** a measurement more than 3σ from the stored height, on two consecutive scans, resets the cell to the new height instead of averaging.
+- **Visibility cleanup:** cells the camera now sees *through*, like the old surface over a fresh hole, are cleared (`elevation_mapping_cupy`).
+- **Height-drift compensation:** each scan's vertical offset against the map is removed first, so SLAM height drift isn't mistaken for digging (`elevation_mapping_cupy`).
+
+Height minus a baseline gives dug (cut) and dumped (fill) volume; berm volume is what Lunabotics scores.
+
+Outputs:
+- `/terrain/cloud`: one point per cell, with elevation, change and variance fields.
+- `/terrain/elevation`: a 32FC1 grid image.
+- `/terrain/volume`: `[cut, fill]` in m³.
+- Services `/terrain/reset_baseline` and `/terrain/clear`.
+
+Settings are in [config/lunabotics_terrain.yaml](config/lunabotics_terrain.yaml). The two-step workflow is the arena version of anchoring to a prior map, which is how the [DEM-anchored lunar SLAM paper](https://arxiv.org/abs/2603.17229) limits drift.
+
+## Simulation (Isaac Sim 6)
+
+```bash
+./run_sim.sh                  # Isaac window + RViz + camera window, autonomous survey loop
+./run_sim.sh --headless       # no Isaac window (saves GPU)
+./run_sim.sh --dig-at 62      # dig a 0.25 m hole beside the loop just after lap 1 (sim time 62 s)
+./run_sim.sh --teleop         # drive with the keyboard instead
+./run_sim.sh --seed 3         # different terrain
+```
+
+[sim/isaac_lunar_sim.py](sim/isaac_lunar_sim.py) builds the scene from stock Isaac Sim assets and existing techniques:
+- **Terrain:** procedural lunar terrain ([sim/lunar_terrain.py](sim/lunar_terrain.py), the OmniLRS approach). It combines fractal regolith, craters with raised rims, power-law rocks, a regolith texture and a low sun. The 4 m around the start is kept driveable.
+- **Rover:** a Clearpath Jackal with skid-steer (tank) drive.
+- **Camera:** Isaac's RealSense D455 model on a front mast, pitched 40° down so the rover never enters the view.
+- **Physics:** lunar gravity (1.62 m/s²) and regolith friction.
+
+It publishes the same topics as the real camera driver:
+- `/camera/infra1|infra2` mono IR, with the 95 mm stereo baseline in `camera_info`.
+- `/camera/depth` and `/camera/imu` (200 Hz, gravity included).
+- Static camera TFs, plus `/clock` and `/ground_truth/odom`.
+
+The same Lunabotics pipeline then runs with `sim:=true`. [sim/survey_driver.py](sim/survey_driver.py) drives a 2.5 m square twice, steering by ground truth; SLAM never sees it.
+
+**One-time install** (about 40 GB download, about 25 GB on disk; needs a 595-branch NVIDIA driver):
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+uv venv ~/isaacsim-env --python 3.12
+VIRTUAL_ENV=~/isaacsim-env uv pip install "isaacsim[all,extscache]==6.0.1" \
+    --extra-index-url https://pypi.nvidia.com --index-strategy unsafe-best-match
+```
+
+`run_sim.sh` accepts NVIDIA's Omniverse EULA (`OMNI_KIT_ACCEPT_EULA=YES`), so read it before your first run.
+
+Notes:
+- **Why 6.0.1:** Isaac Sim 5.1 crashes on startup with the 590/595 drivers, while 6.0.1 is validated on them.
+- **Speed:** on an 8 GB RTX 4060 laptop, the sim runs at about 0.4× real time. Everything uses sim time, so SLAM is unaffected.
+- **Texture:** the regolith texture has 1–4 cm clods and fine grain, the scale the camera actually resolves. With smooth noise alone, tracking dropped to about 40 inliers and was lost hundreds of times while moving. With clods it holds 120–160 inliers and loses nothing. Real lunar regolith is the hard case here, as the DEM-anchoring paper points out.
+- **Rendering:** set up like a camera, not a game engine. DLSS, motion blur and temporally denoised lighting are off, and each frame gets 2 render subframes, because RTX's frame-to-frame accumulation smears moving images and breaks visual odometry.
+
 ## Tuning notes
 
 - **Exposure:** IR auto-exposure picks 15–20 ms indoors with the projector off. That motion-blurs features and loses tracking. The firmware ignores `auto_exposure_limit`, so the config fixes exposure at 5 ms and raises gain to 64 to keep the same brightness. In a dim room, raise `depth_module.gain` (about 160). To go back to auto-exposure, set `depth_module.enable_auto_exposure: true`.

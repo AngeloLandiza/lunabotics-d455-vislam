@@ -20,7 +20,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess
 from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
-from launch_ros.actions import Node
+from launch_ros.actions import Node, SetParameter
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -31,22 +31,28 @@ def generate_launch_description():
     config = LaunchConfiguration('config')
     rtabmap_args = LaunchConfiguration('rtabmap_args')
     database = {'database_path': LaunchConfiguration('database_path')}
+    sim = LaunchConfiguration('sim')
+    # Real camera: images come through the projector splitter. Isaac Sim: straight from
+    # /camera (rendered IR has no projector dots).
+    src = PythonExpression(["'/camera' if '", sim, "'.lower() == 'true' else '/split'"])
 
     stereo = [
         ('imu', '/imu/data'),
-        ('left/image_rect', '/split/infra1/image_rect_raw'),
-        ('left/camera_info', '/split/infra1/camera_info'),
-        ('right/image_rect', '/split/infra2/image_rect_raw'),
-        ('right/camera_info', '/split/infra2/camera_info'),
+        ('left/image_rect', [src, '/infra1/image_rect_raw']),
+        ('left/camera_info', [src, '/infra1/camera_info']),
+        ('right/image_rect', [src, '/infra2/image_rect_raw']),
+        ('right/camera_info', [src, '/infra2/camera_info']),
     ]
 
     camera = Node(
         package='realsense2_camera', executable='realsense2_camera_node',
         namespace='', name='camera', output='screen', emulate_tty=True,
+        condition=UnlessCondition(sim),
         parameters=[config],
     )
 
     splitter = ExecuteProcess(
+        condition=UnlessCondition(sim),
         cmd=['python3', os.path.join(REPO, 'scripts', 'emitter_splitter.py')],
         output='screen',
     )
@@ -68,8 +74,8 @@ def generate_launch_description():
         package='rtabmap_util', executable='point_cloud_xyz', output='screen',
         parameters=[config],
         remappings=[
-            ('depth/image', '/split/depth/image_rect_raw'),
-            ('depth/camera_info', '/split/depth/camera_info'),
+            ('depth/image', [src, '/depth/image_rect_raw']),
+            ('depth/camera_info', [src, '/depth/camera_info']),
             ('cloud', '/lidar/points'),
         ],
     )
@@ -108,13 +114,14 @@ def generate_launch_description():
     rviz = Node(
         package='rviz2', executable='rviz2', name='fusion_map', output='log',
         condition=IfCondition(viz),
-        arguments=['-d', os.path.join(REPO, 'rviz', 'lidar_map.rviz')],
+        arguments=['-d', LaunchConfiguration('rviz_config')],
     )
 
     viewer = ExecuteProcess(
         condition=IfCondition(viz),
         cmd=['python3', os.path.join(REPO, 'scripts', 'vislam_viewer.py'),
-             '--ros-args', '-r', '/camera/infra1/image_rect_raw:=/split/infra1/image_rect_raw'],
+             '--ros-args', '-r', ['/camera/infra1/image_rect_raw:=', src, '/infra1/image_rect_raw'],
+             '-p', ['use_sim_time:=', sim]],
         additional_env={'GDK_BACKEND': 'x11'},
         output='screen',
     )
@@ -125,6 +132,9 @@ def generate_launch_description():
                               description='Parameter file with all settings.'),
         DeclareLaunchArgument('viz', default_value='true',
                               description='Open the map (RViz) and camera/landmarks windows.'),
+        DeclareLaunchArgument('rviz_config',
+                              default_value=os.path.join(REPO, 'rviz', 'lidar_map.rviz'),
+                              description='RViz config for the map window.'),
         DeclareLaunchArgument('new_map', default_value='true',
                               description='Wipe database_path and start a fresh map (false = extend).'),
         DeclareLaunchArgument('localization', default_value='false',
@@ -134,6 +144,9 @@ def generate_launch_description():
                               description='RTAB-Map database (map) file.'),
         DeclareLaunchArgument('rtabmap_args', default_value='',
                               description='Extra args for odometry and rtabmap.'),
+        DeclareLaunchArgument('sim', default_value='false',
+                              description='Isaac Sim: no camera driver/splitter, simulated clock.'),
+        SetParameter(name='use_sim_time', value=sim),
 
         camera,
         splitter,

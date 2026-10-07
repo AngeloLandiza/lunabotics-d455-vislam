@@ -18,6 +18,7 @@ import time
 import cv2
 import numpy as np
 import rclpy
+from rclpy.executors import ExternalShutdownException
 from geometry_msgs.msg import Point, PoseStamped
 from nav_msgs.msg import Odometry, Path
 from rclpy.node import Node
@@ -208,7 +209,7 @@ def main():
                 if key in (ord('q'), 27):
                     node.show_window = False
                     cv2.destroyAllWindows()
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):  # Ctrl-C / ros2 launch stop
         pass
     finally:
         node.destroy_node()
