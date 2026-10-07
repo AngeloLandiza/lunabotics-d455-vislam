@@ -22,7 +22,7 @@ Visualization Manager:
       Name: Map
       Enabled: true
       Topic:
-        Value: /cloud_map
+        Value: /vislam/map_cloud
         Depth: 1
         Durability Policy: Transient Local
         History Policy: Keep Last

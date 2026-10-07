@@ -1,0 +1,11 @@
+# Loaded on top of the main config when dynamic_map:=true.
+#
+# Ray-trace each keyframe's depth into the OctoMap so voxels the camera now sees
+# through (e.g. ground that was dug out) are cleared. A stronger miss probability
+# makes a voxel disappear after ~3 see-throughs instead of ~9; raise toward 0.3 if
+# noisy stereo depth punches holes in real surfaces.
+
+rtabmap:
+  ros__parameters:
+    Grid/RayTracing: "true"
+    GridGlobal/ProbMiss: "0.2"

@@ -27,9 +27,16 @@ The udev rules are required for the IMU. Without them, the camera's HID/IIO sens
 ./run.sh new_map:=false                      # extend the saved map instead of starting over
 ./run.sh localization:=true                  # localize in the saved map, no new mapping
 ./run.sh database_path:=$HOME/arena.db       # use a specific map file
-./run.sh ir_gain:=120                        # brighter IR image in a dim room
+./run.sh dynamic_map:=true                   # map forgets surfaces that are gone (e.g. dug terrain)
+./run.sh config:=config/my_room.yaml         # use a different settings file
 ./run.sh rtabmap_viz:=true                   # also open the stock RTAB-Map GUI
 ```
+
+### Settings
+
+All camera, IMU, odometry and SLAM settings live in [config/d455_vislam.yaml](config/d455_vislam.yaml), one section per node, each setting commented. Edit it and rerun; nothing needs rebuilding. For a variant, such as a dim room with `depth_module.gain: 160`, copy the file and pass it with `config:=`. The launch flags above only pick modes.
+
+`dynamic_map:=true` loads [config/dynamic_map.yaml](config/dynamic_map.yaml) on top of the main settings. That file turns on ray tracing in RTAB-Map's 3D voxel map (OctoMap), so voxels the camera can now see through, such as dug-out ground, are removed. RViz then shows `/octomap_occupied_space` instead of `/cloud_map`.
 
 ### Windows
 
@@ -54,7 +61,7 @@ To view a saved map offline: `rtabmap-databaseViewer ~/.ros/d455_vislam.db`
 
 ## Tuning notes
 
-- **Exposure:** IR auto-exposure picks 15–20 ms indoors with the projector off. That motion-blurs features and loses tracking. The firmware ignores `auto_exposure_limit`, so the launch file fixes exposure at 5 ms and raises gain to 64 to keep the same brightness. Raise `ir_gain` in a dim room. Set `auto_exposure:=true` to go back to auto.
+- **Exposure:** IR auto-exposure picks 15–20 ms indoors with the projector off. That motion-blurs features and loses tracking. The firmware ignores `auto_exposure_limit`, so the config fixes exposure at 5 ms and raises gain to 64 to keep the same brightness. In a dim room, raise `depth_module.gain` (about 160). To go back to auto-exposure, set `depth_module.enable_auto_exposure: true`.
 - **IR projector:** it's off on purpose. Its dot pattern moves with the camera, which corrupts feature tracking.
 - **Timing:** IR and IMU timestamps both use librealsense `global_time`, meaning hardware time corrected to the host clock. Measured on this unit:
   - The stereo pair has identical timestamps on every frame.
@@ -64,5 +71,6 @@ To view a saved map offline: `rtabmap-databaseViewer ~/.ros/d455_vislam.db`
 
   The startup warning `frame's time domain is HARDWARE_CLOCK` comes from the very first frames only, before the host-clock fit has enough samples.
 - **Map database:** each mapping run starts a fresh map and overwrites `database_path`, so copy the `.db` somewhere to keep it. Appending sessions (`new_map:=false`) works, but it has crashed RTAB-Map once on startup (`Memory::addLink` assertion).
+- **Odometry resets:** odometry re-initializes after 5 consecutive failed frames (`Odom/ResetCountdown`). Don't set it to 1. Each reset starts a new RTAB-Map session, and the displayed map jumps until a loop closure joins the sessions back together.
 - **Startup:** keep the camera still for a second at startup. Odometry waits for the IMU to initialize gravity alignment.
-- **Robot mounting:** publish a static TF `base_link -> camera_link` and run with `frame_id:=base_link`.
+- **Robot mounting:** publish a static TF `base_link -> camera_link` and set `frame_id: base_link` in the config's `stereo_odometry`, `rtabmap` and `rtabmap_viz` sections.
