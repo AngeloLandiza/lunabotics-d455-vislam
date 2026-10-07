@@ -5,11 +5,12 @@
 #   imu_filter_madgwick   -> fuses gyro+accel into an orientation quaternion (/imu/data)
 #   rtabmap_odom          -> stereo odometry, IMU used for motion prior + gravity alignment
 #   rtabmap_slam          -> graph SLAM with loop closure + IMU gravity constraints
-#   rtabmap_viz           -> optional GUI
+#   rviz2 + vislam_viewer -> map/trajectory window + camera/landmarks window
 #
 # Usage:
 #   ros2 launch launch/d455_vislam.launch.py
 #   ros2 launch launch/d455_vislam.launch.py viz:=false                 # headless (robot)
+#   ros2 launch launch/d455_vislam.launch.py rtabmap_viz:=true          # stock RTAB-Map GUI too
 #   ros2 launch launch/d455_vislam.launch.py localization:=true         # reuse saved map
 #   ros2 launch launch/d455_vislam.launch.py database_path:=~/arena.db  # custom map file
 #   ros2 launch launch/d455_vislam.launch.py rtabmap_args:=--delete_db_on_start
@@ -18,7 +19,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -38,6 +39,25 @@ def generate_launch_description():
         'approx_sync': False,       # IR pair is hardware-synced
         'wait_imu_to_init': True,   # start odometry gravity-aligned
         'database_path': database_path,
+    }
+
+    # RTAB-Map core parameters (strings, as RTAB-Map expects).
+    odom_parameters = {
+        # Re-initialize after 1 failed frame instead of staying lost forever;
+        # rtabmap starts a new session and re-links it on the next loop closure.
+        'Odom/ResetCountdown': '1',
+        # Fewer features: ~39 ms/frame instead of ~52 ms, still ~150 inliers.
+        'Vis/MaxFeatures': '500',
+        'OdomF2M/MaxSize': '1500',
+    }
+    slam_parameters = {
+        # Cleaner dense map from the stereo pair: SGBM disparity, short range
+        # (stereo depth error grows with distance^2), 3 cm voxels, outlier removal.
+        'Stereo/DenseStrategy': '1',
+        'Grid/RangeMax': '4.0',
+        'Grid/CellSize': '0.03',
+        'Grid/NoiseFilteringRadius': '0.1',
+        'Grid/NoiseFilteringMinNeighbors': '8',
     }
 
     remappings = [
@@ -65,6 +85,12 @@ def generate_launch_description():
             'gyro_fps': '200',
             'accel_fps': '200',
             'unite_imu_method': LaunchConfiguration('unite_imu_method'),
+            # Short fixed exposure: auto-exposure picks 15-20 ms indoors with the
+            # emitter off, which motion-blurs features and loses tracking.
+            # (The firmware ignores depth_module.auto_exposure_limit on this unit.)
+            'depth_module.enable_auto_exposure': LaunchConfiguration('auto_exposure'),
+            'depth_module.exposure': LaunchConfiguration('ir_exposure'),
+            'depth_module.gain': LaunchConfiguration('ir_gain'),
         }.items(),
     )
 
@@ -76,7 +102,7 @@ def generate_launch_description():
 
     odometry = Node(
         package='rtabmap_odom', executable='stereo_odometry', output='screen',
-        parameters=[parameters],
+        parameters=[parameters, odom_parameters],
         arguments=[rtabmap_args],
         remappings=remappings,
     )
@@ -84,7 +110,7 @@ def generate_launch_description():
     slam_mapping = Node(
         package='rtabmap_slam', executable='rtabmap', output='screen',
         condition=UnlessCondition(localization),
-        parameters=[parameters],
+        parameters=[parameters, slam_parameters],
         arguments=[rtabmap_args],
         remappings=remappings,
     )
@@ -92,7 +118,7 @@ def generate_launch_description():
     slam_localization = Node(
         package='rtabmap_slam', executable='rtabmap', output='screen',
         condition=IfCondition(localization),
-        parameters=[parameters, {
+        parameters=[parameters, slam_parameters, {
             'Mem/IncrementalMemory': 'False',
             'Mem/InitWMWithAllNodes': 'True',
         }],
@@ -100,9 +126,23 @@ def generate_launch_description():
         remappings=remappings,
     )
 
-    visualizer = Node(
-        package='rtabmap_viz', executable='rtabmap_viz', output='screen',
+    repo = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    rviz = Node(
+        package='rviz2', executable='rviz2', name='vislam_map', output='log',
         condition=IfCondition(viz),
+        arguments=['-d', os.path.join(repo, 'rviz', 'vislam_map.rviz')],
+    )
+
+    viewer = ExecuteProcess(
+        condition=IfCondition(viz),
+        cmd=['python3', os.path.join(repo, 'scripts', 'vislam_viewer.py')],
+        output='screen',
+    )
+
+    rtabmap_gui = Node(
+        package='rtabmap_viz', executable='rtabmap_viz', output='screen',
+        condition=IfCondition(LaunchConfiguration('rtabmap_viz')),
         parameters=[parameters, {'odometry_node_name': 'stereo_odometry'}],
         remappings=remappings,
     )
@@ -111,7 +151,9 @@ def generate_launch_description():
         DeclareLaunchArgument('frame_id', default_value='camera_link',
                               description='Robot frame tracked by odometry (e.g. base_link).'),
         DeclareLaunchArgument('viz', default_value='true',
-                              description='Launch the rtabmap_viz GUI.'),
+                              description='Open the map (RViz) and camera/landmarks windows.'),
+        DeclareLaunchArgument('rtabmap_viz', default_value='false',
+                              description='Also open the stock rtabmap_viz GUI.'),
         DeclareLaunchArgument('localization', default_value='false',
                               description='Localize in an existing map instead of mapping.'),
         DeclareLaunchArgument('database_path',
@@ -119,6 +161,12 @@ def generate_launch_description():
                               description='RTAB-Map database (map) file.'),
         DeclareLaunchArgument('rtabmap_args', default_value='',
                               description='Extra args for odometry and rtabmap, e.g. --delete_db_on_start.'),
+        DeclareLaunchArgument('auto_exposure', default_value='false',
+                              description='IR auto-exposure (blurs under motion indoors).'),
+        DeclareLaunchArgument('ir_exposure', default_value='5000',
+                              description='IR exposure in microseconds when auto_exposure is false.'),
+        DeclareLaunchArgument('ir_gain', default_value='64',
+                              description='IR gain (16-248) when auto_exposure is false; raise in dim light.'),
         DeclareLaunchArgument('unite_imu_method', default_value='2',
                               description='0-None, 1-copy, 2-linear_interpolation.'),
 
@@ -130,5 +178,7 @@ def generate_launch_description():
         odometry,
         slam_mapping,
         slam_localization,
-        visualizer,
+        rviz,
+        viewer,
+        rtabmap_gui,
     ])
