@@ -13,7 +13,7 @@
 #   ros2 launch launch/d455_vislam.launch.py rtabmap_viz:=true          # stock RTAB-Map GUI too
 #   ros2 launch launch/d455_vislam.launch.py localization:=true         # reuse saved map
 #   ros2 launch launch/d455_vislam.launch.py database_path:=~/arena.db  # custom map file
-#   ros2 launch launch/d455_vislam.launch.py rtabmap_args:=--delete_db_on_start
+#   ros2 launch launch/d455_vislam.launch.py new_map:=false              # extend saved map
 
 import os
 
@@ -22,7 +22,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node, SetParameter
 
 
@@ -111,7 +111,12 @@ def generate_launch_description():
         package='rtabmap_slam', executable='rtabmap', output='screen',
         condition=UnlessCondition(localization),
         parameters=[parameters, slam_parameters],
-        arguments=[rtabmap_args],
+        # Fresh map per run by default: appending a new session to an existing
+        # database has crashed rtabmap (Memory::addLink weight assertion).
+        arguments=[PythonExpression(["'--delete_db_on_start' if '",
+                                     LaunchConfiguration('new_map'),
+                                     "'.lower() == 'true' else ''"]),
+                   rtabmap_args],
         remappings=remappings,
     )
 
@@ -154,6 +159,9 @@ def generate_launch_description():
                               description='Open the map (RViz) and camera/landmarks windows.'),
         DeclareLaunchArgument('rtabmap_viz', default_value='false',
                               description='Also open the stock rtabmap_viz GUI.'),
+        DeclareLaunchArgument('new_map', default_value='true',
+                              description='Mapping mode: wipe database_path and start a fresh map '
+                                          '(false = extend the existing map).'),
         DeclareLaunchArgument('localization', default_value='false',
                               description='Localize in an existing map instead of mapping.'),
         DeclareLaunchArgument('database_path',

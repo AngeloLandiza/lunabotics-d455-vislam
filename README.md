@@ -22,9 +22,9 @@ The udev rules are required for the IMU. Without them, the camera's HID/IIO sens
 ## Run
 
 ```bash
-./run.sh                                     # map with both windows (map saved to ~/.ros/d455_vislam.db)
+./run.sh                                     # new map with both windows (saved to ~/.ros/d455_vislam.db)
 ./run.sh viz:=false                          # headless, e.g. on the robot
-./run.sh rtabmap_args:=--delete_db_on_start  # start a fresh map
+./run.sh new_map:=false                      # extend the saved map instead of starting over
 ./run.sh localization:=true                  # localize in the saved map, no new mapping
 ./run.sh database_path:=$HOME/arena.db       # use a specific map file
 ./run.sh ir_gain:=120                        # brighter IR image in a dim room
@@ -63,5 +63,6 @@ To view a saved map offline: `rtabmap-databaseViewer ~/.ros/d455_vislam.db`
   - Both streams drift the same ~0.2 ms/min relative to the host, so they stay in sync with each other.
 
   The startup warning `frame's time domain is HARDWARE_CLOCK` comes from the very first frames only, before the host-clock fit has enough samples.
+- **Map database:** each mapping run starts a fresh map and overwrites `database_path`, so copy the `.db` somewhere to keep it. Appending sessions (`new_map:=false`) works, but it has crashed RTAB-Map once on startup (`Memory::addLink` assertion).
 - **Startup:** keep the camera still for a second at startup. Odometry waits for the IMU to initialize gravity alignment.
 - **Robot mounting:** publish a static TF `base_link -> camera_link` and run with `frame_id:=base_link`.
