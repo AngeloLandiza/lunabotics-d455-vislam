@@ -59,6 +59,20 @@ The annotated camera image is also published on `/vislam/feature_image`, so you 
 
 To view a saved map offline: `rtabmap-databaseViewer ~/.ros/d455_vislam.db`
 
+## Simulated 3D LiDAR mode
+
+```bash
+./run_lidar.sh                    # map with RViz (saved to ~/.ros/d455_lidar.db)
+./run_lidar.sh viz:=false         # headless
+./run_lidar.sh localization:=true # localize in the saved LiDAR map
+```
+
+This mode treats the D455 like a 3D LiDAR. Its depth stream is converted into a point cloud on `/lidar/points`: about 8,500 points per scan at 30 Hz, 5 cm spacing, 0.3–6 m range. Mapping then runs RTAB-Map's own 3D-LiDAR pipeline (`rtabmap_examples/lidar3d.launch.py`): ICP scan-to-map odometry with the IMU as the rotation prior, then scan-based SLAM. No visual features are used, so the IR projector is on for dense depth. RViz shows the voxel map coloured by height, the live scan in white, the trajectory and the camera frustum.
+
+To swap in a real LiDAR later, publish its cloud on `/lidar/points` and drop the camera and `point_cloud_xyz` nodes. Settings live in [config/d455_lidar.yaml](config/d455_lidar.yaml).
+
+ICP needs geometry to lock onto. A flat floor plus one wall, or a scene with nothing within 6 m, can make it slide. The visual mode (`./run.sh`) is the more robust tracker; this mode gives the denser, LiDAR-style map.
+
 ## Tuning notes
 
 - **Exposure:** IR auto-exposure picks 15–20 ms indoors with the projector off. That motion-blurs features and loses tracking. The firmware ignores `auto_exposure_limit`, so the config fixes exposure at 5 ms and raises gain to 64 to keep the same brightness. In a dim room, raise `depth_module.gain` (about 160). To go back to auto-exposure, set `depth_module.enable_auto_exposure: true`.

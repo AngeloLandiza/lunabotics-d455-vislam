@@ -61,9 +61,9 @@ rtabmap:                                  # rtabmap_slam (mapping and localizati
     approx_sync: false
 
     # Map update rate and how far the camera must move before adding a keyframe.
-    Rtabmap/DetectionRate: "1"            # Hz
-    RGBD/LinearUpdate: "0.1"              # m
-    RGBD/AngularUpdate: "0.1"             # rad
+    Rtabmap/DetectionRate: "3"            # Hz
+    RGBD/LinearUpdate: "0.05"              # m
+    RGBD/AngularUpdate: "0.05"             # rad
 
     # Cleaner dense map from the stereo pair: SGBM disparity, short range (stereo
     # depth error grows with distance^2), 3 cm voxels, outlier removal.
