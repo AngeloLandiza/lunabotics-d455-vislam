@@ -50,6 +50,7 @@ if [ "$mode" = eval ]; then
 fi
 dig_tool=(python3 "$REPO/sim/dig_tool.py" --ros-args -p use_sim_time:=true -p seed:="$seed")
 if [ "$mode" = teleop ]; then
+  echo "[run_arena] 'Arena Dig Tool' window: click it, hold W A S D to drive, mouse to dig, Q to quit"
   "${dig_tool[@]}" -p drive:=true                  # closing the window ends the run
 else
   "${dig_tool[@]}" &

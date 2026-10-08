@@ -328,6 +328,11 @@ class Window:
         r.bind('<KeyPress>', self.on_key)
         r.bind('<KeyRelease>', self.on_key_release)
         r.bind('<FocusOut>', lambda e: node.held.clear())        # never keep driving without focus
+        # Come up in front of the Isaac / RViz windows (GNOME would open it behind them) with
+        # keyboard focus, since WASD needs it.
+        r.attributes('-topmost', True)
+        r.after(2000, lambda: r.attributes('-topmost', False))
+        r.after(200, r.focus_force)
         for b, sign in ((1, 1), (3, -1)):
             lb.bind(f'<ButtonPress-{b}>', lambda e, s=sign: self.mouse('down', e, s))
             lb.bind(f'<B{b}-Motion>', lambda e: self.mouse('move', e))
@@ -394,7 +399,7 @@ def main():
     except (KeyboardInterrupt, ExternalShutdownException, tk.TclError):
         pass
     finally:
-        if node.drive:
+        if node.drive and rclpy.ok():               # (Ctrl+C has already shut ROS down)
             node.held.clear()
             node.publish_drive()                    # stop the rover
         try:
