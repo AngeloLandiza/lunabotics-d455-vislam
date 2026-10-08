@@ -49,6 +49,8 @@ obstacle_segmenter:
     boulder_edge: 0.03                    # m: a candidate's outline is grown out to here...
     crater_edge: 0.015                    # m: ...so a bowl-shaped crater is sized rim to rim
     max_grow: 0.15                        # m: max outline growth beyond the candidate
+    rim_search: 0.25                      # m: craters are widened to their rim crest, searched this far out
+    rim_default: 0.08                     # m: widening when the rim isn't seen
     changed: 0.04                         # m of change since the baseline: dug pit / dumped pile
     # Walls and the pillar, from RTAB-Map's 3D map (vertical faces the terrain map can't hold)
     map_cloud_topic: /cloud_map

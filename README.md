@@ -140,12 +140,13 @@ Outputs:
 1. **Local ground:** a 1 m window around each cell, taken as a low percentile and then a median with bumps and pits removed. Slopes, ducts and crater rims don't shift it.
 2. **Threshold:** cells more than 8 cm above the local ground seed a bump; cells more than 6 cm below it seed a pit. A morphological open removes single-cell noise.
 3. **Outline:** each seed grows out through connected cells to a shallow edge threshold (3 cm for bumps, 1.5 cm for pits; at most 15 cm), and unseen cells inside are filled. Without this, a bowl-shaped crater was sized by its deep middle only, about 60% of its real width.
-4. **Blobs:** connected blobs are sized and labelled:
+4. **Rim:** a crater is then widened out to the crest of its raised rim, so the outline covers everything a wheel should keep off. The crest is the ring around the crater (searched up to 25 cm out) with the highest median height; if it isn't seen, the crater is widened by 8 cm.
+5. **Blobs:** connected blobs are sized and labelled:
 
 | Label | RViz colour | Rule |
 |---|---|---|
 | boulder | orange | bump 12–90 cm across |
-| crater | blue | pit 15–110 cm across |
+| crater | blue | pit 15–110 cm across (size given out to the rim crest) |
 | dug pit | cyan | pit the robot dug (terrain change < −4 cm since the baseline) |
 | pile | yellow | bump the robot dumped (change > +4 cm), e.g. the berm |
 | structure | (not drawn) | long, large or taller than 60 cm; kept out of the boulders, drawn as wall / pillar below |
@@ -174,7 +175,8 @@ Outputs:
 
 Offline test on 5 simulated arena rounds, with 1 cm map noise:
 - found 30 of 31 boulders and 15 of 16 craters, with no false positives;
-- sizes: craters 88% of true diameter (74–94%), boulders 95% (87–98%);
+- sizes: boulders 95% of true diameter (87–98%);
+- craters: 100% of the true hole covered (median), 94% of the hole out to the rim crest; outlines are 1.15× the hole's diameter;
 - median centre error 1.0 cm;
 - about 110 ms per update; walls and the pillar about 0.3 s per new 3D map, at 400k points.
 

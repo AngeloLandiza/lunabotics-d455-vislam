@@ -6,7 +6,9 @@ and the bed's unevenness cancel) is thresholded into bumps (> boulder_height) an
 pits (< -crater_depth). Those only seed a detection: each one is grown out to its edge
 through connected cells past a shallow threshold (boulder_edge / crater_edge, hysteresis
 like Canny edges) and unseen cells inside are filled, so a bowl-shaped crater is sized
-rim to rim and not just by its deep middle. Connected blobs are sized and labelled:
+by its whole bowl and not just by its deep middle. A crater is then widened out to the
+crest of its raised rim (found from the median height in rings around it), so the
+outline covers everything a wheel should keep off. Connected blobs are sized and labelled:
 
   boulder    bump 12-90 cm across          crater     natural pit 15-110 cm across
   dug pit    pit the robot dug (terrain mapper's change < 0 since the baseline)
@@ -62,8 +64,8 @@ def local_ground(H, res, window=1.0, outlier=0.06):
 
 
 def segment(H, change, res, ground_window=1.0, boulder_height=0.08, crater_depth=0.06,
-            boulder_edge=0.03, crater_edge=0.015, max_grow=0.15, changed=0.04, boulder_size=(0.12, 0.9),
-            crater_size=(0.15, 1.1), boulder_max_height=0.6):
+            boulder_edge=0.03, crater_edge=0.015, max_grow=0.15, rim_search=0.25, rim_default=0.08,
+            changed=0.04, boulder_size=(0.12, 0.9), crater_size=(0.15, 1.1), boulder_max_height=0.6):
     """H, change: (nx, ny) grids (NaN = unknown). Returns (blob dicts, obstacle mask, ground).
 
     Blob: kind, i, j (centroid cell), diameter (m), height (m, + bump / - pit), cells.
@@ -109,12 +111,30 @@ def segment(H, change, res, ground_window=1.0, boulder_height=0.08, crater_depth
                     kind = 'crater'
                 else:
                     continue
-            # cv2 centroid is (col, row) = (j, i)
-            blobs.append({'kind': kind, 'i': float(cent[b][1]), 'j': float(cent[b][0]), 'diameter': diam,
-                          'height': peak, 'cells': cells})
+            ci, cj = float(cent[b][1]), float(cent[b][0])          # cv2 centroid is (col, row) = (j, i)
+            if sign < 0:
+                cells = to_rim(cells, rel, known, ci, cj, diam / 2, res, rim_search, rim_default)
+                diam = 2 * math.sqrt(cells.sum() * res * res / math.pi)
+            blobs.append({'kind': kind, 'i': ci, 'j': cj, 'diameter': diam, 'height': peak, 'cells': cells})
             if kind in ('boulder', 'crater', 'structure'):
                 mask |= cells
     return blobs, mask, ground
+
+
+def to_rim(cells, rel, known, ci, cj, radius, res, search=0.25, default=0.08):
+    """Widen a pit's cells out to the crest of its rim: the ring (2.5 cm wide, up to search
+    beyond the outline) with the highest median height. default if the rim isn't seen."""
+    ii, jj = np.indices(rel.shape)
+    r = np.hypot(ii - ci, jj - cj) * res
+    best, width = -np.inf, default
+    for w in np.arange(0.0, search, 0.025):
+        ring = (r >= radius + w) & (r < radius + w + 0.025) & known
+        if ring.sum() >= 4:
+            h = float(np.median(rel[ring]))
+            if h > best:
+                best, width = h, w + 0.0125
+    width = max(width, 0.03)
+    return cells | (ndimage.distance_transform_edt(~cells) * res <= width)
 
 
 def structures(points, x0, y0, shape, res, ground_window=1.0, wall_height=0.12, wall_length=1.0,
@@ -190,6 +210,7 @@ def main():
             self.kw = dict(ground_window=p('ground_window', 1.0), boulder_height=p('boulder_height', 0.08),
                            crater_depth=p('crater_depth', 0.06), boulder_edge=p('boulder_edge', 0.03),
                            crater_edge=p('crater_edge', 0.015), max_grow=p('max_grow', 0.15),
+                           rim_search=p('rim_search', 0.25), rim_default=p('rim_default', 0.08),
                            changed=p('changed', 0.04))
             self.skw = dict(ground_window=self.kw['ground_window'], wall_height=p('wall_height', 0.12),
                             wall_length=p('wall_length', 1.0), pillar_height=p('pillar_height', 0.35))
