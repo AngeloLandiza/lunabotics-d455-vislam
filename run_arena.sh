@@ -36,7 +36,7 @@ pids+=($!)
 
 source /opt/ros/humble/setup.bash
 echo "[run_arena] waiting for Isaac Sim (/clock)..."
-until timeout 3 ros2 topic echo --once /clock >/dev/null 2>&1; do
+until timeout 5 ros2 topic echo --once --no-daemon /clock rosgraph_msgs/msg/Clock >/dev/null 2>&1; do   # no daemon: a stuck one hung this
   kill -0 "${pids[0]}" 2>/dev/null || { echo "[run_arena] Isaac Sim exited"; exit 1; }
   sleep 2
 done
