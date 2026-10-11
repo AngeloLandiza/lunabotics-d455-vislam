@@ -1,0 +1,118 @@
+# BP-1 sensor sandbox (step 2, v0.2)
+
+A plain-Python, CPU-only stand-in for the arena: it builds random 2027-style arenas, simulates a LiDAR and the D455 over them with noise and dust, and scores boulder and crater detectors against ground truth. It is the first layer of the BP-1 simulation; the same sensor models are meant to sit on top of Isaac Sim's ideal ray hits later (see "Path to Isaac Sim").
+
+## What it models
+
+| Part | Model | Evidence |
+| --- | --- | --- |
+| Arena | 6.8 m x 5.0 m height field at 1 cm, walls, a central column, rough raked surface, ~2 cm gravel, ≥3 boulders (30-40 cm wide), ≥3 craters (≤ ~40-50 cm) | Sizes Verified from the 2027 guidebook; zone layout, column size, roughness and heights Assumed |
+| LiDAR | Ray marching against the height field; return power ∝ ρ·cos(incidence)/r²·exp(−2τ); blind zone; Gaussian range noise | Power law and two-way attenuation from Hahner et al., arXiv 2108.05249 (Eq. 17); BP-1 reflectivity Assumed (0.10) |
+| LiDAR scan patterns | Generic 16-beam spinning; approximate non-repetitive rosette with 70.4° FOV and 0.21 m blind zone | Rosette FOV and blind zone are the MID-70 values in Xie et al. 2024; the curve shape is Assumed |
+| Dust | Gaussian plume of extinction α(x,y,z); two-way attenuation of true returns; discrete particle echoes kept in first-return mode | Model form from Hahner et al. (fog, arXiv 2108.05249; snowfall, arXiv 2203.15118); every dust number Assumed |
+| D455 | Per-pixel ray cast at 212x120, 87°x58° FOV; σz = z²·σd/(f·B), f = 674 px, B = 95 mm, σd = 0.32 px; invalid pixels rise as transmittance falls | FOV and baseline Verified (Intel); σd Inferred from "<2% at 4 m"; dust effect Assumed |
+| Detectors | baseline: fixed height thresholds per 5 cm cell. carving: thresholds scale with 3σ of range noise, free-space carving bounds hidden crater floors, and a solidity check drops high returns that another ray passed beneath. log-odds: each return and each distinct ray adds evidence per cell, frame by frame (+0.85 support, -0.4 contradiction, clamped to [-2, 3.5]); rays passing below the ground plane count as crater evidence; an object is accepted when the evidence summed over its cells passes a per-sensor threshold | carving and log-odds are our own combinations (Inferred) of CFAR-style normalisation, occupancy carving, Pairet et al.'s log-odds steps and Hines et al.'s virtual surfaces (research/step2/18); the log-odds step sizes are Pairet et al.'s, the thresholds were tuned on seeds 1000-1015 |
+
+Not modelled yet: LiDAR self-occlusion by the robot, stereo matching on texture (depth is ray-cast plus noise), dust seen by the D455 as false depth, multiple scattering, sun glare, slip, and terrain deformation from digging.
+
+## Run it
+
+```
+python3 -m pip install numpy scipy matplotlib
+python3 evaluate.py 60 results_v02 2000   # Monte Carlo on seeds 2000-2059, about 35 s per trial per core
+python3 figures.py results_v02            # figures + tables.md
+python3 tests/test_bridge.py       # Isaac bridge checks (needs: python3 -m pip install usd-core)
+python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac Sim
+```
+
+## Files
+
+- `params.py`: every number with its status (Verified / Inferred / Assumed) and source. Change values here only.
+- `arena.py`, `raycast.py`, `sensors.py`, `dust.py`: the world and sensor models.
+- `detect.py`: grid accumulation, ground fit, both detectors, and scoring.
+- `evaluate.py`, `figures.py`: the experiment and its plots. `results/` is v0 (baseline and carving, seeds 1000-1059); `results_v02/` adds the log-odds detector on fresh seeds 2000-2059 that no threshold was tuned on. Result folders are not committed; rerun the two commands above to rebuild them.
+- `isaac_bridge.py`: exports an arena to USD for Isaac Sim, and applies the BP-1 layer to ideal LiDAR ranges or depth images from any source.
+- `tests/test_bridge.py`: checks that the BP-1 layer gives identical output from our ray marcher and from outside hits, and that the USD mesh matches the height field.
+- `usd/arena_seed1.usda`: one exported arena (Z up, metres, origin at the start-zone corner) with its obstacle list in `arena_seed1.usda.truth.json`.
+
+## Path to Isaac Sim
+
+Isaac Sim 6.1 needs an x86_64 desktop with at least an RTX 4080 (16 GB VRAM), and Jetson is not on its requirements page. The pages read in step 2 document no Livox-style pattern, no LiDAR range noise and no D455 stereo noise, and one forum reply says fog does not affect RTX LiDAR in Isaac Sim 4.2.0 (research/step2/16 and 17, with corrections in research/step2/verify). So the plan is a hybrid (Inferred):
+
+1. `isaac_bridge.py` exports the same random arena to USD (`export_arena_usd`), with a static collider and the true obstacle list.
+2. Isaac Sim renders that arena and gives ideal LiDAR ranges and ideal depth images.
+3. `lidar_from_ideal` and `d455_from_ideal` add BP-1 reflectivity, dust and noise with the same code the sandbox uses (`Lidar.apply`, `D455Depth.apply`); the test proves the two paths match exactly.
+4. `detect.py` and `score` run unchanged on the result.
+
+Not done yet, because no Isaac Sim was available to test against: the Isaac-side script that reads ideal hits and normals out of RTX LiDAR and the D455 asset, and a dust plume that follows the digging tool. The USD collider schema is applied but has not been loaded in Isaac Sim.
+
+## Parameter status
+
+| Parameter | Value | Status | Source |
+| --- | --- | --- | --- |
+| ARENA.length_x | 6.8 m | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.2.1 |
+| ARENA.width_y | 5.0 m | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.2.1 |
+| ARENA.grid_res | 0.01 m | Assumed | sandbox resolution choice |
+| ARENA.berm_center | 5.38 to 0.9 m | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.2.3 |
+| ARENA.berm_size | 2.2 to 0.9 m | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.2.2 (orientation Assumed: 2.2 m along x) |
+| ARENA.start_zone | (0.0, 2.0, 0.0, 2.0) m (x0,x1,y0,y1) | Assumed | zone sizes are not in the guidebook text |
+| ARENA.obstacle_zone_x | 2.0 to 4.4 m | Assumed | Figure 9 labels unreadable; band chosen between start and berm |
+| ARENA.column_xy_r | (3.4, 2.5, 0.15) m | Assumed | 'central support column' (11.4.2); size and position not in text |
+| ARENA.surface_rms | 0.01 m | Assumed | raked BP-1 roughness not measured |
+| ARENA.surface_corr_len | 0.25 m | Assumed | roughness correlation length |
+| ARENA.gravel_per_m2 | 4.0 1/m^2 | Assumed | gravel ~2 cm diameter exists (11.1); density not given |
+| ARENA.gravel_diam | 0.02 m | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.1 item 2 |
+| OBSTACLES.n_boulders | 3  | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.4.1 (minimum) |
+| OBSTACLES.n_craters | 3  | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.4.2 (minimum) |
+| OBSTACLES.boulder_diam | 0.3 to 0.4 m | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.4.1 |
+| OBSTACLES.boulder_height | 0.1 to 0.3 m | Assumed | 11.4.1 says only 'varying heights' |
+| OBSTACLES.crater_diam | 0.3 to 0.5 m | Inferred | 11.4.2: depth and width not exceeding ~40-50 cm |
+| OBSTACLES.crater_depth | 0.1 to 0.4 m | Assumed | upper bound from 11.4.2; lower bound chosen |
+| OBSTACLES.crater_rim_frac | 0.1 of depth | Assumed | rim height; replace with a published crater profile |
+| OBSTACLES.min_separation | 0.8 m | Assumed | spacing between obstacle centers |
+| BP1.depth | 0.45 m | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.1 |
+| BP1.particle_size_most_under | 0.0001 m | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.1 g |
+| BP1.density_compacted | 1.5 to 1.8 g/cm^3 | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.1 f |
+| BP1.density_top_raked | 0.75 g/cm^3 | Verified | 2027 Lunabotics Guidebook (research/step2/00-guidebook-arena-bp1.md) 11.1 h |
+| BP1.lidar_reflectivity | 0.1  | Assumed | NOT KNOWN. Guidebook Figure 7 lets teams measure it; needs the PDF figure |
+| MOUNTS.d455_xyz | (0.35, 0.0, 0.6) m | Assumed | Angelo: front, 'somewhat high' |
+| MOUNTS.d455_pitch_down | 40.0 deg | Verified | Angelo's sensor layout |
+| MOUNTS.lidar_xyz | (0.0, 0.0, 0.8) m | Assumed | Angelo: on top of the robot |
+| MOUNTS.lidar_pitch_down | 30.0 deg | Assumed | Angelo: 'angled downwards'; angle not given |
+| D455.hfov | 87.0 deg | Verified | https://www.intelrealsense.com/depth-camera-d455/ |
+| D455.vfov | 58.0 deg | Verified | https://www.intelrealsense.com/depth-camera-d455/ |
+| D455.baseline | 0.095 m | Verified | https://www.intelrealsense.com/depth-camera-d455/ |
+| D455.native_width | 1280 px | Assumed | focal length is computed at this width |
+| D455.sim_size | 212 to 120 px | Assumed | downsampled for speed |
+| D455.subpixel_best | 0.08 px | Verified | https://dev.intelrealsense.com/docs/tuning-depth-cameras-for-best-performance (curves use subpixel=0.08) |
+| D455.subpixel_field | 0.32 px | Inferred | from '<2% at 4 m' with f=674 px, B=0.095 m (step 1 check) |
+| D455.min_depth | 0.4 m | Assumed | minimum depth not checked yet |
+| D455.max_depth | 6.0 m | Assumed | useful range cap for the sandbox |
+| D455.invalid_frac_clear | 0.02  | Assumed | baseline invalid-pixel fraction on low-texture regolith |
+| LIDAR_GENERIC.range_sigma | 0.02 m | Assumed | replace with the chosen LiDAR's datasheet |
+| LIDAR_GENERIC.max_range_ref | 20.0 m | Assumed | range at which a 10% target at normal incidence is just detected |
+| LIDAR_GENERIC.rho_ref | 0.1  | Assumed | reference reflectivity for max_range_ref |
+| DUST.beta_peak | 1.5 1/m | Assumed | peak extinction in the dig plume; no BP-1 measurement found yet |
+| DUST.beta_background | 0.0 1/m | Assumed | clear air away from digging |
+| DUST.plume_sigma_h | 0.5 m | Assumed | horizontal spread |
+| DUST.plume_sigma_v | 0.3 m | Assumed | vertical spread |
+| DUST.plume_center_z | 0.3 m | Assumed | height of densest dust |
+| DUST.echo_kappa | 0.3  | Assumed | fraction of extinction events strong enough to trigger a LiDAR echo |
+| DUST.camera_invalid_gain | 1.0  | Assumed | how fast stereo invalid pixels grow as transmittance drops |
+| DETECT.cell | 0.05 m | Assumed | elevation grid |
+| DETECT.h_pos | 0.08 m | Assumed | positive obstacle threshold above fitted ground |
+| DETECT.h_neg | 0.08 m | Assumed | negative obstacle threshold below fitted ground |
+| DETECT.min_cells_pos | 3 cells | Assumed |  |
+| DETECT.min_cells_neg | 4 cells | Assumed |  |
+| DETECT.carve_margin | 0.08 m | Assumed | a ray sample counts as free space only if it is this far (plus 3 sigma) short of the hit |
+| DETECT.wall_band | 0.15 m | Assumed | detections this close to the arena edge are walls, scored separately from false alarms |
+| DETECT.match_margin | 0.15 m | Assumed | detection counts if its center is within radius + margin |
+| DETECT.l_occ | 0.85 | Verified | value from Pairet et al. Sec. 7.1, https://arxiv.org/abs/2004.12317 (our per-ray use on a height grid is Inferred) |
+| DETECT.l_free | -0.4 | Verified | Pairet et al. Sec. 7.1 |
+| DETECT.l_min | -2.0 | Verified | Pairet et al. Sec. 7.1 |
+| DETECT.l_max | 3.5 | Verified | Pairet et al. Sec. 7.1 |
+| DETECT.l_decide_lidar | 5.1 | Assumed | LiDAR: accept an object when log-odds summed over its cells reach 6 net observations; tuned on seeds 1000-1015 |
+| DETECT.l_decide_d455 | 0.85 | Assumed | D455: accept an object at 1 net observation (it made no dust false alarms); tuned on seeds 1000-1015 |
+| DETECT.d_neg | 0.04 m | Assumed | a ray passing this far below the fitted ground (or 3 vertical sigma) is evidence of a depression |
+| LIDAR_PROFILES.spin16 | kind=spinning, channels=16, vmin=-15.0, vmax=15.0, hres=0.4, min_range=0.3 | Assumed | Assumed generic 16-beam spinning pattern |
+| LIDAR_PROFILES.rosette70 | kind=rosette, fov=70.4, points=10000, petals=7.0, min_range=0.21 | Assumed | Approximate non-repetitive pattern; 70.4 deg FOV and 0.21 m blind zone are the Livox MID-70 values reported by Xie et al. (https://pmc.ncbi.nlm.nih.gov/articles/PMC11679008); the curve itself is Assumed |
