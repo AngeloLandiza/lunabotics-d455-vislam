@@ -39,7 +39,7 @@ python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac
 
 ## Path to Isaac Sim
 
-Isaac Sim 6.1 needs an x86_64 desktop with at least an RTX 4080 (16 GB VRAM), and Jetson is not on its requirements page. The pages read in step 2 document no Livox-style pattern, no LiDAR range noise and no D455 stereo noise, and one forum reply says fog does not affect RTX LiDAR in Isaac Sim 4.2.0 (research/step2/16 and 17, with corrections in research/step2/verify). So the plan is a hybrid (Inferred):
+NVIDIA lists an x86_64 machine with an RTX 4080 (16 GB VRAM) as Isaac Sim's minimum, and Jetson is not on its requirements page; the capture below runs on an 8 GB RTX 4060 Laptop GPU anyway. The pages read in step 2 document no Livox-style pattern, no LiDAR range noise and no D455 stereo noise, and one forum reply says fog does not affect RTX LiDAR in Isaac Sim 4.2.0 (research/step2/16 and 17, with corrections in research/step2/verify). So the plan is a hybrid (Inferred):
 
 1. `isaac_bridge.py` exports the same random arena to USD (`export_arena_usd`), with a static collider and the true obstacle list.
 2. Isaac Sim renders that arena and gives ideal LiDAR ranges and ideal depth images.
@@ -70,7 +70,7 @@ Agreement with the sandbox (seed-1 arena, 8 poses, run 2026-10-11):
 
 The LiDAR's 1 cm 95th percentile against the sandbox comes from the export: the USD mesh samples the 1 cm height map every 2 cm. Against the mesh itself, Isaac is exact to 1 mm. A single RTX scan without merging misses 1.3-3.0 % of rays.
 
-Detection (logodds, two 4-frame approaches, clear air and a plume 0.8 m ahead): over 32 frame/sensor/dust cases, the sandbox found 69 obstacle detections with 2 false alarms, and Isaac + BP-1 layer found 68 with 3. Per-case results are in `isaac_out/validation.json`. The differences are single obstacles near the threshold (Inferred: the same noise draws land on slightly different ideal ranges).
+Detection (logodds, two 4-frame approaches, clear air and a plume 0.8 m ahead): over 16 cases per source (2 approaches x LiDAR and D455 x clear and dust x 1 and 4 frames), the sandbox found 69 obstacle detections with 2 false alarms, and Isaac + BP-1 layer found 68 with 3. Per-case results are in `isaac_out/validation.json`. The differences are single obstacles near the threshold (Inferred: the same noise draws land on slightly different ideal ranges).
 
 ## Parameter status
 
