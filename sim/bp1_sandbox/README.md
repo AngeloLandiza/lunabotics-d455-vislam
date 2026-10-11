@@ -23,6 +23,7 @@ python3 evaluate.py 60 results_v02 2000   # Monte Carlo on seeds 2000-2059, abou
 python3 figures.py results_v02            # figures + tables.md
 python3 tests/test_bridge.py       # Isaac bridge checks (needs: python3 -m pip install usd-core)
 python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac Sim
+./run_isaac_capture.sh             # Isaac Sim 6.0.1 headless capture of that arena + isaac_validate.py (see below)
 ```
 
 ## Files
@@ -33,6 +34,7 @@ python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac
 - `evaluate.py`, `figures.py`: the experiment and its plots. `results/` is v0 (baseline and carving, seeds 1000-1059); `results_v02/` adds the log-odds detector on fresh seeds 2000-2059 that no threshold was tuned on. Result folders are not committed; rerun the two commands above to rebuild them.
 - `isaac_bridge.py`: exports an arena to USD for Isaac Sim, and applies the BP-1 layer to ideal LiDAR ranges or depth images from any source.
 - `tests/test_bridge.py`: checks that the BP-1 layer gives identical output from our ray marcher and from outside hits, and that the USD mesh matches the height field.
+- `isaac_capture.py`, `isaac_validate.py`, `run_isaac_capture.sh`: the Isaac-side capture and its check (section "Isaac Sim capture"). Output goes to `isaac_out/`, which is not committed.
 - `usd/arena_seed1.usda`: one exported arena (Z up, metres, origin at the start-zone corner) with its obstacle list in `arena_seed1.usda.truth.json`.
 
 ## Path to Isaac Sim
@@ -44,7 +46,31 @@ Isaac Sim 6.1 needs an x86_64 desktop with at least an RTX 4080 (16 GB VRAM), an
 3. `lidar_from_ideal` and `d455_from_ideal` add BP-1 reflectivity, dust and noise with the same code the sandbox uses (`Lidar.apply`, `D455Depth.apply`); the test proves the two paths match exactly.
 4. `detect.py` and `score` run unchanged on the result.
 
-Not done yet, because no Isaac Sim was available to test against: the Isaac-side script that reads ideal hits and normals out of RTX LiDAR and the D455 asset, and a dust plume that follows the digging tool. The USD collider schema is applied but has not been loaded in Isaac Sim.
+Done since: the Isaac-side capture below. Still not done: a dust plume that follows the digging tool, and loading the USD collider with a driving robot.
+
+## Isaac Sim capture
+
+`run_isaac_capture.sh` runs `isaac_capture.py` with `~/isaacsim-env/bin/python` (Isaac Sim 6.0.1, pip install, headless), then `isaac_validate.py` with the system `python3`. Tested on an RTX 4060 Laptop GPU (8 GB): peak 1.66 GB of VRAM by nvidia-smi, about 16 s for 8 poses.
+
+- **Arena**: `usd/arena_seed1.usda`, opened as-is (Z up, metres).
+- **Poses**: robot `(x, y, yaw)` list (`--poses`); both sensors placed with `sensors.sensor_pose()` and `params.MOUNTS`.
+- **LiDAR**: an RTX `OmniLidar` with a custom rotary pattern equal to `spin16`: 16 emitters at -15 to +15 deg, 900 azimuth ticks (0.4 deg), 8 m far range, one return, `instantLidar`. Built-in noise is off: `rangeAccuracyM` (schema default 0.02 m), azimuth, elevation and origin errors set to 0. Isaac returns azimuth, elevation and range per ray; the script stores them in `spinning_dirs` order.
+- **RTX dropout**: each RTX scan drops about 1.5-3% of its returns at random, and no documented attribute turns this off. The script merges 4 scans per pose (`--scans`); returned ranges agree between scans to 0.0 cm.
+- **Depth**: a `UsdGeom.Camera` with the `distance_to_image_plane` annotator, as in `sim/isaac_lunar_sim.py`. Isaac renders square pixels only, so 87 x 58 deg at 212 x 120 cannot be rendered directly. The script renders 1060 x 622 (`--upsample 5`) and resamples to the sandbox pixel grid: columns are exact, rows are interpolated.
+- **Output**: `isaac_out/capture.npz`. Per pose it holds the origin, rotation, merged ranges, Isaac ray directions, the per-scan ranges, and the depth image (rows top to bottom), ready for `isaac_bridge.lidar_from_ideal` / `d455_from_ideal`.
+
+Agreement with the sandbox (seed-1 arena, 8 poses, run 2026-10-11):
+
+| Comparison | median abs. diff | 95th pct | one side hits only |
+| --- | --- | --- | --- |
+| LiDAR vs sandbox ray march | 0.04-0.19 cm | 1.04-1.22 cm | 0.04-0.15 % |
+| LiDAR vs exact USD mesh | 0.00 cm | 0.07-0.10 cm | 0.01-0.10 % |
+| Depth vs sandbox ray march | 0.00 cm | 0.02-0.14 cm | 0 % |
+| Depth vs exact USD mesh | 0.00 cm | 0.00 cm | 0 % |
+
+The LiDAR's 1 cm 95th percentile against the sandbox comes from the export: the USD mesh samples the 1 cm height map every 2 cm. Against the mesh itself, Isaac is exact to 1 mm. A single RTX scan without merging misses 1.3-3.0 % of rays.
+
+Detection (logodds, two 4-frame approaches, clear air and a plume 0.8 m ahead): over 32 frame/sensor/dust cases, the sandbox found 69 obstacle detections with 2 false alarms, and Isaac + BP-1 layer found 68 with 3. Per-case results are in `isaac_out/validation.json`. The differences are single obstacles near the threshold (Inferred: the same noise draws land on slightly different ideal ranges).
 
 ## Parameter status
 
