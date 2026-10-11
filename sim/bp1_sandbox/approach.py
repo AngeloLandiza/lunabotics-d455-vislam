@@ -4,6 +4,7 @@ evidence, what it really is) and how far ahead the path has been observed. speed
 missed-hazard rates, phantom stops and speeds for any threshold and speed policy, without re-running the scans.
 
 Usage: python3 approach.py [n_arenas] [out_dir] [first_seed] [--rms M] [--undulation M] [--pitch-err DEG] [--clear-only]
+       [--ground plane|local] [--ground-sigma M] [--workers N]
 --rms sets the floor roughness (params.py default 0.01 m), --undulation adds long-wavelength floor waves of that RMS,
 --pitch-err makes the robot's attitude estimate wrong by that many degrees (sign alternates with the seed). The extra
 draws use their own random stream, so every case sees the same arenas, starts and sensor noise as the others.
@@ -165,11 +166,19 @@ def main():
     ap.add_argument("--undulation", type=float, default=0.0, help="RMS of long-wavelength floor waves in m")
     ap.add_argument("--pitch-err", type=float, default=0.0, help="attitude (pitch) estimate error in degrees")
     ap.add_argument("--clear-only", action="store_true", help="skip the dust runs")
+    ap.add_argument("--ground", choices=["plane", "local"], default=None, help="ground fit (default from params.py)")
+    ap.add_argument("--ground-sigma", type=float, default=None, help="window width in m for the local ground fit")
     ap.add_argument("--workers", type=int, default=4)
     a = ap.parse_args()
     if a.rms is not None:      # set before the pool forks, so every worker builds arenas with it
         old = pr.ARENA["surface_rms"]
         pr.ARENA["surface_rms"] = pr.P(a.rms, old.unit, "Assumed", "approach.py --rms (robustness case)")
+    if a.ground is not None:
+        old = pr.DETECT["ground_fit"]
+        pr.DETECT["ground_fit"] = pr.P(a.ground, old.unit, "Assumed", "approach.py --ground")
+    if a.ground_sigma is not None:
+        old = pr.DETECT["ground_sigma"]
+        pr.DETECT["ground_sigma"] = pr.P(a.ground_sigma, old.unit, "Assumed", "approach.py --ground-sigma")
     CASE.update(undulation=a.undulation, pitch_err=a.pitch_err, clear_only=a.clear_only)
     os.makedirs(a.out, exist_ok=True)
     t0 = time.time()
@@ -180,7 +189,7 @@ def main():
             print(f"{k + 1}/{a.n} arenas, {time.time() - t0:.0f} s", flush=True)
     meta = {"n_arenas": a.n, "seed0": a.seed0, "seconds": time.time() - t0,
             "DS": DS, "FRONT": FRONT, "HALF_W": HALF_W, "X_END": X_END, "PLUME_AHEAD": PLUME_AHEAD, "LOOK": LOOK,
-            "surface_rms": v(pr.ARENA, "surface_rms"), **CASE,
+            "surface_rms": v(pr.ARENA, "surface_rms"), "ground_fit": v(pr.DETECT, "ground_fit"), "ground_sigma": v(pr.DETECT, "ground_sigma"), **CASE,
             "det_fields": ["kind", "x", "y", "evidence", "cells", "along", "lateral", "class", "match"]}
     with open(os.path.join(a.out, "approaches.json"), "w") as f:
         json.dump({"meta": meta, "trials": res}, f)

@@ -82,6 +82,44 @@ def accumulate(scans, grid, carve=True):
 
 
 def fit_ground(L, grid):
+    """Ground height per cell: one robust plane (params DETECT.ground_fit = "plane") or robust local planes ("local")."""
+    g = fit_ground_plane(L, grid)
+    return fit_ground_local(L, grid, g) if v(pr.DETECT, "ground_fit") == "local" else g
+
+
+def fit_ground_local(L, grid, g0, iters=4, c=4.685):
+    """Robust locally weighted plane fit (Cleveland 1979's robust LOESS, degree 1, on the cell mean heights).
+
+    Each cell gets the plane that best fits the observed cells around it, weighted by a Gaussian of width
+    DETECT.ground_sigma; Tukey biweights computed from the residuals then drop boulders, craters and noise, and
+    the fit is repeated. The weighted sums are Gaussian-filtered maps, so one pass costs a few image filters.
+    Cells with little data nearby fall back towards the global plane g0."""
+    sig = v(pr.DETECT, "ground_sigma") / grid.cell
+    X, Y = grid.centers()
+    X, Y = X - grid.L / 2, Y - grid.W / 2
+    has = L["count"] > 0
+    z = np.where(has, L["zsum"] / np.maximum(L["count"], 1), 0.0)
+    g = g0
+    for _ in range(iters):
+        res = np.where(has, z - g, 0.0)
+        s = 1.4826 * np.median(np.abs(res[has])) + 1e-3 if has.any() else 1.0
+        w = np.where(has, np.clip(1 - (res / (c * s)) ** 2, 0, None) ** 2, 0.0)
+        f = lambda a: ndimage.gaussian_filter(a, sig, mode="constant")  # noqa: E731
+        S0, Sx, Sy = f(w), f(w * X), f(w * Y)
+        Sxx, Sxy, Syy = f(w * X * X), f(w * X * Y), f(w * Y * Y)
+        Sz, Sxz, Syz = f(w * z), f(w * X * z), f(w * Y * z)
+        A = np.stack([np.stack([S0, Sx, Sy], -1), np.stack([Sx, Sxx, Sxy], -1), np.stack([Sy, Sxy, Syy], -1)], -2)
+        b = np.stack([Sz, Sxz, Syz], -1)
+        ok = (S0 > 1e-3) & (np.linalg.det(A) > 1e-12 * np.maximum(S0, 1e-12) ** 3)
+        coef = np.zeros(b.shape)
+        coef[ok] = np.linalg.solve(A[ok], b[ok][..., None])[..., 0]
+        local = coef[..., 0] + coef[..., 1] * X + coef[..., 2] * Y
+        trust = np.clip(S0 / 0.25, 0, 1) * ok   # under a quarter of the window observed: lean on the global plane
+        g = trust * local + (1 - trust) * g0
+    return g
+
+
+def fit_ground_plane(L, grid):
     X, Y = grid.centers()
     has = L["count"] > 0
     z = np.where(has, L["zsum"] / np.maximum(L["count"], 1), np.nan)

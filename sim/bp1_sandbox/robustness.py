@@ -30,7 +30,10 @@ def case_label(meta):
         parts.append(f"floor waves {100 * meta['undulation']:g} cm")
     if meta.get("pitch_err", 0) > 0:
         parts.append(f"pitch error {meta['pitch_err']:g} deg")
-    return ", ".join(parts) or "baseline (1 cm roughness, flat, exact attitude)"
+    label = ", ".join(parts) or "baseline (1 cm roughness, flat, exact attitude)"
+    if meta.get("ground_fit") == "local":
+        label += f", local ground fit ({100 * meta.get('ground_sigma', 0.3):g} cm window)"
+    return label
 
 
 def map_false_alarms(group, thr):
