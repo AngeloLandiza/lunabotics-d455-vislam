@@ -35,6 +35,7 @@ python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac
 - `isaac_bridge.py`: exports an arena to USD for Isaac Sim, and applies the BP-1 layer to ideal LiDAR ranges or depth images from any source.
 - `tests/test_bridge.py`: checks that the BP-1 layer gives identical output from our ray marcher and from outside hits, and that the USD mesh matches the height field.
 - `isaac_capture.py`, `isaac_validate.py`, `run_isaac_capture.sh`: the Isaac-side capture and its check (section "Isaac Sim capture"). Output goes to `isaac_out/`, which is not committed.
+- `approach.py`, `speed_gate.py`: frame-by-frame approach runs and their scoring for confirmation thresholds, speeds and a speed gate (section "Approach runs and speed"). Output goes to `results_approach*/`, which is not committed.
 - `live_view.py`, `live_view.rviz`, `run_live.sh`: live RViz2 view of one approach run (section "Live view").
 - `usd/arena_seed1.usda`: one exported arena (Z up, metres, origin at the start-zone corner) with its obstacle list in `arena_seed1.usda.truth.json`.
 
@@ -94,6 +95,28 @@ Detection (logodds, two 4-frame approaches, clear air and a plume 0.8 m ahead): 
   - every candidate cluster, labelled with its kind, pooled evidence, state and truth class. Red is confirmed (evidence >= threshold), yellow is unresolved (0.85 <= evidence < threshold), grey is faint;
   - the speed gate: 1.0 m/s, or 0.25 m/s when a confirmed hazard, an unresolved candidate or unobserved corridor ground lies within d_stop(1.0) + 0.5 m of the front. d_stop(v) = 0.3 v + v^2 / (2 x 0.5) + 0.10 m is drawn as a line ahead of the front. This gate is a display aid (Assumed numbers); `speed_gate.py` holds the evaluated policy.
 - **RViz quirks** worked around: rviz2 (Humble) ignores the window size in the config, so `run_live.sh` resizes the window through Xlib. It also draws spaces in text markers very wide, so the labels use underscores.
+
+## Approach runs and speed
+
+```
+python3 approach.py 48 results_approach 3000      # 48 arenas, seeds 3000-3047 (about 35 min on 4 cores)
+python3 approach.py 48 results_approach_b 3048    # 48 more for a held-out test
+python3 speed_gate.py results_approach results_approach_b   # tune on the first folder, test on the rest
+```
+
+`approach.py` drives the robot in a straight line from a random start (x 0.3-0.8 m, y 0.8-4.2 m, heading N(0, 10 deg) clipped to +-25 deg) until its centre reaches x = 4.9 m or comes within 0.5 m of a side wall. The log-odds detector updates every 0.15 m, for the 16-beam LiDAR and the D455, in clear air and with a dust plume 1.2 m ahead. Each frame records every candidate (kind, position, pooled evidence, truth class) and how far ahead the corridor has been observed, so `speed_gate.py` can score any threshold or speed policy without new scans.
+
+`speed_gate.py` starts the robot from rest (0.5 m/s^2 up and down) and counts a hazard as missed when it is first confirmed closer than d_stop(v) = 0.3 v + v^2 / (2 x 0.5) + 0.10 m at the robot's speed in that frame. A phantom stop is a frame where a candidate that is no real obstacle, wall, or view of one (within 0.30 m of an obstacle's edge) reaches the threshold inside that distance. The speed gate drives fast unless unobserved corridor ground or an unconfirmed candidate lies within the fast stopping distance; confirmed hazards go to the planner. All of these numbers are Assumed. It writes `speed_gate.md`, `speed_gate.json`, `sweep_tradeoff.png` and `speed_misses.png`.
+
+Results over seeds 3000-3095 (96 arenas, 68 craters and 111 boulders or column crossings in the path; thresholds 5.1 for LiDAR and 0.85 for D455, set earlier on seeds 1000-1015 and kept by the sweep on 3000-3047):
+
+| Constant speed | Stopping distance | Craters missed, LiDAR | Craters missed, D455 | Boulders missed |
+| --- | --- | --- | --- | --- |
+| 0.75 m/s | 0.89 m | 0 of 68 | 0 of 68 | 0 of 111 |
+| 1.0 m/s | 1.40 m | 1 of 68 | 4 of 68 (dust), 3 (clear) | 0 of 111 |
+| 1.25 m/s | 2.04 m | 5 of 68 (dust), 6 (clear) | 13 of 68 (dust), 11 (clear) | 0 of 111 |
+
+LiDAR or D455 together gives the LiDAR's numbers. Phantom stops: 0.17 per 10 m for the LiDAR in dust, 0 otherwise. The speed gate (1.0 / 0.25 m/s, both sensors, dust) averaged 0.50 m/s against 0.66 m/s for a steady 0.75 m/s, spent 26% of the distance slow (20% for unobserved ground) and missed 1 crater, so it does not pay off in this arena (Inferred). Over 0 misses in 68 craters the 95% Wilson interval still reaches 5%.
 
 ## Parameter status
 
