@@ -3,12 +3,15 @@ frame by frame, as it would on the robot. For every frame it records each candid
 evidence, what it really is) and how far ahead the path has been observed. speed_gate.py turns these records into
 missed-hazard rates, phantom stops and speeds for any threshold and speed policy, without re-running the scans.
 
-Usage: python3 approach.py [n_arenas] [out_dir] [first_seed]
+Usage: python3 approach.py [n_arenas] [out_dir] [first_seed] [--rms M] [--undulation M] [--pitch-err DEG] [--clear-only]
+--rms sets the floor roughness (params.py default 0.01 m), --undulation adds long-wavelength floor waves of that RMS,
+--pitch-err makes the robot's attitude estimate wrong by that many degrees (sign alternates with the seed). The extra
+draws use their own random stream, so every case sees the same arenas, starts and sensor noise as the others.
 Every number below is Assumed unless marked; the robot's real size, braking and frame rate replace them later.
 """
+import argparse
 import json
 import os
-import sys
 import time
 from multiprocessing import Pool
 
@@ -19,6 +22,7 @@ from params import v
 from arena import Arena
 from detect import Grid, add_scan, clusters, fit_ground, logodds_delta, logodds_zref, new_layers
 from dust import Plume
+from raycast import flat_ground_range
 from sensors import Lidar, D455Depth
 
 SENSORS = ["spin16", "d455"]
@@ -28,6 +32,9 @@ HALF_W = 0.40        # m, half-width of the swept corridor: robot half-width plu
 X_END = 4.9          # m, robot centre stops here, short of the berm wall
 PLUME_AHEAD = 1.2    # m ahead of the start, dust plume centre (Assumed: a dig site in front)
 LOOK = 3.0           # m beyond the front edge searched for unobserved corridor cells
+UNDULATION_WL = (1.5, 3.0)   # m, wavelength range of the floor waves (Assumed)
+EXTRA_SEED = 7_000_003       # offset of the random stream for floor waves and attitude error
+CASE = {"undulation": 0.0, "pitch_err": 0.0, "clear_only": False}
 
 
 def path_frame(x0, y0, yaw):
@@ -35,9 +42,43 @@ def path_frame(x0, y0, yaw):
     return h, np.array([-h[1], h[0]])
 
 
+def undulate(arena, seed, rms, n=12):
+    """Add long-wavelength floor waves of the given RMS inside the walls (the robot still rides at z = 0)."""
+    r = np.random.default_rng(seed + EXTRA_SEED)
+    lam, th, ph = r.uniform(*UNDULATION_WL, n), r.uniform(0, 2 * np.pi, n), r.uniform(0, 2 * np.pi, n)
+    k = 2 * np.pi / lam
+    f = sum(np.cos(k[i] * (np.cos(th[i]) * arena.X + np.sin(th[i]) * arena.Y) + ph[i]) for i in range(n))
+    inside = (arena.X >= 0) & (arena.X <= arena.L) & (arena.Y >= 0) & (arena.Y <= arena.W)
+    arena.h[inside] += (f * rms / np.sqrt(n / 2))[inside]
+
+
+def believed(scan, robot, pitch_err):
+    """The scan as the robot places it when its pitch estimate is off by pitch_err degrees: every ray and sample is
+    rotated about the robot's ground point. Positive error makes the ground ahead look lower."""
+    x, y, yaw = robot
+    c = np.array([x, y, 0.0])
+    a, p = np.radians(yaw), np.radians(pitch_err)
+    Rz = np.array([[np.cos(a), -np.sin(a), 0], [np.sin(a), np.cos(a), 0], [0, 0, 1]])
+    Ry = np.array([[np.cos(p), 0, np.sin(p)], [0, 1, 0], [-np.sin(p), 0, np.cos(p)]])
+    R = Rz @ Ry @ Rz.T
+    out = dict(scan)
+    out["origin"] = c + R @ (scan["origin"] - c)
+    out["dirs"] = scan["dirs"] @ R.T
+    out["pts"] = c + (scan["pts"] - c) @ R.T
+    out["r_flat"] = flat_ground_range(out["origin"], out["dirs"])
+    sm = dict(scan["samples"])
+    P = c + (np.stack([sm["x"], sm["y"], sm["z"]], -1) - c) @ R.T
+    sm["x"], sm["y"], sm["z"] = P[:, 0], P[:, 1], P[:, 2]
+    out["samples"] = sm
+    return out
+
+
 def trial(seed):
     rng = np.random.default_rng(seed)
     arena = Arena(rng)
+    if CASE["undulation"] > 0:
+        undulate(arena, seed, CASE["undulation"])
+    pitch_err = CASE["pitch_err"] * (1 if seed % 2 == 0 else -1)
     x0, y0 = rng.uniform(0.3, 0.8), rng.uniform(0.8, 4.2)
     yaw = float(np.clip(rng.normal(0, 10), -25, 25))
     h, n = path_frame(x0, y0, yaw)
@@ -82,7 +123,7 @@ def trial(seed):
     runs = []
     for sname in SENSORS:
         sensor = D455Depth() if sname == "d455" else Lidar(sname)
-        for dust_on in (False, True):
+        for dust_on in (False,) if CASE["clear_only"] else (False, True):
             dust = Plume(x0 + PLUME_AHEAD * h[0], y0 + PLUME_AHEAD * h[1]) if dust_on else None
             L = new_layers(grid)
             lp, ln = np.zeros((grid.nx, grid.ny)), np.zeros((grid.nx, grid.ny))
@@ -91,6 +132,8 @@ def trial(seed):
                 s = i * DS
                 robot = (x0 + s * h[0], y0 + s * h[1], yaw)
                 scan = sensor.scan(arena, robot, rng, dust=dust)
+                if pitch_err:
+                    scan = believed(scan, robot, pitch_err)
                 add_scan(L, scan, grid)
                 g = fit_ground(L, grid)
                 dp, dn = logodds_delta(scan, grid, g, logodds_zref(L, g))
@@ -109,26 +152,39 @@ def trial(seed):
                                "dust_echoes": int(scan["is_dust"].sum())})
             runs.append({"sensor": sname, "dust": dust_on, "frames": frames})
     every = [[o.kind, o.x, o.y, o.radius] for o in arena.obstacles]
-    return {"seed": seed, "start": [x0, y0, yaw], "length": length, "obstacles": obst, "arena_obstacles": every, "runs": runs}
+    return {"seed": seed, "start": [x0, y0, yaw], "length": length, "obstacles": obst, "arena_obstacles": every,
+            "pitch_err": pitch_err, "runs": runs}
 
 
 def main():
-    n = int(sys.argv[1]) if len(sys.argv) > 1 else 48
-    out = sys.argv[2] if len(sys.argv) > 2 else "results_approach"
-    seed0 = int(sys.argv[3]) if len(sys.argv) > 3 else 3000
-    os.makedirs(out, exist_ok=True)
+    ap = argparse.ArgumentParser(description="Frame-by-frame approach runs")
+    ap.add_argument("n", nargs="?", type=int, default=48)
+    ap.add_argument("out", nargs="?", default="results_approach")
+    ap.add_argument("seed0", nargs="?", type=int, default=3000)
+    ap.add_argument("--rms", type=float, default=None, help="floor roughness RMS in m (default from params.py)")
+    ap.add_argument("--undulation", type=float, default=0.0, help="RMS of long-wavelength floor waves in m")
+    ap.add_argument("--pitch-err", type=float, default=0.0, help="attitude (pitch) estimate error in degrees")
+    ap.add_argument("--clear-only", action="store_true", help="skip the dust runs")
+    ap.add_argument("--workers", type=int, default=4)
+    a = ap.parse_args()
+    if a.rms is not None:      # set before the pool forks, so every worker builds arenas with it
+        old = pr.ARENA["surface_rms"]
+        pr.ARENA["surface_rms"] = pr.P(a.rms, old.unit, "Assumed", "approach.py --rms (robustness case)")
+    CASE.update(undulation=a.undulation, pitch_err=a.pitch_err, clear_only=a.clear_only)
+    os.makedirs(a.out, exist_ok=True)
     t0 = time.time()
-    with Pool(4) as p:
+    with Pool(a.workers) as p:
         res = []
-        for k, r in enumerate(p.imap(trial, range(seed0, seed0 + n))):
+        for k, r in enumerate(p.imap(trial, range(a.seed0, a.seed0 + a.n))):
             res.append(r)
-            print(f"{k + 1}/{n} arenas, {time.time() - t0:.0f} s", flush=True)
-    meta = {"n_arenas": n, "seed0": seed0, "seconds": time.time() - t0,
+            print(f"{k + 1}/{a.n} arenas, {time.time() - t0:.0f} s", flush=True)
+    meta = {"n_arenas": a.n, "seed0": a.seed0, "seconds": time.time() - t0,
             "DS": DS, "FRONT": FRONT, "HALF_W": HALF_W, "X_END": X_END, "PLUME_AHEAD": PLUME_AHEAD, "LOOK": LOOK,
+            "surface_rms": v(pr.ARENA, "surface_rms"), **CASE,
             "det_fields": ["kind", "x", "y", "evidence", "cells", "along", "lateral", "class", "match"]}
-    with open(os.path.join(out, "approaches.json"), "w") as f:
+    with open(os.path.join(a.out, "approaches.json"), "w") as f:
         json.dump({"meta": meta, "trials": res}, f)
-    print(f"{n} arenas in {time.time() - t0:.0f} s -> {out}/approaches.json")
+    print(f"{a.n} arenas in {time.time() - t0:.0f} s -> {a.out}/approaches.json")
 
 
 if __name__ == "__main__":
