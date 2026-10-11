@@ -70,7 +70,10 @@ def main():
     with open(os.path.join(out, "robustness.json"), "w") as f:
         json.dump({"thresholds": CHOSEN, "speeds": SPEEDS, "rows": rows}, f, indent=1, default=float)
     write_md(rows, os.path.join(out, "robustness.md"))
-    plot(rows, out)
+    try:
+        plot(rows, out)
+    except ImportError as e:   # matplotlib missing: the tables still stand, and plot() can rerun from robustness.json
+        print(f"no figure ({e})")
 
 
 def write_md(rows, path):
