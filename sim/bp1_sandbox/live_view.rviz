@@ -1,0 +1,190 @@
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Reference Frame: map
+      Plane: XY
+      Plane Cell Count: 16
+      Cell Size: 0.5
+      Line Style:
+        Line Width: 0.03
+        Value: Lines
+      Color: 58; 62; 72
+      Alpha: 0.4
+      Normal Cell Count: 0
+      Offset:
+        X: 3.4
+        Y: 2.5
+        Z: -0.3
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Terrain
+      Enabled: true
+      Topic:
+        Value: /bp1/terrain
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+      Style: Squares
+      Size (m): 0.02
+      Size (Pixels): 2
+      Color Transformer: RGB8
+      Alpha: 1
+      Decay Time: 0
+      Position Transformer: XYZ
+      Queue Size: 2
+      Selectable: false
+    - Class: rviz_default_plugins/MarkerArray
+      Name: True obstacles
+      Enabled: true
+      Topic:
+        Value: /bp1/truth
+        Depth: 5
+        Durability Policy: Transient Local
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Robot, corridor, plume
+      Enabled: true
+      Topic:
+        Value: /bp1/robot
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+    - Class: rviz_default_plugins/Path
+      Name: Path driven
+      Enabled: true
+      Topic:
+        Value: /bp1/path
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+      Line Style: Billboards
+      Line Width: 0.03
+      Color: 255; 70; 160
+      Alpha: 1
+      Buffer Length: 1
+      Pose Style: None
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Scan surface returns
+      Enabled: true
+      Topic:
+        Value: /bp1/scan_surface
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+      Style: Spheres
+      Size (m): 0.025
+      Size (Pixels): 3
+      Color Transformer: FlatColor
+      Color: 80; 255; 120
+      Alpha: 1
+      Decay Time: 0
+      Position Transformer: XYZ
+      Queue Size: 2
+      Selectable: false
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Scan dust echoes
+      Enabled: true
+      Topic:
+        Value: /bp1/scan_dust
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+      Style: Spheres
+      Size (m): 0.04
+      Size (Pixels): 4
+      Color Transformer: FlatColor
+      Color: 255; 150; 20
+      Alpha: 1
+      Decay Time: 0
+      Position Transformer: XYZ
+      Queue Size: 2
+      Selectable: false
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Log-odds boulder (lp)
+      Enabled: true
+      Topic:
+        Value: /bp1/lp
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Log-odds crater (ln)
+      Enabled: true
+      Topic:
+        Value: /bp1/ln
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Candidates
+      Enabled: true
+      Topic:
+        Value: /bp1/candidates
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Speed gate + HUD
+      Enabled: true
+      Topic:
+        Value: /bp1/gate
+        Depth: 5
+        Durability Policy: Volatile
+        History Policy: Keep Last
+        Reliability Policy: Reliable
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Marker Scale: 0.4
+      Show Arrows: false
+      Show Axes: true
+      Show Names: false
+  Enabled: true
+  Global Options:
+    Background Color: 20; 22; 27
+    Fixed Frame: map
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Interact
+      Hide Inactive Objects: true
+  Transformation:
+    Current:
+      Class: rviz_default_plugins/TF
+  Value: true
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Name: Current View
+      Target Frame: <Fixed Frame>
+      Distance: 7.5
+      Focal Point:
+        X: 2.8
+        Y: 2.5
+        Z: 0
+      Focal Shape Fixed Size: false
+      Focal Shape Size: 0.05
+      Near Clip Distance: 0.01
+      Pitch: 0.95
+      Yaw: 3.3
+      Value: Orbit (rviz)
+    Saved: ~
+Window Geometry:
+  Hide Left Dock: false
+  Hide Right Dock: true
+  Height: 900
+  Width: 1500
+  X: 40
+  Y: 40

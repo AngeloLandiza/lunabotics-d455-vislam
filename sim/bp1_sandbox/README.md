@@ -35,6 +35,7 @@ python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac
 - `isaac_bridge.py`: exports an arena to USD for Isaac Sim, and applies the BP-1 layer to ideal LiDAR ranges or depth images from any source.
 - `tests/test_bridge.py`: checks that the BP-1 layer gives identical output from our ray marcher and from outside hits, and that the USD mesh matches the height field.
 - `isaac_capture.py`, `isaac_validate.py`, `run_isaac_capture.sh`: the Isaac-side capture and its check (section "Isaac Sim capture"). Output goes to `isaac_out/`, which is not committed.
+- `live_view.py`, `live_view.rviz`, `run_live.sh`: live RViz2 view of one approach run (section "Live view").
 - `usd/arena_seed1.usda`: one exported arena (Z up, metres, origin at the start-zone corner) with its obstacle list in `arena_seed1.usda.truth.json`.
 
 ## Path to Isaac Sim
@@ -71,6 +72,28 @@ Agreement with the sandbox (seed-1 arena, 8 poses, run 2026-10-11):
 The LiDAR's 1 cm 95th percentile against the sandbox comes from the export: the USD mesh samples the 1 cm height map every 2 cm. Against the mesh itself, Isaac is exact to 1 mm. A single RTX scan without merging misses 1.3-3.0 % of rays.
 
 Detection (logodds, two 4-frame approaches, clear air and a plume 0.8 m ahead): over 16 cases per source (2 approaches x LiDAR and D455 x clear and dust x 1 and 4 frames), the sandbox found 69 obstacle detections with 2 false alarms, and Isaac + BP-1 layer found 68 with 3. Per-case results are in `isaac_out/validation.json`. The differences are single obstacles near the threshold (Inferred: the same noise draws land on slightly different ideal ranges).
+
+## Live view (RViz2)
+
+`./run_live.sh [flags]` starts rviz2 with `live_view.rviz` and runs `live_view.py`. That script replays `approach.trial` for one arena seed, one sensor, and clear air or dust, frame by frame. It needs ROS 2 Humble (rclpy, rviz2) and the system `python3`.
+
+```
+./run_live.sh                                   # seed 1, spin16, clear air, 2 frames/s
+./run_live.sh --sensor d455 --dust --loop       # D455 in the dust plume, replaying the run
+./run_live.sh --l-dec-lidar 4.0 --paused        # another confirmation threshold; start paused
+```
+
+- **Flags**: `--seed`, `--sensor spin16|d455`, `--dust`, `--rate` (frames/s), `--l-dec-lidar` / `--l-dec-d455` (confirmation thresholds, defaults from params.py: 5.1 and 0.85), `--paused`, `--loop`.
+- **Keys** in the terminal: space pause/resume, `n` step, `r` restart, `q` quit.
+- **Speed**: the first pass shows frames as they are computed. A spin16 frame in dust takes about 1 s on the laptop, so playback can be slower than `--rate`. With `--loop`, later passes replay the cached frames at `--rate`.
+- **What is shown** (frame `map` = arena frame):
+  - terrain coloured by height, and the true obstacles as translucent labelled cylinders (boulder orange, crater blue, column grey);
+  - the robot footprint (TF `base_link`), its corridor (half-width 0.40 m, from the front edge 0.35 m ahead of centre), and the path driven so far;
+  - the current scan, with surface returns in green and dust echoes in orange, plus the dust plume as a +-2 sigma ellipsoid;
+  - the log-odds layers `lp` (blue to red, full cells) and `ln` (teal to magenta, smaller cells);
+  - every candidate cluster, labelled with its kind, pooled evidence, state and truth class. Red is confirmed (evidence >= threshold), yellow is unresolved (0.85 <= evidence < threshold), grey is faint;
+  - the speed gate: 1.0 m/s, or 0.25 m/s when a confirmed hazard, an unresolved candidate or unobserved corridor ground lies within d_stop(1.0) + 0.5 m of the front. d_stop(v) = 0.3 v + v^2 / (2 x 0.5) + 0.10 m is drawn as a line ahead of the front. This gate is a display aid (Assumed numbers); `speed_gate.py` holds the evaluated policy.
+- **RViz quirks** worked around: rviz2 (Humble) ignores the window size in the config, so `run_live.sh` resizes the window through Xlib. It also draws spaces in text markers very wide, so the labels use underscores.
 
 ## Parameter status
 
