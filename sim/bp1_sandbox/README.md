@@ -122,17 +122,32 @@ LiDAR or D455 together gives the LiDAR's numbers. Phantom stops: 0.17 per 10 m f
 ## Floor and tilt cases
 
 ```
-python3 approach.py 48 results_rob/base 3000 --clear-only                      # today's floor, for reference
-python3 approach.py 48 results_rob/rms3 3000 --clear-only --rms 0.03           # rougher floor (3 cm RMS)
-python3 approach.py 48 results_rob/und4 3000 --clear-only --undulation 0.04    # floor waves, 4 cm RMS
-python3 approach.py 48 results_rob/pitch2 3000 --clear-only --pitch-err 2      # attitude estimate off by 2 deg
-python3 approach.py 48 results_rob/und4_l20 3000 --clear-only --undulation 0.04 --ground local --ground-sigma 0.2 --ground-spread 0.10
-python3 robustness.py results_rob/summary results_rob/base results_rob/rms3 results_rob/und4 results_rob/und4_l20
+python3 approach.py 48 results_rob/base 3000 --clear-only --ground plane            # flat floor, single ground plane
+python3 approach.py 48 results_rob/und4 3000 --clear-only --undulation 0.04 --ground plane   # floor waves, 4 cm RMS
+python3 approach.py 48 results_rob/und4_local 3000 --clear-only --undulation 0.04   # same, default local ground fit
+python3 approach.py 48 results_rob/rms3 3000 --clear-only --rms 0.03 --ground plane # rougher floor (3 cm RMS)
+python3 approach.py 48 results_rob/pitch2 3000 --clear-only --pitch-err 2 --ground plane    # attitude estimate off by 2 deg
+python3 robustness.py results_rob/summary results_rob/base results_rob/und4 results_rob/und4_local
 ```
 
 Every case uses the same arenas, starts and sensor noise; the extra draws come from their own random stream. The dust runs draw from the sensor stream too, so the D455 noise is paired only between folders that both run or both skip dust (compare a local-fit folder with dust against `results_approach`, which has dust). `--rms` changes the floor roughness (correlation length 0.25 m, so 3 cm RMS makes bumps about 25 cm wide and up to about 9 cm high). `--undulation` adds 12 long floor waves (wavelengths 1.5-3 m, random directions) of the given RMS inside the walls; the robot still rides level at z = 0, so the waves change what the sensors see, not the robot's attitude. `--pitch-err` rotates every scan about the robot's ground point, as if the attitude estimate were off by that many degrees (the sign alternates with the seed). `robustness.py` scores each folder with the thresholds in `params.py` and the rules of `speed_gate.py` (missed hazards from rest, phantom stops ahead) and adds the false alarms left anywhere in the map per frame. A folder with dust runs is scored twice, clear and in dust. It writes `robustness.md`, `robustness.json` and, with matplotlib, `robustness.png`.
 
-`--ground local` replaces the single robust ground plane with a robust local plane fit: LOESS of degree 1 with Tukey bisquare robustness weights (Cleveland 1979, JASA 74(368):829-836, https://stat.cmu.edu/~rnugent/PCMI2016/papers/LowessCleveland.pdf). Each cell's ground is the plane that best fits the observed cell heights around it, weighted by a Gaussian of width `DETECT.ground_sigma`; bisquare weights with c = 4.685 x 1.4826 x MAD of the residuals then remove boulders, craters and noise, and the fit is repeated (4 iterations; Cleveland uses 6 x median|r| and recommends 2). Where under a quarter of the window is observed, the fit leans back towards the global plane. `--ground-spread 0.10` (`DETECT.ground_spread`) also leaves out cells whose returns span more than 10 cm in height: without it, LiDAR echoes from the dust plume raised the cell mean heights, the local fit followed them up by about 4 cm, and the real ground below read as a crater (1.4 phantom stops per 10 m in dust on the flat floor, against 0.24 with the plane). On seed 3020 ground cells spanned under 6 cm at the 99th percentile and plume cells about 90 cm; the 10 cm limit is Assumed from that. The weighted sums are Gaussian-filtered moment maps, so a pass costs a few image filters. The default in `params.py` stays the plane until the 48-arena runs show the local fit misses nothing more.
+The ground fit is now a robust local plane fit by default (`--ground plane` brings back the single robust plane): LOESS of degree 1 with Tukey bisquare robustness weights (Cleveland 1979, JASA 74(368):829-836, https://stat.cmu.edu/~rnugent/PCMI2016/papers/LowessCleveland.pdf). Each cell's ground is the plane that best fits the observed cell heights around it, weighted by a Gaussian of width `DETECT.ground_sigma`; bisquare weights with c = 4.685 x 1.4826 x MAD of the residuals then remove boulders, craters and noise, and the fit is repeated (4 iterations; Cleveland uses 6 x median|r| and recommends 2). Where under a quarter of the window is observed, the fit leans back towards the global plane. `DETECT.ground_spread` = 0.10 m leaves out cells whose returns span more than 10 cm in height: without it, LiDAR echoes from the dust plume raised the cell mean heights, the local fit followed them up by about 4 cm, and the real ground below read as a crater (1.4 phantom stops per 10 m in dust on the flat floor, against 0.24 with the plane). On seed 3020 ground cells spanned under 6 cm at the 99th percentile and plume cells about 90 cm; the 10 cm limit is Assumed from that. The weighted sums are Gaussian-filtered moment maps, so a pass costs a few image filters.
+
+Results over seeds 3000-3047 (48 arenas, 39 craters and 53 boulder or column crossings in the path), LiDAR and D455 together, constant 0.75 m/s from rest, local fit with a 20 cm window and the 10 cm spread limit:
+
+| Case | False stops per 10 m, plane | False stops per 10 m, local fit | Missed (craters + boulders), plane | Missed, local fit |
+| --- | --- | --- | --- | --- |
+| Flat floor, 1 cm roughness | 0 | 0 | 0 | 0 |
+| Flat floor, dust plume | 0.24 | 0.24 | 0 | 0 |
+| Floor waves, 2 cm RMS | 12.8 | 0 | 1 + 0 | 0 |
+| Floor waves, 4 cm RMS | 30.9 | 0.10 | 3 + 3 | 0 |
+| Roughness 3 cm RMS | 9.0 | 2.4 | 0 | 0 |
+| Pitch error 2 deg | 17.5 | 0 | 0 | 0 |
+
+The LiDAR alone, with the local fit, missed 1 crater on the 4 cm floor waves at 0.75 m/s; the D455 alone missed none. At 1.0 m/s the local fit missed at most 2 of 39 craters with both sensors in every case (the plane: 5 on the 4 cm waves and 4 at 3 cm roughness). The false stops left at 3 cm roughness are bumps up to about 9 cm high and 25 cm wide, which pass the 8 cm boulder height, so some of them are arguably real. Every case here is Assumed: wave amplitudes and wavelengths, roughness and pitch errors were chosen as stress cases, not measured on the arena floor. `robustness.md` in each summary folder has the per-sensor tables.
+
+The earlier results in this README (`results_v02/`, the speed test in `results_approach*/`, the Isaac comparison) were made with the single plane; add `--ground plane` to `approach.py`, or set `DETECT.ground_fit` to `"plane"`, to reproduce them.
 
 ## Parameter status
 
@@ -202,8 +217,8 @@ Every case uses the same arenas, starts and sensor noise; the extra draws come f
 | DETECT.l_decide_lidar | 5.1 | Assumed | LiDAR: accept an object when log-odds summed over its cells reach 6 net observations; tuned on seeds 1000-1015 |
 | DETECT.l_decide_d455 | 0.85 | Assumed | D455: accept an object at 1 net observation (it made no dust false alarms); tuned on seeds 1000-1015 |
 | DETECT.d_neg | 0.04 m | Assumed | a ray passing this far below the fitted ground (or 3 vertical sigma) is evidence of a depression |
-| DETECT.ground_fit | plane | Assumed | 'plane': one robust plane for the arena; 'local': robust local planes (Cleveland 1979 LOESS) for uneven floors |
-| DETECT.ground_sigma | 0.3 m | Assumed | width of the Gaussian window for the local ground fit |
-| DETECT.ground_spread | 0.0 m | Assumed | local ground fit uses only cells whose returns span less than this in height (0 = all cells) |
+| DETECT.ground_fit | local | Assumed | 'local': robust local planes (Cleveland 1979 LOESS); 'plane': one robust plane for the arena. Local chosen on seeds 3000-3047: same misses on a flat floor, far fewer false stops on floor waves, roughness and pitch error |
+| DETECT.ground_sigma | 0.2 m | Assumed | width of the Gaussian window for the local ground fit; 0.2 m beat 0.3 m on 4 cm floor waves (seeds 3000-3003) |
+| DETECT.ground_spread | 0.1 m | Assumed | local ground fit uses only cells whose returns span less than this in height (0 = all cells); seed 3020: ground cells under 6 cm at p99, dust-plume cells about 90 cm |
 | LIDAR_PROFILES.spin16 | kind=spinning, channels=16, vmin=-15.0, vmax=15.0, hres=0.4, min_range=0.3 | Assumed | Assumed generic 16-beam spinning pattern |
 | LIDAR_PROFILES.rosette70 | kind=rosette, fov=70.4, points=10000, petals=7.0, min_range=0.21 | Assumed | Approximate non-repetitive pattern; 70.4 deg FOV and 0.21 m blind zone are the Livox MID-70 values reported by Xie et al. (https://pmc.ncbi.nlm.nih.gov/articles/PMC11679008); the curve itself is Assumed |
