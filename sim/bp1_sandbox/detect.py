@@ -37,37 +37,47 @@ class Grid:
         return np.meshgrid(xs, ys, indexing="ij")
 
 
-def accumulate(scans, grid, carve=True):
+def new_layers(grid):
     shape = (grid.nx, grid.ny)
-    L = {
+    return {
         "count": np.zeros(shape), "zmax": np.full(shape, -np.inf), "zmin": np.full(shape, np.inf),
         "zsum": np.zeros(shape), "sig": np.full(shape, np.inf), "carve": np.full(shape, np.inf),
         "expected": np.zeros(shape),
     }
+
+
+def add_scan(L, s, grid, carve=True):
+    """Add one scan to the grid layers in place (used per frame by approach.py, and by accumulate)."""
+    P, ok = s["pts"], s["valid"]
+    i, j, inside = grid.idx(P[:, 0], P[:, 1])
+    m = ok & inside
+    np.add.at(L["count"], (i[m], j[m]), 1)
+    np.maximum.at(L["zmax"], (i[m], j[m]), P[m, 2])
+    np.minimum.at(L["zmin"], (i[m], j[m]), P[m, 2])
+    np.add.at(L["zsum"], (i[m], j[m]), P[m, 2])
+    np.minimum.at(L["sig"], (i[m], j[m]), s["sigma"][m])
+    # cells a flat floor would have put returns in (for "in view" bookkeeping)
+    rf = s["r_flat"]
+    okf = np.isfinite(rf) & (rf < 8.0)
+    F = s["origin"] + np.nan_to_num(rf)[:, None] * s["dirs"]
+    fi, fj, fin = grid.idx(F[:, 0], F[:, 1])
+    mf = okf & fin
+    np.add.at(L["expected"], (fi[mf], fj[mf]), 1)
+    if carve:
+        sm = s["samples"]
+        r = s["r"][sm["ray"]]
+        sig = np.nan_to_num(s["sigma"][sm["ray"]], nan=1.0)
+        free = np.isfinite(r) & (sm["t"] < r - (v(pr.DETECT, "carve_margin") + 3 * sig))
+        ci, cj, cin = grid.idx(sm["x"], sm["y"])
+        mc = free & cin
+        np.minimum.at(L["carve"], (ci[mc], cj[mc]), sm["z"][mc])
+    return L
+
+
+def accumulate(scans, grid, carve=True):
+    L = new_layers(grid)
     for s in scans:
-        P, ok = s["pts"], s["valid"]
-        i, j, inside = grid.idx(P[:, 0], P[:, 1])
-        m = ok & inside
-        np.add.at(L["count"], (i[m], j[m]), 1)
-        np.maximum.at(L["zmax"], (i[m], j[m]), P[m, 2])
-        np.minimum.at(L["zmin"], (i[m], j[m]), P[m, 2])
-        np.add.at(L["zsum"], (i[m], j[m]), P[m, 2])
-        np.minimum.at(L["sig"], (i[m], j[m]), s["sigma"][m])
-        # cells a flat floor would have put returns in (for "in view" bookkeeping)
-        rf = s["r_flat"]
-        okf = np.isfinite(rf) & (rf < 8.0)
-        F = s["origin"] + np.nan_to_num(rf)[:, None] * s["dirs"]
-        fi, fj, fin = grid.idx(F[:, 0], F[:, 1])
-        mf = okf & fin
-        np.add.at(L["expected"], (fi[mf], fj[mf]), 1)
-        if carve:
-            sm = s["samples"]
-            r = s["r"][sm["ray"]]
-            sig = np.nan_to_num(s["sigma"][sm["ray"]], nan=1.0)
-            free = np.isfinite(r) & (sm["t"] < r - (v(pr.DETECT, "carve_margin") + 3 * sig))
-            ci, cj, cin = grid.idx(sm["x"], sm["y"])
-            mc = free & cin
-            np.minimum.at(L["carve"], (ci[mc], cj[mc]), sm["z"][mc])
+        add_scan(L, s, grid, carve)
     return L
 
 
@@ -99,54 +109,101 @@ def _ray_cells(grid, rays, ci, cj, mask):
     return u // grid.ny, u % grid.ny
 
 
-def logodds_layers(scans, grid, L, g):
-    """Per-cell log-odds for boulders (lp) and craters (ln), updated frame by frame and clamped."""
+def logodds_zref(L, g):
+    """Height a ray must pass under to contradict a boulder in a cell: the highest return minus h_pos when that
+    return stands above the ground by more than h_pos, else ground + h_pos."""
+    h_pos = v(pr.DETECT, "h_pos")
+    return np.where(np.isfinite(L["zmax"]) & (L["zmax"] - g > h_pos), L["zmax"] - h_pos, g + h_pos)
+
+
+def logodds_delta(s, grid, g, zref):
+    """Log-odds increments of one scan: dp for boulders, dn for craters (before clamping)."""
     lo, lf = v(pr.DETECT, "l_occ"), v(pr.DETECT, "l_free")
-    lmin, lmax = v(pr.DETECT, "l_min"), v(pr.DETECT, "l_max")
     h_pos, d_neg, margin = v(pr.DETECT, "h_pos"), v(pr.DETECT, "d_neg"), v(pr.DETECT, "carve_margin")
     shape = (grid.nx, grid.ny)
+    sig_r = np.nan_to_num(s["sigma_r"], nan=1.0)
+    sv = sig_r * np.abs(s["dirs"][:, 2])                # vertical part of the range noise
+    P, ok = s["pts"], s["valid"]
+    i, j, inside = grid.idx(P[:, 0], P[:, 1])
+    m = ok & inside
+    i, j, dz, svm = i[m], j[m], P[m, 2] - g[i[m], j[m]], sv[m]
+    tp, tn = np.maximum(h_pos, 3 * svm), np.maximum(d_neg, 3 * svm)
+    hit, low, ground = dz > tp, dz < -tn, (dz >= -tn) & (dz <= tp)
+    dp, dn = np.zeros(shape), np.zeros(shape)
+    np.add.at(dp, (i[hit], j[hit]), lo)
+    np.add.at(dn, (i[low], j[low]), lo)
+    np.add.at(dn, (i[ground], j[ground]), lf)
+    sm = s["samples"]
+    r = s["r"][sm["ray"]]
+    free = np.isfinite(r) & (sm["t"] < r - (margin + 3 * sig_r[sm["ray"]]))
+    ci, cj, cin = grid.idx(sm["x"], sm["y"])
+    ci, cj = np.clip(ci, 0, grid.nx - 1), np.clip(cj, 0, grid.ny - 1)
+    free &= cin
+    bi, bj = _ray_cells(grid, sm["ray"], ci, cj, free & (sm["z"] < zref[ci, cj]))
+    np.add.at(dp, (bi, bj), lf)
+    deep = free & (sm["z"] < g[ci, cj] - np.maximum(d_neg, 3 * sv[sm["ray"]]))
+    di, dj = _ray_cells(grid, sm["ray"], ci, cj, deep)
+    np.add.at(dn, (di, dj), lo)
+    return dp, dn
+
+
+def logodds_layers(scans, grid, L, g):
+    """Per-cell log-odds for boulders (lp) and craters (ln), updated frame by frame and clamped."""
+    lmin, lmax = v(pr.DETECT, "l_min"), v(pr.DETECT, "l_max")
+    shape = (grid.nx, grid.ny)
     lp, ln = np.zeros(shape), np.zeros(shape)
-    zref = np.where(np.isfinite(L["zmax"]) & (L["zmax"] - g > h_pos), L["zmax"] - h_pos, g + h_pos)
+    zref = logodds_zref(L, g)
     for s in scans:
-        sig_r = np.nan_to_num(s["sigma_r"], nan=1.0)
-        sv = sig_r * np.abs(s["dirs"][:, 2])                # vertical part of the range noise
-        P, ok = s["pts"], s["valid"]
-        i, j, inside = grid.idx(P[:, 0], P[:, 1])
-        m = ok & inside
-        i, j, dz, svm = i[m], j[m], P[m, 2] - g[i[m], j[m]], sv[m]
-        tp, tn = np.maximum(h_pos, 3 * svm), np.maximum(d_neg, 3 * svm)
-        hit, low, ground = dz > tp, dz < -tn, (dz >= -tn) & (dz <= tp)
-        dp, dn = np.zeros(shape), np.zeros(shape)
-        np.add.at(dp, (i[hit], j[hit]), lo)
-        np.add.at(dn, (i[low], j[low]), lo)
-        np.add.at(dn, (i[ground], j[ground]), lf)
-        sm = s["samples"]
-        r = s["r"][sm["ray"]]
-        free = np.isfinite(r) & (sm["t"] < r - (margin + 3 * sig_r[sm["ray"]]))
-        ci, cj, cin = grid.idx(sm["x"], sm["y"])
-        ci, cj = np.clip(ci, 0, grid.nx - 1), np.clip(cj, 0, grid.ny - 1)
-        free &= cin
-        bi, bj = _ray_cells(grid, sm["ray"], ci, cj, free & (sm["z"] < zref[ci, cj]))
-        np.add.at(dp, (bi, bj), lf)
-        deep = free & (sm["z"] < g[ci, cj] - np.maximum(d_neg, 3 * sv[sm["ray"]]))
-        di, dj = _ray_cells(grid, sm["ray"], ci, cj, deep)
-        np.add.at(dn, (di, dj), lo)
+        dp, dn = logodds_delta(s, grid, g, zref)
         lp = np.clip(lp + dp, lmin, lmax)
         ln = np.clip(ln + dn, lmin, lmax)
     return lp, ln
 
 
-def detect(L, grid, method="carve", scans=None):
+def clusters(pos, neg, grid, lp=None, ln=None, l_dec=None):
+    """Connected clusters of flagged cells (8-connected), at least min_cells each.
+
+    With log-odds layers, each cluster carries its evidence (lp or ln summed over its cells), and clusters below
+    l_dec are dropped; l_dec=-inf keeps them all, for threshold sweeps.
+    """
+    out = []
+    for kind, mask, mn in (("pos", pos, v(pr.DETECT, "min_cells_pos")), ("neg", neg, v(pr.DETECT, "min_cells_neg"))):
+        lab, n = ndimage.label(mask, structure=np.ones((3, 3)))
+        if n == 0:
+            continue
+        for k, sl in enumerate(ndimage.find_objects(lab), start=1):
+            sub = lab[sl] == k
+            ii, jj = np.nonzero(sub)
+            if len(ii) < mn:
+                continue
+            ii, jj = ii + sl[0].start, jj + sl[1].start
+            ev = None
+            if lp is not None:
+                ev = float((lp if kind == "pos" else ln)[ii, jj].sum())
+                if l_dec is not None and ev < l_dec:
+                    continue               # not enough pooled evidence over the whole object
+            out.append({"kind": kind, "x": (ii.mean() + 0.5) * grid.cell, "y": (jj.mean() + 0.5) * grid.cell,
+                        "cells": len(ii), "evidence": ev})
+    return out
+
+
+def l_decide(sensor):
+    return v(pr.DETECT, "l_decide_d455" if sensor == "d455" else "l_decide_lidar")
+
+
+def detect(L, grid, method="carve", scans=None, l_dec=None):
     g = fit_ground(L, grid)
     h_pos, h_neg = v(pr.DETECT, "h_pos"), v(pr.DETECT, "h_neg")
     has = L["count"] > 0
+    if method == "logodds":
+        lp, ln = logodds_layers(scans, grid, L, g)
+        # cells where support outweighs contradiction; clusters are judged on their pooled evidence
+        l_dec = l_decide(scans[0]["sensor"]) if l_dec is None else l_dec
+        out = clusters(lp > 0, ln > 0, grid, lp, ln, l_dec)
+        return out, {"pos": lp > 0, "neg": ln > 0, "ground": g, "lp": lp, "ln": ln}
     if method == "baseline":
         pos = has & (L["zmax"] - g > h_pos)
         neg = has & (L["zmin"] - g < -h_neg)
-    elif method == "logodds":
-        lp, ln = logodds_layers(scans, grid, L, g)
-        pos, neg = lp > 0, ln > 0          # cells where support outweighs contradiction; clusters are judged below
-        l_dec = v(pr.DETECT, "l_decide_d455" if scans[0]["sensor"] == "d455" else "l_decide_lidar")
     else:
         sig = np.where(np.isfinite(L["sig"]), L["sig"], 0.0)
         tp, tn = np.maximum(h_pos, 3 * sig), np.maximum(h_neg, 3 * sig)
@@ -154,18 +211,7 @@ def detect(L, grid, method="carve", scans=None):
         hollow = L["carve"] < L["zmax"] - tp            # some ray passed beneath the high return
         pos &= ~hollow
         neg = (has & (L["zmin"] - g < -tn)) | (np.isfinite(L["carve"]) & (L["carve"] - g < -h_neg))
-    out = []
-    for kind, mask, mn in (("pos", pos, v(pr.DETECT, "min_cells_pos")), ("neg", neg, v(pr.DETECT, "min_cells_neg"))):
-        lab, n = ndimage.label(mask, structure=np.ones((3, 3)))
-        for k in range(1, n + 1):
-            ii, jj = np.nonzero(lab == k)
-            if len(ii) < mn:
-                continue
-            if method == "logodds" and (lp if kind == "pos" else ln)[ii, jj].sum() < l_dec:
-                continue                   # not enough pooled evidence over the whole object
-            out.append({"kind": kind, "x": (ii.mean() + 0.5) * grid.cell, "y": (jj.mean() + 0.5) * grid.cell,
-                        "cells": len(ii)})
-    return out, {"pos": pos, "neg": neg, "ground": g}
+    return clusters(pos, neg, grid), {"pos": pos, "neg": neg, "ground": g}
 
 
 def score(dets, arena, L, grid, sensor_xy):
