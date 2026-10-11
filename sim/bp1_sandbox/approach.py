@@ -108,7 +108,8 @@ def trial(seed):
                 frames.append({"s": round(s, 3), "dets": dets, "first_unseen": first_unseen,
                                "dust_echoes": int(scan["is_dust"].sum())})
             runs.append({"sensor": sname, "dust": dust_on, "frames": frames})
-    return {"seed": seed, "start": [x0, y0, yaw], "length": length, "obstacles": obst, "runs": runs}
+    every = [[o.kind, o.x, o.y, o.radius] for o in arena.obstacles]
+    return {"seed": seed, "start": [x0, y0, yaw], "length": length, "obstacles": obst, "arena_obstacles": every, "runs": runs}
 
 
 def main():
