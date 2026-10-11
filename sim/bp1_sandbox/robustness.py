@@ -1,7 +1,7 @@
 """Floor roughness, floor waves and attitude error: how much they cost the detector at the speeds that passed.
 
-Each argument is a results folder written by approach.py (clear air) for one case on the same seeds. Every case is
-scored with the thresholds in params.py and the same rules as speed_gate.py: missed hazards at constant speed from
+Each argument is a results folder written by approach.py for one case on the same seeds; its dust runs, if it has
+any, are scored as a separate case. Every case is scored with the thresholds in params.py and the same rules as speed_gate.py: missed hazards at constant speed from
 rest, phantom stops ahead (false candidates confirmed inside the stopping distance), and the false alarms left in the
 map (false candidates above the threshold anywhere in the arena, per frame).
 
@@ -55,21 +55,9 @@ def main():
     for d in dirs:
         meta, runs, by_dir = load([d])
         seeds = by_dir[0]
-        label = case_label(meta)
-        for sensor in SENSORS:
-            g = groups(runs, sensor, False, seeds)
-            thr = thr_for(sensor, CHOSEN)
-            fa_pos, fa_neg = map_false_alarms(g, thr)
-            row = {"case": label, "dir": d, "sensor": sensor, "n_arenas": len(seeds), "map_fa_pos": fa_pos, "map_fa_neg": fa_neg}
-            for vel in SPEEDS:
-                rec, ph, _, _ = drive(g, thr, vel, gate=False)
-                s = summarize(rec)
-                row[f"v{vel}"] = {"phantom_per_10m": ph, **{k: s[k] for k, _ in KINDS}}
-            rows.append(row)
-            print(f"{label:48s} {LABEL[sensor]:14s} map FA/frame boulder {fa_pos:.2f} crater {fa_neg:.2f} | "
-                  + " | ".join(f"{vel} m/s: craters {row[f'v{vel}']['craters']['missed']}/{row[f'v{vel}']['craters']['n']}, "
-                               f"boulders {row[f'v{vel}']['boulders']['missed']}/{row[f'v{vel}']['boulders']['n']}, "
-                               f"phantom {row[f'v{vel}']['phantom_per_10m']:.2f}" for vel in SPEEDS), flush=True)
+        for dust in (False, True):
+            if ("spin16", dust) in runs:
+                rows += score_case(case_label(meta) + (", dust plume" if dust else ""), d, runs, dust, seeds)
     with open(os.path.join(out, "robustness.json"), "w") as f:
         json.dump({"thresholds": CHOSEN, "speeds": SPEEDS, "rows": rows}, f, indent=1, default=float)
     write_md(rows, os.path.join(out, "robustness.md"))
@@ -77,6 +65,26 @@ def main():
         plot(rows, out)
     except ImportError as e:   # matplotlib missing: the tables still stand, and plot() can rerun from robustness.json
         print(f"no figure ({e})")
+
+
+def score_case(label, d, runs, dust, seeds):
+    rows = []
+    for sensor in SENSORS:
+        g = groups(runs, sensor, dust, seeds)
+        thr = thr_for(sensor, CHOSEN)
+        fa_pos, fa_neg = map_false_alarms(g, thr)
+        row = {"case": label, "dir": d, "dust": dust, "sensor": sensor, "n_arenas": len(seeds),
+               "map_fa_pos": fa_pos, "map_fa_neg": fa_neg}
+        for vel in SPEEDS:
+            rec, ph, _, _ = drive(g, thr, vel, gate=False)
+            s = summarize(rec)
+            row[f"v{vel}"] = {"phantom_per_10m": ph, **{k: s[k] for k, _ in KINDS}}
+        rows.append(row)
+        print(f"{label:48s} {LABEL[sensor]:14s} map FA/frame boulder {fa_pos:.2f} crater {fa_neg:.2f} | "
+              + " | ".join(f"{vel} m/s: craters {row[f'v{vel}']['craters']['missed']}/{row[f'v{vel}']['craters']['n']}, "
+                           f"boulders {row[f'v{vel}']['boulders']['missed']}/{row[f'v{vel}']['boulders']['n']}, "
+                           f"phantom {row[f'v{vel}']['phantom_per_10m']:.2f}" for vel in SPEEDS), flush=True)
+    return rows
 
 
 def write_md(rows, path):
