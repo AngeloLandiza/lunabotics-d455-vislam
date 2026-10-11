@@ -89,8 +89,8 @@ def score_case(label, d, runs, dust, seeds):
 
 def write_md(rows, path):
     L = ["# Floor roughness, floor waves and attitude error", "",
-         f"Clear air, thresholds from params.py (LiDAR {CHOSEN['spin16']}, D455 {CHOSEN['d455']}), constant speed from rest; "
-         "same arenas, starts and sensor noise in every case.", "",
+         f"Thresholds from params.py (LiDAR {CHOSEN['spin16']}, D455 {CHOSEN['d455']}), constant speed from rest; "
+         "same arenas and starts in every case, and the same sensor noise among folders that all skip or all run dust.", "",
          "| Case | Sensor | False boulders in map per frame | False craters in map per frame | "
          + " | ".join(f"Missed at {vel} m/s (craters, boulders) | Phantom stops per 10 m at {vel} m/s" for vel in SPEEDS) + " |",
          "|" + " --- |" * (4 + 2 * len(SPEEDS))]

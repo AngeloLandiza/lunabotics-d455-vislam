@@ -7,7 +7,8 @@ Usage: python3 approach.py [n_arenas] [out_dir] [first_seed] [--rms M] [--undula
        [--ground plane|local] [--ground-sigma M] [--workers N]
 --rms sets the floor roughness (params.py default 0.01 m), --undulation adds long-wavelength floor waves of that RMS,
 --pitch-err makes the robot's attitude estimate wrong by that many degrees (sign alternates with the seed). The extra
-draws use their own random stream, so every case sees the same arenas, starts and sensor noise as the others.
+draws use their own random stream, so every case sees the same arenas, starts and sensor noise as the others. The
+dust runs share the sensor stream, so D455 noise matches only between folders that both run or both skip dust.
 Every number below is Assumed unless marked; the robot's real size, braking and frame rate replace them later.
 """
 import argparse
