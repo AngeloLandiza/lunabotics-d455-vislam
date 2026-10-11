@@ -144,6 +144,9 @@ Results over seeds 3000-3047 (48 arenas, 39 craters and 53 boulder or column cro
 | Floor waves, 4 cm RMS | 30.9 | 0.10 | 3 + 3 | 0 |
 | Roughness 3 cm RMS | 9.0 | 2.4 | 0 | 0 |
 | Pitch error 2 deg | 17.5 | 0 | 0 | 0 |
+| Floor waves, 1 cm RMS | 1.0 | not run | 0 | not run |
+| Roughness 2 cm RMS | 0.78 | not run | 0 | not run |
+| Pitch error 1 deg | 0 | not run | 0 | not run |
 
 The LiDAR alone, with the local fit, missed 1 crater on the 4 cm floor waves at 0.75 m/s; the D455 alone missed none. At 1.0 m/s the local fit missed at most 2 of 39 craters with both sensors in every case (the plane: 5 on the 4 cm waves and 4 at 3 cm roughness). The false stops left at 3 cm roughness are bumps up to about 9 cm high and 25 cm wide, which pass the 8 cm boulder height, so some of them are arguably real. Every case here is Assumed: wave amplitudes and wavelengths, roughness and pitch errors were chosen as stress cases, not measured on the arena floor. `robustness.md` in each summary folder has the per-sensor tables.
 
