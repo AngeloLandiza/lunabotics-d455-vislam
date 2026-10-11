@@ -32,7 +32,8 @@ def case_label(meta):
         parts.append(f"pitch error {meta['pitch_err']:g} deg")
     label = ", ".join(parts) or "baseline (1 cm roughness, flat, exact attitude)"
     if meta.get("ground_fit") == "local":
-        label += f", local ground fit ({100 * meta.get('ground_sigma', 0.3):g} cm window)"
+        label += f", local ground fit ({100 * meta.get('ground_sigma', 0.3):g} cm window"
+        label += f", cells under {100 * meta['ground_spread']:g} cm spread)" if meta.get("ground_spread") else ")"
     return label
 
 

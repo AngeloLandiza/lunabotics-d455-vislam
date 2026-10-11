@@ -123,6 +123,7 @@ DETECT = {
     "d_neg": P(0.04, "m", "Assumed", "a ray passing this far below the fitted ground (or 3 vertical sigma) is evidence of a depression"),
     "ground_fit": P("plane", "", "Assumed", "'plane': one robust plane for the arena; 'local': robust local planes (Cleveland 1979 LOESS) for uneven floors"),
     "ground_sigma": P(0.3, "m", "Assumed", "width of the Gaussian window for the local ground fit"),
+    "ground_spread": P(0.0, "m", "Assumed", "local ground fit uses only cells whose returns span less than this in height (0 = all cells)"),
 }
 
 

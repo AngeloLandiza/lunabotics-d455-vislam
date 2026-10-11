@@ -93,11 +93,15 @@ def fit_ground_local(L, grid, g0, iters=4, c=4.685):
     Each cell gets the plane that best fits the observed cells around it, weighted by a Gaussian of width
     DETECT.ground_sigma; Tukey biweights computed from the residuals then drop boulders, craters and noise, and
     the fit is repeated. The weighted sums are Gaussian-filtered maps, so one pass costs a few image filters.
-    Cells with little data nearby fall back towards the global plane g0."""
+    Cells with little data nearby fall back towards the global plane g0. With DETECT.ground_spread set, cells whose
+    returns span more than that in height (dust echoes over the ground, boulder flanks, crater walls) are left out."""
     sig = v(pr.DETECT, "ground_sigma") / grid.cell
     X, Y = grid.centers()
     X, Y = X - grid.L / 2, Y - grid.W / 2
     has = L["count"] > 0
+    spread_max = v(pr.DETECT, "ground_spread")
+    if spread_max:
+        has &= L["zmax"] - L["zmin"] < spread_max
     z = np.where(has, L["zsum"] / np.maximum(L["count"], 1), 0.0)
     g = g0
     for _ in range(iters):
