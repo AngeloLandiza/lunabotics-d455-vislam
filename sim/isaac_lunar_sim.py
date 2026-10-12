@@ -32,6 +32,8 @@ parser.add_argument('--world', choices=['arena', 'lunar'], default='lunar')
 parser.add_argument('--seed', type=int, default=0, help='terrain / obstacle layout / start pose')
 parser.add_argument('--start-heading', default='random', help='arena: N, E, S, W or random')
 parser.add_argument('--no-lidar', action='store_true', help='team robot: leave out the Unitree L1')
+parser.add_argument('--earlier-trips', type=int, default=0,
+                    help='arena, team robot: start with the ruts of N earlier drives across the bed (a used bed)')
 parser.add_argument('--realism', choices=['off', 'nominal', 'heavy'], default='nominal',
                     help='BP-1 realism layers (sim/realism.py, sim/bp1_sandbox): off = ideal sensors')
 parser.add_argument('--robot', choices=['team', 'jackal'], default=None,
@@ -474,6 +476,54 @@ frame_ids = {'infra1': 'camera_infra1_optical_frame', 'infra2': 'camera_infra2_o
              'depth': 'camera_depth_optical_frame'}
 baseline = float(np.linalg.norm(world_frame(RIGHT)[1] - world_frame(LEFT)[1]))
 dust = None                         # realism.DustPlumes, added with the dust layer
+
+# Wheel ruts (arena, team robot): realism.Ruts presses each wheel's 0.1 m patch into the bed to the Bekker static
+# sinkage of the 74.1 kg rover on 4 wheels of 0.3302 m (about 3.2 cm, lunar-soil values), with side berms, whenever a
+# wheel has moved 2 cm; touched tiles are re-meshed (render and collision), so the rover sits in its own tracks.
+ruts = None
+if args.world == 'arena' and ROBOT == 'team':
+    import realism  # noqa: E402
+    WHEEL_XY = [(0.275, 0.27), (0.275, -0.27), (-0.18, 0.27), (-0.18, -0.27)]     # xacro wheel joints
+    RUT_DEPTH = realism.rut_depth(65.0 + 4 * 2.27, 4, 0.1, 2 * WHEEL_RADIUS)
+    ruts = realism.Ruts(args.realism, xs, ys, H0, RUT_DEPTH, 0.1, WHEEL_XY)
+    print(f'[sim] ruts: {"on" if ruts.on else "off"}, depth {RUT_DEPTH * 100:.1f} cm', flush=True)
+    if ruts.on and args.earlier_trips > 0:
+        # earlier drives from the start side across the obstacle zone to the far side (sandbox ruts.earlier_trips
+        # pattern, Assumed), each leg clear of rocks and craters (|H0| > 5 cm) by the body half-width + 5 cm
+        rng_t = np.random.default_rng(args.seed + 202)
+
+        def corridor_clear(a, b, half=0.41):
+            n = int(np.hypot(*(b - a)) / 0.05) + 2
+            for f in np.linspace(0, 1, n):
+                p = a + f * (b - a)
+                i0, i1 = np.searchsorted(xs, [p[0] - half, p[0] + half])
+                j0, j1 = np.searchsorted(ys, [p[1] - half, p[1] + half])
+                if np.abs(H0[i0:i1, j0:j1]).max(initial=0.0) > 0.05:
+                    return False
+            return True
+        trips, tries = [], 0
+        while len(trips) < args.earlier_trips and tries < 20000:
+            tries += 1
+            W = ys[-1]
+            pts = ([np.array([rng_t.uniform(0.5, 1.8), rng_t.uniform(0.6, W - 0.6)])]
+                   + [np.array([x, rng_t.uniform(0.6, W - 0.6)]) for x in np.sort(rng_t.uniform(2.5, 4.4, rng_t.integers(1, 4)))]
+                   + [np.array([rng_t.uniform(4.6, xs[-1] - 0.6), rng_t.uniform(0.6, W - 0.6)])])
+            if all(corridor_clear(pts[k], pts[k + 1]) for k in range(len(pts) - 1)):
+                trips.append(pts)
+        box = [10 ** 9, -1, 10 ** 9, -1]
+        for pts in trips:
+            ruts.last = None
+            for k in range(len(pts) - 1):
+                a, b = pts[k], pts[k + 1]
+                yaw = float(np.arctan2(*(b - a)[::-1]))
+                for f in np.linspace(0, 1, int(np.hypot(*(b - a)) / 0.02) + 2):
+                    bb = ruts.stamp(H, *(a + f * (b - a)), yaw)
+                    if bb:
+                        box = [min(box[0], bb[0]), max(box[1], bb[1]), min(box[2], bb[2]), max(box[3], bb[3])]
+        ruts.last = None
+        if box[1] > 0:
+            terrain.update(*box)
+        print(f'[sim] ruts of {len(trips)} earlier trips stamped', flush=True)
 if LIDAR:
     from isaacsim.sensors.experimental.rtx import parse_generic_model_output_data  # noqa: E402
     cloud_pub = ros.create_publisher(PointCloud2, '/l1/points', 5)
@@ -678,6 +728,13 @@ while app.is_running():
     now = world.current_time
     stamp = Time(sec=int(now), nanosec=int((now % 1) * 1e9))
     publish_gt_camera(stamp)
+    if ruts is not None and ruts.on:
+        pos, q = rover.get_world_pose()
+        Rb = quat_wxyz_to_R(np.asarray(q, float))
+        bb = ruts.stamp(H, float(pos[0]), float(pos[1]), float(np.arctan2(Rb[1, 0], Rb[0, 0])))
+        if bb:
+            terrain.update(*bb)
+            terrain_dirty = True
     if LIDAR:
         publish_lidar(stamp)
     for _ in range(20):                       # non-blocking: handle queued /arena/dig requests
