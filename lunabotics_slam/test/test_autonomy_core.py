@@ -309,7 +309,13 @@ def test_closed(seeds=(3000, 3001, 3002), level='nominal', legs=3):
                     hm.add(ac.make_scan(ac.apply_T(T_ab, origin_b[None])[0], ac.apply_T(T_ab, Pb), ac.val('l1_sigma'),
                                         'l1'))
                 if k % 100 == 0:                                         # 1 Hz: wall fix, ground refit, hazards
-                    f.wall_fix()
+                    before = math.hypot(*(f.x[:2] - robot.pose[:2]))
+                    res = f.wall_fix()
+                    if os.environ.get('CLOSED_DEBUG'):
+                        after = math.hypot(*(f.x[:2] - robot.pose[:2]))
+                        if max(before, after) > 0.04:
+                            print(f'   t {t:.0f} wall fix {res}: error {before * 100:.1f} -> {after * 100:.1f} cm, '
+                                  f'true {np.round(robot.pose, 2)}, sd {np.round(np.sqrt(np.diag(f.Pc)[:2]) * 100, 1)} cm')
                     hm.refit()
                     hazards = hm.objects()
                     err.append(math.hypot(*(f.x[:2] - robot.pose[:2])))

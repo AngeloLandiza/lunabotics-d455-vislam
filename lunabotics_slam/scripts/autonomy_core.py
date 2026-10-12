@@ -321,6 +321,7 @@ class WallFilter:
         self.x = np.array(pose, float)
         self.Pc = np.diag([sx ** 2, sx ** 2, math.radians(sa) ** 2])
         self.t = t
+        self.t_q, self.d_q = t, 0.0
         self.hist = [(t, *self.x)]
         self.win = (self.x.copy(), self.Pc.copy(), t, 0.0, 0.0)
         self.buf, self.rejected = [], []
@@ -349,12 +350,20 @@ class WallFilter:
         am = self.x[2] + w_gyro * dt / 2
         self.x = self.x + [vv * math.cos(am) * dt, vv * math.sin(am) * dt, w_gyro * dt]
         self.x[2] = wrap(self.x[2])
-        # covariance: the window form of drift.py, applied per step (distance-proportional + gyro noise and bias)
+        # covariance: drift.py's window form. Slip and the scale error are correlated over a window (fuse_every), so
+        # the distance part grows with the square of the distance driven in the window, and the gyro bias part with
+        # the square of the window's duration; spread per step so the window total matches drift.py
         sig_d = math.hypot(_P('sig_v_wheel'), _P('wheel_cal_err'))
+        if self.t - self.t_q >= _P('fuse_every'):
+            self.t_q, self.d_q = self.t, 0.0
+        d0, span0 = self.d_q, self.t - self.t_q
+        self.d_q += abs(vv) * dt
         c, s = math.cos(self.x[2]), math.sin(self.x[2])
         J1 = np.array([[1, 0, -s * vv * dt], [0, 1, c * vv * dt], [0, 0, 1]])
-        q = np.diag([(sig_d * abs(vv) * dt) ** 2 + 1e-10, (sig_d * abs(vv) * dt) ** 2 + 1e-10,
-                     math.radians(_P('gyro_noise')) ** 2 * dt + (math.radians(_P('gyro_bias')) * dt) ** 2])
+        dvar = sig_d ** 2 * (self.d_q ** 2 - d0 ** 2) + 1e-10
+        span1 = span0 + dt
+        q = np.diag([dvar, dvar, math.radians(_P('gyro_noise')) ** 2 * dt
+                     + math.radians(_P('gyro_bias')) ** 2 * (span1 ** 2 - span0 ** 2)])
         self.Pc = J1 @ self.Pc @ J1.T + q
         x0, P0, t0, dist, _ = self.win
         self.win = (x0, P0, t0, dist + abs(vv) * dt, t - t0)
