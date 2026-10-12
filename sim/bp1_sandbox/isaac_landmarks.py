@@ -36,6 +36,9 @@ parser.add_argument("--settle", type=int, default=6, help="app updates after eac
 parser.add_argument("--average", type=int, default=16,
                     help="renders averaged per image: RTX samples the lights randomly every frame (no denoiser here), "
                          "and one render carries ~3.6 grey levels of noise in diffuse light (measured 2026-10-12)")
+parser.add_argument("--fine-res", type=float, default=None,
+                    help="render the terrain at this resolution in m (e.g. 0.005) with the ruts stamped at that "
+                         "resolution, to reduce the staircase along the trench edges; poses still use the 1 cm field")
 parser.add_argument("--out", default=None)
 args, _ = parser.parse_known_args()
 
@@ -136,7 +139,36 @@ stage_utils.create_new_stage()
 stage = stage_utils.get_current_stage()
 UsdGeom.SetStageUpAxis(stage, UsdGeom.Tokens.z)
 UsdGeom.SetStageMetersPerUnit(stage, 1.0)
-nx, ny = H0.shape
+# Render grid: the 1 cm arena grid, or a finer one (--fine-res) over the same extent
+if args.fine_res:
+    from types import SimpleNamespace
+    nfx = int(round((base_arena.X[-1, 0] - base_arena.x0) / args.fine_res)) + 1
+    nfy = int(round((base_arena.Y[0, -1] - base_arena.y0) / args.fine_res)) + 1
+    FX, FY = np.meshgrid(base_arena.x0 + np.arange(nfx) * args.fine_res, base_arena.y0 + np.arange(nfy) * args.fine_res,
+                         indexing="ij")
+    li = np.clip(np.rint((FX - base_arena.x0) / base_arena.res).astype(int), 0, H0.shape[0] - 1)
+    lj = np.clip(np.rint((FY - base_arena.y0) / base_arena.res).astype(int), 0, H0.shape[1] - 1)
+    base_arena.h = H0.copy()
+    HF0 = base_arena.height(FX, FY)                       # bilinear from the 1 cm field (no ruts)
+    HF0 = np.where(base_arena.label[li, lj] == 0, HF0, H0[li, lj])     # obstacles and walls keep their 1 cm shape
+    fine = SimpleNamespace(X=FX, Y=FY, h=HF0.copy(), label=base_arena.label[li, lj], L=base_arena.L, W=base_arena.W)
+else:
+    FX, FY, li, lj = base_arena.X, base_arena.Y, None, None
+
+
+def render_heights(depth):
+    """Heights on the render grid with ruts of this depth from the earlier drive (0: none)."""
+    if not args.fine_res:
+        return terrain_for(depth)
+    fine.h = HF0.copy()
+    if depth > 0:
+        r = Ruts(fine, depth, width=robot.wheels[0][2])
+        r.path(wheel_track_points(poses, len(poses) - 1, X_REAR, X_FRONT), LAT)
+        r.apply()
+    return fine.h
+
+
+nx, ny = FX.shape
 ii, jj = np.meshgrid(np.arange(nx - 1), np.arange(ny - 1), indexing="ij")
 a_ = (ii * ny + jj).ravel()
 terrain = UsdGeom.Mesh.Define(stage, "/World/Terrain")
@@ -151,7 +183,8 @@ terrain_pts = terrain.CreatePointsAttr()
 rng_tex = np.random.default_rng(1000 + args.seed)
 factor = 1 + 0.15 * rng_tex.uniform(-1, 1, H0.shape)
 diffuse = np.array(LOOK["diffuse_rgb_linear"]["value"])
-albedo = (factor.reshape(-1, 1) * diffuse).astype(np.float32)
+f_render = factor if li is None else factor[li, lj]           # same 1 cm grain on a finer render grid
+albedo = (f_render.reshape(-1, 1) * diffuse).astype(np.float32)
 pv = UsdGeom.PrimvarsAPI(terrain.GetPrim()).CreatePrimvar("bp1Albedo", Sdf.ValueTypeNames.Color3fArray,
                                                            UsdGeom.Tokens.vertex)
 pv.Set(Vt.Vec3fArray.FromNumpy(albedo))
@@ -250,14 +283,14 @@ tel = Telemetry(kind="isaac", total=len(todo) * len(lights) * len(poses_run), ar
 app_utils.play()
 app_utils.update_app(steps=5)
 cam_T_by_pass, done, t0 = {}, 0, time.time()
-meta = {"seed": args.seed, "trip_seed": trip_seed, "poses": [list(p) for p in poses_run], "image": [W_IMG, H_IMG],
+meta = {"fine_res": args.fine_res, "seed": args.seed, "trip_seed": trip_seed, "poses": [list(p) for p in poses_run], "image": [W_IMG, H_IMG],
         "hfov_deg": HFOV, "lights": LIGHTS, "passes": {}, "look": "bp1_look.json", "texture": os.path.basename(tex_path)}
 for pname in todo:
     depth, cam_depth = PASSES[pname]
     h_cam = terrain_for(cam_depth)
+    h_render = render_heights(depth)
+    terrain_pts.Set(Vt.Vec3fArray.FromNumpy(np.stack([FX.ravel(), FY.ravel(), h_render.ravel()], 1).astype(np.float32)))
     h = terrain_for(depth)
-    terrain_pts.Set(Vt.Vec3fArray.FromNumpy(np.stack([base_arena.X.ravel(), base_arena.Y.ravel(), h.ravel()], 1)
-                                            .astype(np.float32)))
     Ts = []
     for pose in poses_run:
         Tb = settled(pose, h_cam)                          # robot (and camera) settled on the camera's terrain
