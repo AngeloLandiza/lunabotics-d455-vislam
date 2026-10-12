@@ -30,8 +30,9 @@ deg, tag centre 0.3, 0.6 or 0.9 m high); `python3 summarize.py results/sweep_v1`
 1. **The current rear camera cannot see tags from inside the zone.** With the URDF camera (1.2 rad, 15 deg up), tags
    0.3 or 0.6 m high are never in view from any heading; at 0.9 m, 10-33% of start positions still see none after a
    full turn. Close to the wall the tags fall below the image.
-2. **A wide lens fixes coverage.** At 2.0 rad (about 115 deg, pinhole, distortion ignored) and level or 15 deg down,
-   every start pose sees a tag after turning, with tags 0.3 m high.
+2. **A wide lens pitched down fixes coverage.** At 2.0 rad (about 115 deg, pinhole, distortion ignored), 15 deg down,
+   with tags 0.3 m high, every start pose reaches a tag by turning in place with two or more tags (4% never do with
+   one tag). Level, the same lens leaves 10-33% of poses with no tag in view except with four tags.
 3. **Two perpendicular tags do not improve accuracy; they reduce turning.** The camera almost never sees both walls
    at once (0-1% of views with two tags, 12-15% with four), so a pose comes from one wall's tags. Paired on the same
    poses (2.0 rad, 15 deg down, tags 0.3 m): perpendicular minus one tag, median position error +0.1 cm
