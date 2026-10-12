@@ -16,7 +16,8 @@ A hazard is missed when it is first confirmed closer than the stopping distance 
 or never confirmed before the robot reaches it. A phantom stop is a frame in which a candidate that is no real
 obstacle (nor a wall, nor within NEAR of a real obstacle's edge) reaches the threshold inside the stopping distance.
 
-Usage: python3 speed_gate.py results_dir [more_results_dirs ...]
+Usage: python3 speed_gate.py results_dir [more_results_dirs ...] [--tune-speed V]
+--tune-speed picks thresholds for another driving speed (default 1.0 m/s), for records whose frames match that speed.
 One directory: thresholds are tuned on the lower half of its seeds and tested on the upper half. Several: tuned on
 the first directory, tested on the others. Output goes to the first directory.
 """
@@ -212,7 +213,13 @@ def thr_for(sensor, chosen):
 
 
 def main():
-    dirs = sys.argv[1:] or ["results_approach"]
+    global TUNE_SPEED
+    args = sys.argv[1:]
+    if "--tune-speed" in args:
+        i = args.index("--tune-speed")
+        TUNE_SPEED = float(args[i + 1])
+        del args[i:i + 2]
+    dirs = args or ["results_approach"]
     meta, runs, by_dir = load(dirs)
     if len(by_dir) == 1:
         seeds = by_dir[0]
@@ -232,7 +239,7 @@ def main():
                 continue
             g = groups(runs, sensor, dust, tune)
             for thr in SWEEP[sensor]:
-                for vel in (0.75, 1.0, 1.25):
+                for vel in sorted({0.75, 1.0, 1.25, TUNE_SPEED}):
                     rec, ph, _, _ = drive(g, [thr], vel, gate=False)
                     s = summarize(rec)
                     warn = [r["clear_at_confirm"] for r in rec if r["first"] is not None and r["clear_at_confirm"] > 0]

@@ -13,7 +13,7 @@ A plain-Python, CPU-only stand-in for the arena: it builds random 2027-style are
 | D455 | Per-pixel ray cast at 212x120, 87°x58° FOV; σz = z²·σd/(f·B), f = 674 px, B = 95 mm, σd = 0.32 px; invalid pixels rise as transmittance falls | FOV and baseline Verified (Intel); σd Inferred from "<2% at 4 m"; dust effect Assumed |
 | Detectors | baseline: fixed height thresholds per 5 cm cell. carving: thresholds scale with 3σ of range noise, free-space carving bounds hidden crater floors, and a solidity check drops high returns that another ray passed beneath. log-odds: each return and each distinct ray adds evidence per cell, frame by frame (+0.85 support, -0.4 contradiction, clamped to [-2, 3.5]); rays passing below the ground plane count as crater evidence; an object is accepted when the evidence summed over its cells passes a per-sensor threshold | carving and log-odds are our own combinations (Inferred) of CFAR-style normalisation, occupancy carving, Pairet et al.'s log-odds steps and Hines et al.'s virtual surfaces (research/step2/18); the log-odds step sizes are Pairet et al.'s, the thresholds were tuned on seeds 1000-1015 |
 
-Not modelled yet: LiDAR self-occlusion by the robot, stereo matching on texture (depth is ray-cast plus noise), dust seen by the D455 as false depth, multiple scattering, sun glare, slip, and terrain deformation from digging.
+Since 2026-10-12 the robot body, its self-occlusion and wheel ruts are modelled too (section "Team robot, Unitree L1, self-mask and ruts"). Not modelled yet: stereo matching on texture (depth is ray-cast plus noise), dust seen by the D455 as false depth, multiple scattering, sun glare, slip, and terrain deformation from digging.
 
 ## Run it
 
@@ -39,6 +39,9 @@ python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac
 - `isaac_approach.py`, `run_isaac_approach.sh`: approach runs on Isaac Sim hits next to the sandbox (section "Approach runs on Isaac Sim hits"). `isaac_selfmask.py`, `run_isaac_selfmask.sh`: the robot's self-occlusion in Isaac Sim. Small results go to `results_isaac/`.
 - `live_view.py`, `live_view.rviz`, `run_live.sh`: live RViz2 view of one approach run (section "Live view").
 - `robustness.py`: floor roughness, floor waves, attitude error and the local ground fit, scored at the speeds that passed (section "Floor and tilt cases"). Output goes to `results_rob/`, which is not committed.
+- `robot.py`, `selfmask.py`, `ruts.py`, `selfmask_eval.py`, `run_selfmask.sh`: the team robot from its URDF, the L1 self-mask, wheel ruts and their 48-arena cases (section "Team robot, Unitree L1, self-mask and ruts"). Output goes to `results_selfmask/`, which is not committed; `summaries/` keeps the small result files.
+- `refs/guidebook2027/`: guidebook 2027 Figure 7 (BP-1 laser reflectivity photos) and `measure_fig7.py`, which reads BP-1's laser-line brightness against the target patches.
+- `telemetry.py`: progress lines for the dashboard in `sim/dashboard/` (`python3 sim/dashboard/server.py`, then http://127.0.0.1:8765/).
 - `usd/arena_seed1.usda`: one exported arena (Z up, metres, origin at the start-zone corner) with its obstacle list in `arena_seed1.usda.truth.json`.
 
 ## Path to Isaac Sim
@@ -164,6 +167,43 @@ Results over seeds 3000-3047 (48 arenas, 39 craters and 53 boulder or column cro
 The LiDAR alone, with the local fit, missed 1 crater on the 4 cm floor waves at 0.75 m/s; the D455 alone missed none. At 1.0 m/s the local fit missed at most 2 of 39 craters with both sensors in every case (the plane: 5 on the 4 cm waves and 4 at 3 cm roughness). The false stops left at 3 cm roughness are bumps up to about 9 cm high and 25 cm wide, which pass the 8 cm boulder height, so some of them are arguably real. Every case here is Assumed: wave amplitudes and wavelengths, roughness and pitch errors were chosen as stress cases, not measured on the arena floor. `robustness.md` in each summary folder has the per-sensor tables.
 
 The earlier results in this README (`results_v02/`, the speed test in `results_approach*/`, the Isaac comparison) were made with the single plane; add `--ground plane` to `approach.py`, or set `DETECT.ground_fit` to `"plane"`, to reproduce them.
+
+## Team robot, Unitree L1, self-mask and ruts
+
+```
+./run_selfmask.sh                     # every case below, 48 arenas each (seeds 3000-3047), about 2.5 h on 4 cores
+python3 robot.py                      # robot geometry and sensor mounts from the team URDF
+python3 approach.py 48 out 3000 --robot --lidar l1 --body table --sensors lidar   # one case
+```
+
+`--robot` takes the robot from the team's URDF ([educationmoment/EDT-Lunabotics-2026](https://github.com/educationmoment/EDT-Lunabotics-2026), `sim/robot/uic_bot_2027.xacro` adds the 2027 sensors). The 3D LiDAR is the team's Unitree L1, upside down at the rear top as on the comp-day-one branch, 0.986 m above the ground (Verified from the repo). `sensors.l1_dirs` models its scan from the L1 manual: 21,600 points per second over a 360 x 90 deg hemisphere, so 2,160 per 0.1 s frame (the scan geometry is Inferred). The robot body blocks about 20% of that hemisphere, all forward and down; Isaac Sim agrees with `robot.BodyCaster` on 99.7% of blocked beams (`results_isaac/selfmask_l1.*`).
+
+`selfmask.py` keeps the body out of the map. The table mask stores the body range per direction (0.25 deg grid) and widens it to the farthest body range within 1 deg; a return no farther than that plus 6 cm is dropped. The box mask drops every return inside the robot's bounding box plus 5 cm. `selfmask_eval.py` scores every case with fixed thresholds (L1 6.8, tuned on seeds 3000-3023 in dust; D455 0.85) on seeds 3024-3047.
+
+Results (2026-10-12; all models and thresholds as labelled in params.py):
+
+| Case | Body points per scan in the map | Ground points dropped per scan | Frames with a false obstacle on the robot | False obstacles left on the driven path |
+| --- | --- | --- | --- | --- |
+| No mask | 421 | 0 | 73% (dust 76%) | 3.5 per approach |
+| Box mask | 0 | 190 | 0% (dust 18%) | 0 |
+| Table mask | 0.1 | 4.4 | 0% (dust 1%) | 0 |
+| Table mask, L1 tilted 1 deg off its mount | 0.2 | 4.2 | 0% | 0 |
+| Table mask, L1 tilted 2 deg off its mount | 23.5 | 4.1 | 30% | 3.1 |
+
+So the table mask is the one to use, and the L1's mount angle has to be calibrated to within 1 deg (or the mask widened).
+
+Ruts (`ruts.py`, `--ruts`): six earlier trips weave through the obstacle zone and press ruts into the floor. 1.5 and 3.2 cm ruts change nothing. 5 cm ruts give 20 phantom stops per 10 m for the D455 and 10 for the L1 at 1.0 m/s (clear air): the rut trenches read as craters. Real BP-1 rut depth is unknown (3.2 cm comes from lunar soil values), so it should be measured; if ruts reach 5 cm, the robot should discount crater evidence along its own earlier wheel tracks (Inferred).
+
+The L1 at its real mount confirms hazards late: few of its points land on the corridor ahead (about 33 per scan, against about 480 with the L1 at the front top, its axis 45 deg forward of straight down: `--lidar-mount 0.45,0,0.75,180,-45,0`). `--frame-s` gives each frame the points a robot at speed DS / frame_s collects. Hazards missed (too late to stop), L1 alone, 45 hazards per cell:
+
+| L1 mount | 0.25 m/s | 0.5 m/s | 1.0 m/s |
+| --- | --- | --- | --- |
+| Rear top, upside down (the team's) | 0 clear, 0 dust (1.3 phantom stops per 10 m in dust) | 7 clear, 17 dust | 33 clear, 38 dust |
+| Front top, axis 45 deg forward of down | 0 clear, 0 dust | 0 clear, 0 dust | 2 clear, 6 dust |
+
+Each rear cell uses records with that speed's points per frame (`l1_table_f0.6`, `_f0.3`, `_f0.15`) and a threshold tuned at that speed on seeds 3000-3023 (`speed_gate.py --tune-speed`). The front row uses the 1.0 m/s records (`l1_front45_f0.15`) at every speed, so its slower cells are conservative.
+
+The D455 at its front mount misses 0 of 45 up to 0.75 m/s and 1 of 45 at 1.0 m/s (clear air, `both_noruts`). At the real mount the L1 cannot be the forward hazard sensor above walking pace; the D455 has to carry that, or the L1 moves forward and tilts down, at the cost of its rear view for localization (Inferred).
 
 ## Parameter status
 

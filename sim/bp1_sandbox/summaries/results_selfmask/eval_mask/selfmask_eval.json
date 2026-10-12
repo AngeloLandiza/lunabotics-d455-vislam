@@ -1,0 +1,429 @@
+{
+ "ref": "results_selfmask/l1_table",
+ "chosen": {
+  "l1": 6.8,
+  "d455": 0.85
+ },
+ "test_from": 3024,
+ "pad": 0.1,
+ "rows": [
+  {
+   "case": "l1_none",
+   "dir": "results_selfmask/l1_none",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.0,
+   "lost_per_frame": 0.0,
+   "blind_median": 0.006,
+   "blind_p90": 0.02,
+   "frames_no_ground": 0.01702127659574468,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 36,
+    "n": 45,
+    "rate": 0.8,
+    "lo": 0.6617674868607056,
+    "hi": 0.8910399559749099,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.268688773510881,
+    "missed": 12,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8619676945668183
+   }
+  },
+  {
+   "case": "l1_none",
+   "dir": "results_selfmask/l1_none",
+   "sensor": "l1",
+   "dust": true,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.0,
+   "lost_per_frame": 0.0,
+   "blind_median": 0.007,
+   "blind_p90": 0.023,
+   "frames_no_ground": 0.018439716312056736,
+   "footprint_phantom_share": 0.00425531914893617,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.19579050416054822
+   },
+   "v1": {
+    "missed": 39,
+    "n": 45,
+    "rate": 0.8666666666666667,
+    "lo": 0.738224177587027,
+    "hi": 0.9374293636565033,
+    "phantom_per_10m": 0.19579050416054822
+   },
+   "gate1": {
+    "mean_speed": 0.27697983665819087,
+    "missed": 15,
+    "n": 45,
+    "phantom_per_10m": 0.09789525208027411,
+    "slow_share": 0.8296622613803266
+   }
+  },
+  {
+   "case": "l1_raw",
+   "dir": "results_selfmask/l1_raw",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 421.05248226950357,
+   "lost_per_frame": 0.0,
+   "blind_median": 0.19,
+   "blind_p90": 0.343,
+   "frames_no_ground": 0.019858156028368795,
+   "footprint_phantom_share": 0.7333333333333333,
+   "left_on_path": 3.5416666666666665,
+   "v0.75": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.2686239942940456,
+    "missed": 12,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8619676945668183
+   }
+  },
+  {
+   "case": "l1_raw",
+   "dir": "results_selfmask/l1_raw",
+   "sensor": "l1",
+   "dust": true,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 400.26241134751774,
+   "lost_per_frame": 0.0,
+   "blind_median": 0.19,
+   "blind_p90": 0.344,
+   "frames_no_ground": 0.02127659574468085,
+   "footprint_phantom_share": 0.7560283687943262,
+   "left_on_path": 3.75,
+   "v0.75": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.4894762604013706
+   },
+   "v1": {
+    "missed": 39,
+    "n": 45,
+    "rate": 0.8666666666666667,
+    "lo": 0.738224177587027,
+    "hi": 0.9374293636565033,
+    "phantom_per_10m": 0.4894762604013706
+   },
+   "gate1": {
+    "mean_speed": 0.2701977231897238,
+    "missed": 14,
+    "n": 45,
+    "phantom_per_10m": 0.4894762604013706,
+    "slow_share": 0.8546255506607975
+   }
+  },
+  {
+   "case": "l1_box",
+   "dir": "results_selfmask/l1_box",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.02553191489361702,
+   "lost_per_frame": 192.48652482269503,
+   "blind_median": 0.19,
+   "blind_p90": 0.343,
+   "frames_no_ground": 0.019858156028368795,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.2686239942940456,
+    "missed": 12,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8619676945668183
+   }
+  },
+  {
+   "case": "l1_box",
+   "dir": "results_selfmask/l1_box",
+   "sensor": "l1",
+   "dust": true,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.01276595744680851,
+   "lost_per_frame": 179.19432624113475,
+   "blind_median": 0.1905,
+   "blind_p90": 0.347,
+   "frames_no_ground": 0.02127659574468085,
+   "footprint_phantom_share": 0.18439716312056736,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.39158100832109644
+   },
+   "v1": {
+    "missed": 39,
+    "n": 45,
+    "rate": 0.8666666666666667,
+    "lo": 0.738224177587027,
+    "hi": 0.9374293636565033,
+    "phantom_per_10m": 0.39158100832109644
+   },
+   "gate1": {
+    "mean_speed": 0.26987648965207434,
+    "missed": 14,
+    "n": 45,
+    "phantom_per_10m": 0.39158100832109644,
+    "slow_share": 0.8560939794420016
+   }
+  },
+  {
+   "case": "l1_table",
+   "dir": "results_selfmask/l1_table",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.059574468085106386,
+   "lost_per_frame": 4.371631205673759,
+   "blind_median": 0.19,
+   "blind_p90": 0.343,
+   "frames_no_ground": 0.019858156028368795,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.2686239942940456,
+    "missed": 12,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8619676945668183
+   }
+  },
+  {
+   "case": "l1_table",
+   "dir": "results_selfmask/l1_table",
+   "sensor": "l1",
+   "dust": true,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.05390070921985816,
+   "lost_per_frame": 4.235460992907801,
+   "blind_median": 0.19,
+   "blind_p90": 0.344,
+   "frames_no_ground": 0.02127659574468085,
+   "footprint_phantom_share": 0.011347517730496455,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.39158100832109644
+   },
+   "v1": {
+    "missed": 39,
+    "n": 45,
+    "rate": 0.8666666666666667,
+    "lo": 0.738224177587027,
+    "hi": 0.9374293636565033,
+    "phantom_per_10m": 0.39158100832109644
+   },
+   "gate1": {
+    "mean_speed": 0.26987648965207434,
+    "missed": 14,
+    "n": 45,
+    "phantom_per_10m": 0.39158100832109644,
+    "slow_share": 0.8560939794420016
+   }
+  },
+  {
+   "case": "l1_table_tilt1",
+   "dir": "results_selfmask/l1_table_tilt1",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.17588652482269504,
+   "lost_per_frame": 4.212765957446808,
+   "blind_median": 0.175,
+   "blind_p90": 0.3258000000000001,
+   "frames_no_ground": 0.01702127659574468,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 34,
+    "n": 45,
+    "rate": 0.7555555555555555,
+    "lo": 0.6132633941520986,
+    "hi": 0.8576466497449071,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.27055885752396225,
+    "missed": 14,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8502202643171849
+   }
+  },
+  {
+   "case": "l1_table_tilt2",
+   "dir": "results_selfmask/l1_table_tilt2",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 23.500709219858155,
+   "lost_per_frame": 4.066666666666666,
+   "blind_median": 0.154,
+   "blind_p90": 0.30089999999999995,
+   "frames_no_ground": 0.018439716312056736,
+   "footprint_phantom_share": 0.2950354609929078,
+   "left_on_path": 3.125,
+   "v0.75": {
+    "missed": 35,
+    "n": 45,
+    "rate": 0.7777777777777778,
+    "lo": 0.637304262026367,
+    "hi": 0.8745544813399436,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.27113451870872163,
+    "missed": 16,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8458149779735724
+   }
+  },
+  {
+   "case": "l1_box_tilt1",
+   "dir": "results_selfmask/l1_box_tilt1",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.031205673758865248,
+   "lost_per_frame": 189.1758865248227,
+   "blind_median": 0.175,
+   "blind_p90": 0.3258000000000001,
+   "frames_no_ground": 0.01702127659574468,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 34,
+    "n": 45,
+    "rate": 0.7555555555555555,
+    "lo": 0.6132633941520986,
+    "hi": 0.8576466497449071,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.27055885752396225,
+    "missed": 14,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8502202643171849
+   }
+  }
+ ]
+}

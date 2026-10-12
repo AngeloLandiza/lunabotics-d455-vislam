@@ -1,0 +1,315 @@
+{
+ "ref": "results_selfmask/l1_table",
+ "chosen": {
+  "l1": 6.8,
+  "d455": 0.85
+ },
+ "test_from": 3024,
+ "pad": 0.1,
+ "rows": [
+  {
+   "case": "both_noruts",
+   "dir": "results_selfmask/both_noruts",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.059574468085106386,
+   "lost_per_frame": 4.371631205673759,
+   "blind_median": 0.19,
+   "blind_p90": 0.343,
+   "frames_no_ground": 0.019858156028368795,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.2686239942940456,
+    "missed": 12,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8619676945668183
+   }
+  },
+  {
+   "case": "both_noruts",
+   "dir": "results_selfmask/both_noruts",
+   "sensor": "d455",
+   "dust": false,
+   "n": 24,
+   "thr": 0.85,
+   "body_per_frame": 0.0,
+   "lost_per_frame": 0.0,
+   "blind_median": 0.218,
+   "blind_p90": 0.222,
+   "frames_no_ground": 0.009929078014184398,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 0,
+    "n": 45,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.07865426194064076,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 1,
+    "n": 45,
+    "rate": 0.022222222222222223,
+    "lo": 0.003933497522757505,
+    "hi": 0.11566946388718813,
+    "phantom_per_10m": 0.19579050416054822
+   },
+   "gate1": {
+    "mean_speed": 0.5979503887332495,
+    "missed": 1,
+    "n": 45,
+    "phantom_per_10m": 0.19579050416054822,
+    "slow_share": 0.1453744493392073
+   }
+  },
+  {
+   "case": "both_ruts1.5",
+   "dir": "results_selfmask/both_ruts1.5",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.059574468085106386,
+   "lost_per_frame": 4.356028368794326,
+   "blind_median": 0.191,
+   "blind_p90": 0.348,
+   "frames_no_ground": 0.019858156028368795,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.2686239942940456,
+    "missed": 12,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8619676945668183
+   }
+  },
+  {
+   "case": "both_ruts1.5",
+   "dir": "results_selfmask/both_ruts1.5",
+   "sensor": "d455",
+   "dust": false,
+   "n": 24,
+   "thr": 0.85,
+   "body_per_frame": 0.0,
+   "lost_per_frame": 0.0,
+   "blind_median": 0.218,
+   "blind_p90": 0.221,
+   "frames_no_ground": 0.009929078014184398,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 0,
+    "n": 45,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.07865426194064076,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 1,
+    "n": 45,
+    "rate": 0.022222222222222223,
+    "lo": 0.003933497522757505,
+    "hi": 0.11566946388718813,
+    "phantom_per_10m": 0.19579050416054822
+   },
+   "gate1": {
+    "mean_speed": 0.5979503887332495,
+    "missed": 1,
+    "n": 45,
+    "phantom_per_10m": 0.19579050416054822,
+    "slow_share": 0.1453744493392073
+   }
+  },
+  {
+   "case": "both_ruts3.2",
+   "dir": "results_selfmask/both_ruts3.2",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.059574468085106386,
+   "lost_per_frame": 4.353191489361702,
+   "blind_median": 0.193,
+   "blind_p90": 0.355,
+   "frames_no_ground": 0.019858156028368795,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 0.0
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 0.0
+   },
+   "gate1": {
+    "mean_speed": 0.268372686548062,
+    "missed": 12,
+    "n": 45,
+    "phantom_per_10m": 0.0,
+    "slow_share": 0.8634361233480224
+   }
+  },
+  {
+   "case": "both_ruts3.2",
+   "dir": "results_selfmask/both_ruts3.2",
+   "sensor": "d455",
+   "dust": false,
+   "n": 24,
+   "thr": 0.85,
+   "body_per_frame": 0.0,
+   "lost_per_frame": 0.0,
+   "blind_median": 0.216,
+   "blind_p90": 0.221,
+   "frames_no_ground": 0.009929078014184398,
+   "footprint_phantom_share": 0.0,
+   "left_on_path": 0.0,
+   "v0.75": {
+    "missed": 0,
+    "n": 45,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.07865426194064076,
+    "phantom_per_10m": 0.2936857562408223
+   },
+   "v1": {
+    "missed": 1,
+    "n": 45,
+    "rate": 0.022222222222222223,
+    "lo": 0.003933497522757505,
+    "hi": 0.11566946388718813,
+    "phantom_per_10m": 0.5873715124816447
+   },
+   "gate1": {
+    "mean_speed": 0.5979503887332495,
+    "missed": 1,
+    "n": 45,
+    "phantom_per_10m": 0.4894762604013706,
+    "slow_share": 0.1453744493392073
+   }
+  },
+  {
+   "case": "both_ruts5",
+   "dir": "results_selfmask/both_ruts5",
+   "sensor": "l1",
+   "dust": false,
+   "n": 24,
+   "thr": 6.8,
+   "body_per_frame": 0.059574468085106386,
+   "lost_per_frame": 4.337588652482269,
+   "blind_median": 0.194,
+   "blind_p90": 0.358,
+   "frames_no_ground": 0.019858156028368795,
+   "footprint_phantom_share": 0.15177304964539007,
+   "left_on_path": 1.7916666666666667,
+   "v0.75": {
+    "missed": 37,
+    "n": 45,
+    "rate": 0.8222222222222222,
+    "lo": 0.6866989315634587,
+    "hi": 0.9070572107414617,
+    "phantom_per_10m": 10.083210964268234
+   },
+   "v1": {
+    "missed": 38,
+    "n": 45,
+    "rate": 0.8444444444444444,
+    "lo": 0.712158094887512,
+    "hi": 0.9225467468867133,
+    "phantom_per_10m": 10.083210964268234
+   },
+   "gate1": {
+    "mean_speed": 0.2549050615913092,
+    "missed": 12,
+    "n": 45,
+    "phantom_per_10m": 6.558981889378366,
+    "slow_share": 0.92951541850221
+   }
+  },
+  {
+   "case": "both_ruts5",
+   "dir": "results_selfmask/both_ruts5",
+   "sensor": "d455",
+   "dust": false,
+   "n": 24,
+   "thr": 0.85,
+   "body_per_frame": 0.0,
+   "lost_per_frame": 0.0,
+   "blind_median": 0.214,
+   "blind_p90": 0.221,
+   "frames_no_ground": 0.009929078014184398,
+   "footprint_phantom_share": 0.19574468085106383,
+   "left_on_path": 0.7916666666666666,
+   "v0.75": {
+    "missed": 0,
+    "n": 45,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.07865426194064076,
+    "phantom_per_10m": 16.15271659324523
+   },
+   "v1": {
+    "missed": 1,
+    "n": 45,
+    "rate": 0.022222222222222223,
+    "lo": 0.003933497522757505,
+    "hi": 0.11566946388718813,
+    "phantom_per_10m": 19.97063142437592
+   },
+   "gate1": {
+    "mean_speed": 0.5979503887332495,
+    "missed": 1,
+    "n": 45,
+    "phantom_per_10m": 17.033773861967695,
+    "slow_share": 0.1453744493392073
+   }
+  }
+ ]
+}

@@ -1,0 +1,47 @@
+{
+ "meta": {
+  "n_arenas": 48,
+  "seed0": 3000,
+  "seconds": 867.0550472736359,
+  "DS": 0.15,
+  "FRONT": 0.5577455592148431,
+  "HALF_W": 0.4029832661151886,
+  "X_END": 4.9,
+  "PLUME_AHEAD": 1.2,
+  "LOOK": 3.0,
+  "surface_rms": 0.01,
+  "ground_fit": "local",
+  "ground_sigma": 0.2,
+  "ground_spread": 0.1,
+  "BACK": 0.4383712193680232,
+  "label": "both_ruts1.5",
+  "undulation": 0.0,
+  "pitch_err": 0.0,
+  "clear_only": true,
+  "robot": true,
+  "lidar": "l1",
+  "body": "table",
+  "inflate": null,
+  "mask_err": 0.0,
+  "ruts": 0.015,
+  "rut_trips": 6,
+  "sensors": [
+   "lidar",
+   "d455"
+  ],
+  "lidar_mount": null,
+  "frame_s": 0.1,
+  "det_fields": [
+   "kind",
+   "x",
+   "y",
+   "evidence",
+   "cells",
+   "along",
+   "lateral",
+   "class",
+   "match"
+  ]
+ },
+ "source_size": 1482799
+}
