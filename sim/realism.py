@@ -286,7 +286,7 @@ class Ruts:
             ok = under & bed & (sub > floor)
             # side berms: a raised-cosine ridge just outside the wheel, holding berm_frac of the trench section
             bw = val("berm_width", "nominal")
-            ring = (d > self.half) & (d <= self.half + bw) & bed & ~under
+            ring = (d > self.half) & (d <= self.half + bw) & (sub > h0 - 0.002) & (sub < h0 + 0.03) & ~under
             if ok.any() or ring.any():
                 hb = 2 * val("berm_frac", "nominal") * self.depth * (2 * self.half) / (2 * bw)   # peak of 1-cos profile
                 prof = hb * 0.5 * (1 + np.cos(np.pi * (2 * (d - self.half) / bw - 1)))
