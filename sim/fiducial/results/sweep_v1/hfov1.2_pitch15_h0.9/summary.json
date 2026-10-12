@@ -1,0 +1,227 @@
+{
+ "params": {
+  "start_zone": {
+   "value": [
+    0.0,
+    2.0,
+    0.0,
+    2.0
+   ],
+   "unit": "m (x0,x1,y0,y1)",
+   "status": "Assumed",
+   "source": "zone size is in the unreadable Figure 9; same as the BP-1 sandbox (bp1_sandbox/params.py)"
+  },
+  "walls": {
+   "value": "x = 0 and y = 0",
+   "unit": "",
+   "status": "Inferred",
+   "source": "the zone is in the arena corner (11.2), so its two bin-frame sides are the walls meeting there"
+  },
+  "tag_size": {
+   "value": 0.16,
+   "unit": "m",
+   "status": "Assumed",
+   "source": "black-square edge of a tag36h11 tag; team's tag family and size are open"
+  },
+  "tag_height": {
+   "value": 0.9,
+   "unit": "m",
+   "status": "Assumed",
+   "source": "tag centre above the regolith on the bin frame"
+  },
+  "cam_mount": {
+   "value": [
+    -0.42,
+    0.0,
+    0.37,
+    15.0
+   ],
+   "unit": "m, m, m, deg up",
+   "status": "Assumed",
+   "source": "what-if pitch 15.0 deg (xacro: 15)"
+  },
+  "base_height": {
+   "value": 0.2651,
+   "unit": "m",
+   "status": "Verified",
+   "source": "base_link height above ground (team URDF)"
+  },
+  "image": {
+   "value": [
+    1280,
+    720
+   ],
+   "unit": "px",
+   "status": "Verified",
+   "source": "rear_cam sensor in the xacro"
+  },
+  "hfov": {
+   "value": 1.2,
+   "unit": "rad",
+   "status": "Assumed",
+   "source": "what-if field of view (xacro: 1.2); pinhole, lens distortion ignored"
+  },
+  "corner_noise": {
+   "value": 0.5,
+   "unit": "px",
+   "status": "Assumed",
+   "source": "1-sigma corner error after sub-pixel refinement; not measured on BP-1 light"
+  },
+  "min_side_px": {
+   "value": 20.0,
+   "unit": "px",
+   "status": "Assumed",
+   "source": "smallest tag edge in pixels a tag36h11 detector decodes reliably"
+  },
+  "max_view_angle": {
+   "value": 70.0,
+   "unit": "deg",
+   "status": "Assumed",
+   "source": "largest angle between the tag normal and the line of sight that decodes"
+  },
+  "placement_err": {
+   "value": [
+    0.005,
+    1.0
+   ],
+   "unit": "m, deg",
+   "status": "Assumed",
+   "source": "how well a taped or clamped tag's pose is known after setup"
+  },
+  "body_radius": {
+   "value": 0.66,
+   "unit": "m",
+   "status": "Verified",
+   "source": "circumscribed radius of the 1.0 x 0.7 m body about base_link"
+  }
+ },
+ "trials": 1500,
+ "seed": 0,
+ "layouts": {
+  "one": {
+   "seen_frac": 0.06066666666666667,
+   "e_xy_median": 0.023332784385421964,
+   "e_xy_median_ci": [
+    0.0193078600134814,
+    0.026648681585121903
+   ],
+   "e_xy_p95": 0.04961129509362486,
+   "e_xy_p95_ci": [
+    0.041157780069601885,
+    0.05650433440964645
+   ],
+   "e_yaw_median": 0.7590326853154331,
+   "e_yaw_p95": 2.0803348534877353,
+   "bad_yaw_frac": 0.0,
+   "bad_yaw_frac_ci": [
+    0.0,
+    0.0
+   ],
+   "two_planes_frac": 0.0,
+   "turn_median_deg": 75.0,
+   "turn_p95_deg": 155.0,
+   "never_frac": 0.33066666666666666
+  },
+  "two_coplanar": {
+   "seen_frac": 0.152,
+   "e_xy_median": 0.020362117947175466,
+   "e_xy_median_ci": [
+    0.01856579760818349,
+    0.023469345981074127
+   ],
+   "e_xy_p95": 0.04968864831487185,
+   "e_xy_p95_ci": [
+    0.045353895805607704,
+    0.05324377171893087
+   ],
+   "e_yaw_median": 0.7600138050509495,
+   "e_yaw_p95": 2.2987156441895826,
+   "bad_yaw_frac": 0.0,
+   "bad_yaw_frac_ci": [
+    0.0,
+    0.0
+   ],
+   "two_planes_frac": 0.0,
+   "turn_median_deg": 60.0,
+   "turn_p95_deg": 140.0,
+   "never_frac": 0.12066666666666667
+  },
+  "two_perpendicular": {
+   "seen_frac": 0.12866666666666668,
+   "e_xy_median": 0.021830360467999986,
+   "e_xy_median_ci": [
+    0.020127802317860884,
+    0.023364527596154826
+   ],
+   "e_xy_p95": 0.05102880385305968,
+   "e_xy_p95_ci": [
+    0.045334987692358594,
+    0.05806693472667901
+   ],
+   "e_yaw_median": 0.6383930601495741,
+   "e_yaw_p95": 2.180907899282229,
+   "bad_yaw_frac": 0.0,
+   "bad_yaw_frac_ci": [
+    0.0,
+    0.0
+   ],
+   "two_planes_frac": 0.0,
+   "turn_median_deg": 55.0,
+   "turn_p95_deg": 150.0,
+   "never_frac": 0.10066666666666667
+  },
+  "four": {
+   "seen_frac": 0.308,
+   "e_xy_median": 0.0190803845239055,
+   "e_xy_median_ci": [
+    0.017380215608125138,
+    0.02048402099526048
+   ],
+   "e_xy_p95": 0.050758788180098616,
+   "e_xy_p95_ci": [
+    0.045751444301420245,
+    0.05801850311778844
+   ],
+   "e_yaw_median": 0.6933284447763104,
+   "e_yaw_p95": 2.215136805689273,
+   "bad_yaw_frac": 0.0,
+   "bad_yaw_frac_ci": [
+    0.0,
+    0.0
+   ],
+   "two_planes_frac": 0.006493506493506494,
+   "turn_median_deg": 30.0,
+   "turn_p95_deg": 115.0,
+   "never_frac": 0.0
+  }
+ },
+ "paired": {
+  "two_perpendicular_minus_one": {
+   "n": 91,
+   "e_xy_diff_median": 0.0005818459947514489,
+   "e_xy_diff_median_ci": [
+    -0.006319371835753904,
+    0.005314740296708403
+   ],
+   "B_better_frac": 0.4835164835164835
+  },
+  "two_perpendicular_minus_two_coplanar": {
+   "n": 86,
+   "e_xy_diff_median": 0.0009317527986507307,
+   "e_xy_diff_median_ci": [
+    -0.006519806776869162,
+    0.005745776969899549
+   ],
+   "B_better_frac": 0.4883720930232558
+  },
+  "four_minus_two_perpendicular": {
+   "n": 179,
+   "e_xy_diff_median": -0.000895520170336183,
+   "e_xy_diff_median_ci": [
+    -0.004146028354377874,
+    0.0014258033276154172
+   ],
+   "B_better_frac": 0.5307262569832403
+  }
+ }
+}
