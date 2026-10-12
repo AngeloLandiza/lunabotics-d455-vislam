@@ -87,6 +87,8 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'max_range': pr.P(4.0, 'm', 'Assumed', 'returns farther than this from the sensor are not used for hazards: '
                       'arena.sh seed 0 had many false small boulders at 3-6.6 m (grazing L1 returns, far D455 depth with '
                       'sigma = k z^2, about 12 cm at 4 m). The sandbox speed runs need hazards seen by about 2 m ahead'),
+    'max_radius': pr.P(0.5, 'm', 'Assumed', 'a blob wider than this is not one guidebook obstacle (boulders 30-40 '
+                       'cm, craters up to about 50 cm): arena.sh seed 0 grew a 1.9 m crater over the rutted dig area'),
     'min_radius': pr.P(0.11, 'm', 'Assumed', 'objects smaller than this are dropped: guidebook boulders are 30-40 cm, '
                        'and detected discs come out a few cm larger than the true ones; arena.sh seed 0 false boulders '
                        'had a median radius of 9 cm'),
@@ -211,6 +213,7 @@ class HazardMap:
         self.ln = {s: np.zeros(shape) for s in ('lidar', 'd455')}
         self.g = np.zeros(shape)
         self.frames = 0
+        self.dropped = []                   # oversized blobs objects() split or dropped (for logs)
 
     def refit(self):
         if (self.L['count'] > 0).sum() > 50:
@@ -231,7 +234,7 @@ class HazardMap:
     def objects(self):
         """Hazards as dicts: kind ('boulder' / 'crater'), x, y, r (disc of the cluster's area), evidence, sensor.
         Wall returns and the known column are dropped (the planner already has both)."""
-        out = []
+        out, big = [], []
         cell = self.grid.cell
         cx, cy, cr = COLUMN_DISC
         for sensor in ('lidar', 'd455'):
@@ -246,8 +249,23 @@ class HazardMap:
                 r = math.sqrt(d['cells'] * cell * cell / math.pi) + cell / 2
                 if r < val('min_radius'):
                     continue
+                if r > val('max_radius'):
+                    big.append((sensor, d))
+                    continue
                 out.append({'kind': 'boulder' if d['kind'] == 'pos' else 'crater', 'x': d['x'], 'y': d['y'], 'r': r,
                             'evidence': d['evidence'], 'sensor': sensor})
+        # a blob wider than any guidebook obstacle (shallow ruts or dug ground joined to a crater): keep only its
+        # saturated cells, split into clusters again; what is still too wide is dropped as terrain
+        for sensor, d in big:
+            lp, ln = self.lp[sensor], self.ln[sensor]
+            strong = v(pr.DETECT, 'l_max') - 0.5
+            pos, neg = (lp >= strong, ln * 0 > 1) if d['kind'] == 'pos' else (lp * 0 > 1, ln >= strong)
+            for e in detect.clusters(pos, neg, self.grid, lp, ln, detect.l_decide(sensor)):
+                r = math.sqrt(e['cells'] * cell * cell / math.pi) + cell / 2
+                if val('min_radius') <= r <= val('max_radius') and math.hypot(e['x'] - d['x'], e['y'] - d['y']) < 3:
+                    out.append({'kind': 'boulder' if e['kind'] == 'pos' else 'crater', 'x': e['x'], 'y': e['y'],
+                                'r': r, 'evidence': e['evidence'], 'sensor': sensor})
+            self.dropped.append((d['kind'], round(d['x'], 2), round(d['y'], 2), d['cells']))
         return merge_discs(out)
 
     def occupancy(self):
@@ -645,6 +663,24 @@ def mission_goals(rng, cycles=None):
     return goals[:n]
 
 
+def escape_move(w, pose, max_d, step=0.05):
+    """Signed straight distance (+ forwards) to drive so the robot can turn in place, or has the most room to: the
+    footprint must not get closer to anything along the way than it is now (it may start inside a grown hazard)."""
+    pose = np.asarray(pose, float)
+    u = np.array([math.cos(pose[2]), math.sin(pose[2]), 0.0])
+    here = min(a2.clearance(w, pose), ex.CHECK_MARGIN)
+    best, best_score = 0.0, a2.turn_clearance(w, pose[:2])
+    for sgn in (-1.0, 1.0):
+        for d in np.arange(step, max_d + 1e-9, step):
+            q = pose + sgn * d * u
+            if a2.clearance(w, q) < here - 0.005:
+                break
+            sc = a2.turn_clearance(w, q[:2])
+            if sc > best_score + 0.01:
+                best, best_score = sgn * d, sc
+    return float(best)
+
+
 def relocate_goal(kind, g, hazards, max_move=0.8, step=0.05):
     """A nearby goal the robot can reach and turn at: dig goals move to the nearest free pose in the dig box (same
     heading), dump goals to the other dump spots along the berm. None if there is none."""
@@ -731,8 +767,9 @@ class MissionRunner:
              and the goal is skipped after plan_tries
     drive    run the Leg; when a new hazard lands on the rest of the route, stop, then plan again from rest
     stop     zero command until the wheels are still (RobotModel), then plan
-    retreat  after a failed plan: back straight out up to retreat_m (while the footprint stays clear of the known
-             hazards), then plan again; a stop beside a hazard seen late can leave no route from where the robot is
+    retreat  after a failed plan: a straight move forwards or backwards of up to retreat_m that ends where the robot
+             has the most room to turn (escape_move), then plan again; a stop beside a hazard seen late, or the start
+             pose by a wall, can leave no route from where the robot is
     move     after a second failure: the goal itself may sit too close to a detected hazard (detected discs come out a
              few cm larger than the true ones), so a dig goal moves to the nearest free pose in the dig box and a dump
              goal to the next dump spot (relocate_goal); then plan again
@@ -751,6 +788,7 @@ class MissionRunner:
         self.tries = 0
         self.retry_s, self.plan_tries, self.retreat_m = retry_s, plan_tries, retreat_m
         self.retreat_from = None
+        self.escape = None
         self.log = []                       # (t, message) for the node to print
 
     def _go(self, state, t):
@@ -814,17 +852,17 @@ class MissionRunner:
                 self._go('plan', t)
             return self._cmd(0.0, 0.0, dt) + (None,)
         if self.state == 'retreat':
-            back = np.asarray(pose, float) - 0.05 * np.array([math.cos(pose[2]), math.sin(pose[2]), 0.0])
+            if self.escape is None:
+                self.escape = escape_move(make_world(hazards), pose, self.retreat_m)
+                self.log.append((t, f'goal {self.k + 1} {kind}: escape move {self.escape:+.2f} m'))
             gone = math.hypot(*(np.asarray(pose[:2]) - self.retreat_from))
-            world = make_world(hazards)
-            # back out while that does not bring the body closer to anything (it may start inside a grown hazard)
-            here = a2.clearance(world, np.asarray(pose, float))
-            if gone >= self.retreat_m or a2.clearance(world, back) < min(ex.CHECK_MARGIN, here - 0.005) \
-                    or t - self.t_state > 6.0:
+            left = abs(self.escape) - gone
+            if left <= 0.01 or t - self.t_state > 8.0:
                 if self._still():
+                    self.escape = None
                     self._go('plan', t - self.retry_s)
                 return self._cmd(0.0, 0.0, dt) + (None,)
-            return self._cmd(-min(0.15, 1.5 * (self.retreat_m - gone) + 0.05), 0.0, dt) + (None,)
+            return self._cmd(math.copysign(min(0.15, 1.5 * left + 0.05), self.escape), 0.0, dt) + (None,)
         if self.state == 'work':
             hold = val('dig_time') if kind == 'dig' else val('dump_time')
             if t - self.t_state >= hold:

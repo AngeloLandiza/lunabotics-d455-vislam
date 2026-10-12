@@ -290,7 +290,11 @@ def test_closed(seeds=(3000, 3001, 3002), level='nominal', legs=3):
                 vb, wb = robot.step(cv, cw, a2.SIM_DT)
                 t += a2.SIM_DT
                 k += 1
-                contact += a2.SIM_DT * (a2.clearance(w, robot.pose) < 0)
+                if a2.clearance(w, robot.pose) < 0:
+                    if os.environ.get('CLOSED_DEBUG') and contact == 0:
+                        print(f'   t {t:.1f} CONTACT true {np.round(robot.pose, 2)} est {np.round(f.x, 2)} state '
+                              f'{run.state} cmd {cv:.2f} {cw:.2f}')
+                    contact += a2.SIM_DT
                 f.predict((robot.vl + robot.vr) / 2, wb + bias + rng.normal(0, n_sd), t)
                 if k % 10 == 0:                                          # 10 Hz L1 frame at the true pose
                     pose = (robot.pose[0], robot.pose[1], np.degrees(robot.pose[2]))
