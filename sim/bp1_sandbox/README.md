@@ -36,6 +36,7 @@ python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac
 - `tests/test_bridge.py`: checks that the BP-1 layer gives identical output from our ray marcher and from outside hits, and that the USD mesh matches the height field.
 - `isaac_capture.py`, `isaac_validate.py`, `run_isaac_capture.sh`: the Isaac-side capture and its check (section "Isaac Sim capture"). Output goes to `isaac_out/`, which is not committed.
 - `approach.py`, `speed_gate.py`: frame-by-frame approach runs and their scoring for confirmation thresholds, speeds and a speed gate (section "Approach runs and speed"). Output goes to `results_approach*/`, which is not committed.
+- `isaac_approach.py`, `run_isaac_approach.sh`: approach runs on Isaac Sim hits next to the sandbox (section "Approach runs on Isaac Sim hits"). `isaac_selfmask.py`, `run_isaac_selfmask.sh`: the robot's self-occlusion in Isaac Sim. Small results go to `results_isaac/`.
 - `live_view.py`, `live_view.rviz`, `run_live.sh`: live RViz2 view of one approach run (section "Live view").
 - `robustness.py`: floor roughness, floor waves, attitude error and the local ground fit, scored at the speeds that passed (section "Floor and tilt cases"). Output goes to `results_rob/`, which is not committed.
 - `usd/arena_seed1.usda`: one exported arena (Z up, metres, origin at the start-zone corner) with its obstacle list in `arena_seed1.usda.truth.json`.
@@ -96,6 +97,18 @@ Detection (logodds, two 4-frame approaches, clear air and a plume 0.8 m ahead): 
   - every candidate cluster, labelled with its kind, pooled evidence, state and truth class. Red is confirmed (evidence >= threshold), yellow is unresolved (0.85 <= evidence < threshold), grey is faint;
   - the speed gate: 1.0 m/s, or 0.25 m/s when a confirmed hazard, an unresolved candidate or unobserved corridor ground lies within d_stop(1.0) + 0.5 m of the front. d_stop(v) = 0.3 v + v^2 / (2 x 0.5) + 0.10 m is drawn as a line ahead of the front. This gate is a display aid (Assumed numbers); `speed_gate.py` holds the evaluated policy.
 - **RViz quirks** worked around: rviz2 (Humble) ignores the window size in the config, so `run_live.sh` resizes the window through Xlib. It also draws spaces in text markers very wide, so the labels use underscores.
+
+## Approach runs on Isaac Sim hits
+
+`./run_isaac_approach.sh [--seed N] [--noise K] [--headless]` exports the arena to USD if needed, captures every pose of `approach.trial(N)` in Isaac Sim, with the window open unless `--headless`, then runs `isaac_approach.py`. That script runs `approach.trial` unchanged twice, once on sandbox scans and once on Isaac hits passed through the BP-1 layer, and scores both with `speed_gate.py`'s rules and the thresholds in params.py. With `--noise K` both runs are repeated over K independent sensor-noise streams, each giving both sources the same draws per frame. `./run_live.sh --source isaac` shows the Isaac-driven run in RViz.
+
+Results (2026-10-12, local ground fit, thresholds 5.1 / 0.85; full tables in `results_isaac/`):
+
+- **Seed 1, 28 frames:** over 10 noise streams, neither source missed a hazard at 1.0 m/s, for the LiDAR or the D455, in clear air or dust. Confirmation frames match in clear air and differ by at most one frame (0.15 m) in dust.
+  - LiDAR in dust: phantom stops averaged 0.25 per 10 m on the sandbox and 0 on Isaac, and confirmed false-alarm frames averaged 35.7 vs 31.4.
+  - A single noise draw had shown the opposite (Isaac 2.47 per 10 m, 50 vs 25 frames), so that difference was noise, not geometry.
+- **Seed 3000, 29 frames, one noise draw:** same confirmation frames except one hazard one frame later with the D455 in dust. No misses or phantom stops, and gate decisions agree in 28-29 of 29 frames.
+- **Display:** the GUI changes nothing. A windowed capture of seed 1 matches the headless one exactly: identical ranges and depth, and 0.03 % of rays differ in hit/no-hit through Isaac's random dropout.
 
 ## Approach runs and speed
 
