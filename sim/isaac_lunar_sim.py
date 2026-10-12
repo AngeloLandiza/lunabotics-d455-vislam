@@ -14,6 +14,7 @@ Publishes what the real D455 driver does, so the SLAM stack runs unchanged (sim:
   /camera/imu (200 Hz, gravity included)   /clock   /ground_truth/odom
   /ground_truth/camera_pose (camera_link in the world frame, for checking SLAM)
   /arena/heightmap (true terrain, 32FC1 rows = x)   /arena/volume ([cut, fill, berm] m^3)
+  /l1/points (team robot: Unitree L1 PointCloud2, frame lidar3d_link, ~10 Hz; body returns left in)
 drives from /cmd_vel, and digs/dumps where told on /arena/dig ([x, y, radius, depth]).
 
 Run via run/sim/procedural/lunar_terrain.sh or run/sim/arena/arena.sh (Isaac Sim's own Python + internal ROS 2 libraries):  python sim/isaac_lunar_sim.py [--headless]
@@ -30,6 +31,9 @@ parser.add_argument('--headless', action='store_true')
 parser.add_argument('--world', choices=['arena', 'lunar'], default='lunar')
 parser.add_argument('--seed', type=int, default=0, help='terrain / obstacle layout / start pose')
 parser.add_argument('--start-heading', default='random', help='arena: N, E, S, W or random')
+parser.add_argument('--no-lidar', action='store_true', help='team robot: leave out the Unitree L1')
+parser.add_argument('--realism', choices=['off', 'nominal', 'heavy'], default='nominal',
+                    help='BP-1 realism layers (sim/realism.py, sim/bp1_sandbox): off = ideal sensors')
 parser.add_argument('--robot', choices=['team', 'jackal'], default=None,
                     help='team: the EDT Lunabotics rover (sim/team_robot.py; default in the arena); '
                          'jackal: Clearpath Jackal (default on lunar terrain)')
@@ -266,6 +270,39 @@ for w in WHEELS:
 print(f'[sim] base={BASE}\n[sim] left={LEFT}\n[sim] right={RIGHT}\n[sim] depth={DEPTH}\n'
       f'[sim] imu={IMU}\n[sim] wheels L={LEFT_WHEELS} R={RIGHT_WHEELS}', flush=True)
 
+# Unitree L1 (team robot): RTX LiDAR at the xacro's front mount, upside down with its axis 45 deg forward of straight
+# down. Its 360 x 90 deg field (a hemisphere about the sensor's +z) is sampled as a fixed rotary grid with the L1's
+# point rate, 43200/s (Verified, L1 manual; the real pattern is non-repetitive): 18 elevation rings x 240 azimuths per
+# 0.1 s frame. minDistBetweenEchosM: the schema default 0.4 m silently drops every return under 0.4 m (sandbox,
+# 2026-10-12). Isaac gives ideal hits; the sandbox's BP-1 LiDAR layer (bp1_sandbox/sensors.Lidar('l1').apply) turns
+# them into returns: 0.10 reflectivity at 905 nm vs the L1's return-power threshold, the 0.05 m blind zone, 2 cm range
+# noise and dust attenuation (realism.DustPlumes optical depth).
+LIDAR = None
+if ROBOT == 'team' and not args.no_lidar:
+    from pxr import Vt  # noqa: E402,F811
+    from isaacsim.sensors.experimental.rtx import Lidar, LidarSensor  # noqa: E402
+    L1_HZ, L1_EL, L1_AZ = 10, np.arange(2.5, 90.0, 5.0), 240
+    L1_ATTRS = {
+        'omni:sensor:Core:scanType': 'ROTARY',
+        'omni:sensor:Core:numberOfEmitters': len(L1_EL), 'omni:sensor:Core:numberOfChannels': len(L1_EL),
+        'omni:sensor:Core:scanRateBaseHz': L1_HZ, 'omni:sensor:Core:patternFiringRateHz': L1_HZ * L1_AZ,
+        'omni:sensor:Core:farRangeM': 30.0, 'omni:sensor:Core:nearRangeM': 0.01,
+        'omni:sensor:Core:minDistBetweenEchosM': 0.01, 'omni:sensor:Core:maxReturns': 1,
+        'omni:sensor:Core:rayType': 'IDEALIZED', 'omni:sensor:Core:rangeAccuracyM': 0.0,
+        'omni:sensor:Core:azimuthErrorStd': 0.0, 'omni:sensor:Core:elevationErrorStd': 0.0,
+        'omni:sensor:Core:rangeResolutionM': 0.001,
+        'omni:sensor:Core:emitterState:s001:azimuthDeg': Vt.FloatArray([0.0] * len(L1_EL)),
+        'omni:sensor:Core:emitterState:s001:elevationDeg': Vt.FloatArray(L1_EL.tolist()),
+        'omni:sensor:Core:emitterState:s001:fireTimeNs': Vt.UIntArray([0] * len(L1_EL)),
+        'omni:sensor:Core:emitterState:s001:channelId': Vt.UIntArray(list(range(1, len(L1_EL) + 1))),
+    }
+    LIDAR = BASE + '/l1'
+    l1 = Lidar(LIDAR, attributes=L1_ATTRS, tick_rate=L1_HZ, aux_output_level='FULL')
+    (lx, ly, lz), (lr, lp, lyaw) = team_robot.LIDAR_MOUNT
+    place(LIDAR, (lx, ly, lz), tuple(float(np.degrees(a)) for a in (lr, lp, lyaw)))   # URDF rpy = rotateXYZ
+    l1_sensor = LidarSensor(l1, annotators=['generic-model-output'])
+    print(f'[sim] lidar={LIDAR} (Unitree L1, {len(L1_EL) * L1_AZ} points per {1000 // L1_HZ} ms frame)', flush=True)
+
 # ---------------------------------------------------------------- ROS 2 graphs
 annotators = {}
 for name, prim, res, kind in [('infra1', LEFT, CAM_RES, 'LdrColor'), ('infra2', RIGHT, CAM_RES, 'LdrColor'),
@@ -372,6 +409,9 @@ frames = {'camera_infra1_optical_frame': camera_axes(LEFT, True),
           'camera_depth_optical_frame': camera_axes(DEPTH, True)}
 imu_ax, imu_pos = world_frame(IMU)
 frames['camera_imu_optical_frame'] = (imu_ax.T, imu_pos)
+if LIDAR:
+    l1_ax, l1_pos = world_frame(LIDAR)
+    frames['lidar3d_link'] = (l1_ax.T, l1_pos)       # the L1's own axes (columns = sensor x, y, z in the world)
 static_tfs = []  # (child, translation, quaternion xyzw); published via rclpy below
 for child, (R, pos) in frames.items():
     rel_R = R_link.T @ R
@@ -412,7 +452,7 @@ from builtin_interfaces.msg import Time  # noqa: E402
 from geometry_msgs.msg import TransformStamped  # noqa: E402
 from rclpy.qos import DurabilityPolicy, QoSProfile  # noqa: E402
 from geometry_msgs.msg import PoseStamped  # noqa: E402
-from sensor_msgs.msg import CameraInfo, Image  # noqa: E402
+from sensor_msgs.msg import CameraInfo, Image, PointCloud2, PointField  # noqa: E402
 from std_msgs.msg import Float32MultiArray  # noqa: E402
 from tf2_msgs.msg import TFMessage  # noqa: E402
 
@@ -433,6 +473,73 @@ pubs = {n: (ros.create_publisher(Image, f'/camera/{n}/image_rect_raw', 5),
 frame_ids = {'infra1': 'camera_infra1_optical_frame', 'infra2': 'camera_infra2_optical_frame',
              'depth': 'camera_depth_optical_frame'}
 baseline = float(np.linalg.norm(world_frame(RIGHT)[1] - world_frame(LEFT)[1]))
+dust = None                         # realism.DustPlumes, added with the dust layer
+if LIDAR:
+    from isaacsim.sensors.experimental.rtx import parse_generic_model_output_data  # noqa: E402
+    cloud_pub = ros.create_publisher(PointCloud2, '/l1/points', 5)
+    l1_rng = np.random.default_rng(args.seed + 101)
+    l1_last = [None]
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'bp1_sandbox'))
+    import sensors as sb_sensors  # noqa: E402  (numpy only)
+    l1_model = sb_sensors.Lidar('l1')
+    L1_R = None                     # base-from-sensor rotation, set at the first frame
+    (L1_T, _) = team_robot.LIDAR_MOUNT
+    BODY_BOX = ((-0.45, 0.57), (-0.37, 0.37), (-0.28, 0.32))   # base_link frame, body.stl extents + 1-2 cm
+
+
+def ground_normals(P):
+    """Terrain normals at world points P (N, 3) from the heightmap (H rows = x, cols = y), nan off the bed."""
+    i = np.clip(np.rint((P[:, 0] - xs[0]) / (xs[1] - xs[0])).astype(int), 1, len(xs) - 2)
+    j = np.clip(np.rint((P[:, 1] - ys[0]) / (ys[1] - ys[0])).astype(int), 1, len(ys) - 2)
+    gx = (H[i + 1, j] - H[i - 1, j]) / (xs[2] - xs[0])
+    gy = (H[i, j + 1] - H[i, j - 1]) / (ys[2] - ys[0])
+    n = np.stack([-gx, -gy, np.ones_like(gx)], -1)
+    return n / np.linalg.norm(n, axis=1, keepdims=True), np.abs(P[:, 2] - H[i, j]) < 0.03
+
+
+def publish_lidar(stamp):
+    """The newest complete L1 frame as PointCloud2 (x, y, z float32 in lidar3d_link), noise and blind zone applied."""
+    data, _ = l1_sensor.get_data('generic-model-output')
+    if data is None:
+        return
+    g = parse_generic_model_output_data(data)
+    if g.numElements == 0 or g.timestampNs == l1_last[0]:
+        return
+    l1_last[0] = g.timestampNs
+    hit = (np.asarray(g.flags) & 64) > 0
+    az, el = np.radians(np.asarray(g.x, float)), np.radians(np.asarray(g.y, float))
+    d_s = np.stack([np.cos(el) * np.cos(az), np.cos(el) * np.sin(az), np.sin(el)], -1)    # sensor frame
+    t = np.where(hit, np.asarray(g.z, float), np.nan)
+    if args.realism == 'off':
+        ok = np.isfinite(t)
+        pts = (d_s[ok] * t[ok, None]).astype(np.float32)
+    else:
+        q = np.asarray(g.frameEnd.orientation, float)                         # x, y, z, w
+        R_ws = quat_wxyz_to_R(q[[3, 0, 1, 2]])
+        origin = np.asarray(g.frameEnd.posM, float)
+        dirs = d_s @ R_ws.T
+        P = origin + np.nan_to_num(t)[:, None] * dirs
+        n_g, on_ground = ground_normals(P)
+        normals = np.where(on_ground[:, None], n_g, -dirs)                   # off the bed: normal incidence
+        global L1_R
+        if L1_R is None:
+            pos, qb = rover.get_world_pose()
+            L1_R = quat_wxyz_to_R(np.asarray(qb, float)).T @ R_ws
+        Pb = d_s * np.nan_to_num(t)[:, None] @ L1_R.T + L1_T                  # hits in base_link
+        is_body = np.isfinite(t) & np.all([(Pb[:, k] > lo) & (Pb[:, k] < hi) for k, (lo, hi) in enumerate(BODY_BOX)], 0)
+        tau = dust.optical_depth(origin, dirs, np.nan_to_num(t), world.current_time) if dust is not None else 0.0
+        m = {'tau_hit': np.where(np.isfinite(t), tau, 0.0), 'samples': None, 'step': 0.02}
+        out = l1_model.apply(origin, dirs, t, normals, m, l1_rng, dust_on=False, cos_override=np.ones(len(t)),
+                             is_body=is_body)
+        ok = out['valid']
+        pts = (d_s[ok] * out['r'][ok, None]).astype(np.float32)
+    msg = PointCloud2()
+    msg.header.stamp, msg.header.frame_id = stamp, 'lidar3d_link'
+    msg.height, msg.width = 1, len(pts)
+    msg.fields = [PointField(name=n, offset=4 * i, datatype=PointField.FLOAT32, count=1) for i, n in enumerate('xyz')]
+    msg.is_bigendian, msg.point_step, msg.row_step, msg.is_dense = False, 12, 12 * len(pts), True
+    msg.data = array.array('B', pts.tobytes())
+    cloud_pub.publish(msg)
 
 # Ground truth + terrain editing (test harness only; SLAM never subscribes to these).
 latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
@@ -571,6 +678,8 @@ while app.is_running():
     now = world.current_time
     stamp = Time(sec=int(now), nanosec=int((now % 1) * 1e9))
     publish_gt_camera(stamp)
+    if LIDAR:
+        publish_lidar(stamp)
     for _ in range(20):                       # non-blocking: handle queued /arena/dig requests
         rclpy.spin_once(ros, timeout_sec=0.0)
     if not dug and 0 <= args.dig_at <= now:
