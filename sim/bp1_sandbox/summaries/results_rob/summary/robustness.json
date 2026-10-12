@@ -1,0 +1,3090 @@
+{
+ "thresholds": {
+  "spin16": 5.1,
+  "d455": 0.85
+ },
+ "speeds": [
+  0.75,
+  1.0
+ ],
+ "rows": [
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_approach",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_approach",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_approach",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_approach",
+   "dust": true,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 1.2209711470795215,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.2427773731488226,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.2427773731488226,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_approach",
+   "dust": true,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0007037297677691766,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 3,
+     "n": 39,
+     "rate": 0.07692307692307693,
+     "lo": 0.026506914073495688,
+     "hi": 0.2032137312805527
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 3,
+     "n": 92,
+     "rate": 0.03260869565217391,
+     "lo": 0.011150975342623229,
+     "hi": 0.09153512338694722
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_approach",
+   "dust": true,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.6108374384236454,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.2427773731488226,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.2427773731488226,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20s",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20s",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20s",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window, cells under 10 cm spread), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20s",
+   "dust": true,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 1.2209711470795215,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.2427773731488226,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.2427773731488226,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window, cells under 10 cm spread), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20s",
+   "dust": true,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0007037297677691766,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window, cells under 10 cm spread), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20s",
+   "dust": true,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.6108374384236454,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.2427773731488226,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.2427773731488226,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "floor waves 1 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und1",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.09852216748768473,
+   "v0.75": {
+    "phantom_per_10m": 0.9225540179655259,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.0682204418548196,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "floor waves 1 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und1",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.03518648838845883,
+   "v0.75": {
+    "phantom_per_10m": 0.09711094925952904,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.19422189851905808,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "floor waves 1 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und1",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.06685432793807178,
+   "v0.75": {
+    "phantom_per_10m": 1.019664967225055,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.116775916484584,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "floor waves 2 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und2",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.18719211822660098,
+   "map_fa_neg": 3.142153413089374,
+   "v0.75": {
+    "phantom_per_10m": 12.430201505219717,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 2,
+     "n": 53,
+     "rate": 0.03773584905660377,
+     "lo": 0.010410068833819265,
+     "hi": 0.12754523150959116
+    },
+    "all": {
+     "missed": 3,
+     "n": 92,
+     "rate": 0.03260869565217391,
+     "lo": 0.011150975342623229,
+     "hi": 0.09153512338694722
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 15.78052925467347,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 2,
+     "n": 53,
+     "rate": 0.03773584905660377,
+     "lo": 0.010410068833819265,
+     "hi": 0.12754523150959116
+    },
+    "all": {
+     "missed": 3,
+     "n": 92,
+     "rate": 0.03260869565217391,
+     "lo": 0.011150975342623229,
+     "hi": 0.09153512338694722
+    }
+   }
+  },
+  {
+   "case": "floor waves 2 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und2",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.02674173117522871,
+   "map_fa_neg": 1.6284306826178747,
+   "v0.75": {
+    "phantom_per_10m": 5.292546734644333,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 9.031318281136201,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "floor waves 2 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und2",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.10696692470091484,
+   "map_fa_neg": 2.3852920478536244,
+   "v0.75": {
+    "phantom_per_10m": 12.818645302257833,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 16.605972323379465,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "floor waves 2 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und2_l20s",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.1301900070372977,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "floor waves 2 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und2_l20s",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.015482054890921885,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "floor waves 2 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und2_l20s",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.07283603096410979,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 2.8022519352568613,
+   "map_fa_neg": 6.263898662913442,
+   "v0.75": {
+    "phantom_per_10m": 25.78295702840496,
+    "craters": {
+     "missed": 4,
+     "n": 39,
+     "rate": 0.10256410256410256,
+     "lo": 0.04061265558286986,
+     "hi": 0.2357915870224483
+    },
+    "boulders": {
+     "missed": 5,
+     "n": 53,
+     "rate": 0.09433962264150944,
+     "lo": 0.04097203744189684,
+     "hi": 0.20253975673701435
+    },
+    "all": {
+     "missed": 9,
+     "n": 92,
+     "rate": 0.09782608695652174,
+     "lo": 0.05232316443197395,
+     "hi": 0.17556952517254015
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 35.057052682689985,
+    "craters": {
+     "missed": 8,
+     "n": 39,
+     "rate": 0.20512820512820512,
+     "lo": 0.10779590197911117,
+     "hi": 0.3553427296312862
+    },
+    "boulders": {
+     "missed": 5,
+     "n": 53,
+     "rate": 0.09433962264150944,
+     "lo": 0.04097203744189684,
+     "hi": 0.20253975673701435
+    },
+    "all": {
+     "missed": 13,
+     "n": 92,
+     "rate": 0.14130434782608695,
+     "lo": 0.08447613379881469,
+     "hi": 0.22688761638899513
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 1.780436312456017,
+   "map_fa_neg": 3.904292751583392,
+   "v0.75": {
+    "phantom_per_10m": 25.880067977664492,
+    "craters": {
+     "missed": 5,
+     "n": 39,
+     "rate": 0.1282051282051282,
+     "lo": 0.05602734948028318,
+     "hi": 0.26706049037630475
+    },
+    "boulders": {
+     "missed": 4,
+     "n": 53,
+     "rate": 0.07547169811320754,
+     "lo": 0.029739073598901808,
+     "hi": 0.17858722263484245
+    },
+    "all": {
+     "missed": 9,
+     "n": 92,
+     "rate": 0.09782608695652174,
+     "lo": 0.05232316443197395,
+     "hi": 0.17556952517254015
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 35.83394027676622,
+    "craters": {
+     "missed": 10,
+     "n": 39,
+     "rate": 0.2564102564102564,
+     "lo": 0.14568625843452188,
+     "hi": 0.410819567678415
+    },
+    "boulders": {
+     "missed": 4,
+     "n": 53,
+     "rate": 0.07547169811320754,
+     "lo": 0.029739073598901808,
+     "hi": 0.17858722263484245
+    },
+    "all": {
+     "missed": 14,
+     "n": 92,
+     "rate": 0.15217391304347827,
+     "lo": 0.092864555668254,
+     "hi": 0.23936695966537982
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 2.291344123856439,
+   "map_fa_neg": 5.084095707248417,
+   "v0.75": {
+    "phantom_per_10m": 30.881281864530237,
+    "craters": {
+     "missed": 3,
+     "n": 39,
+     "rate": 0.07692307692307693,
+     "lo": 0.026506914073495688,
+     "hi": 0.2032137312805527
+    },
+    "boulders": {
+     "missed": 3,
+     "n": 53,
+     "rate": 0.05660377358490566,
+     "lo": 0.019436308927314183,
+     "hi": 0.15370448936126319
+    },
+    "all": {
+     "missed": 6,
+     "n": 92,
+     "rate": 0.06521739130434782,
+     "lo": 0.03022979137398394,
+     "hi": 0.13505960279305834
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 40.6409322651129,
+    "craters": {
+     "missed": 5,
+     "n": 39,
+     "rate": 0.1282051282051282,
+     "lo": 0.05602734948028318,
+     "hi": 0.26706049037630475
+    },
+    "boulders": {
+     "missed": 3,
+     "n": 53,
+     "rate": 0.05660377358490566,
+     "lo": 0.019436308927314183,
+     "hi": 0.15370448936126319
+    },
+    "all": {
+     "missed": 8,
+     "n": 92,
+     "rate": 0.08695652173913043,
+     "lo": 0.04472065376437301,
+     "hi": 0.16230427069431713
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4_l20s",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.04785362420830401,
+   "map_fa_neg": 1.9943701618578467,
+   "v0.75": {
+    "phantom_per_10m": 0.09711094925952904,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.6508861374119939,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4_l20s",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.04152005629838142,
+   "map_fa_neg": 0.5939479239971851,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.04855547462976452,
+    "craters": {
+     "missed": 3,
+     "n": 39,
+     "rate": 0.07692307692307693,
+     "lo": 0.026506914073495688,
+     "hi": 0.2032137312805527
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 3,
+     "n": 92,
+     "rate": 0.03260869565217391,
+     "lo": 0.011150975342623229,
+     "hi": 0.09153512338694722
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4_l20s",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.04468684025334271,
+   "map_fa_neg": 1.2941590429275158,
+   "v0.75": {
+    "phantom_per_10m": 0.09711094925952904,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.6508861374119939,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "roughness 2 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms2",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.023926812104152005,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.7768875940762323,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.7768875940762323,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "roughness 2 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms2",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 4,
+     "n": 39,
+     "rate": 0.10256410256410256,
+     "lo": 0.04061265558286986,
+     "hi": 0.2357915870224483
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 4,
+     "n": 92,
+     "rate": 0.043478260869565216,
+     "lo": 0.01703544061158062,
+     "hi": 0.10651842326381375
+    }
+   }
+  },
+  {
+   "case": "roughness 2 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms2",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.011963406052076003,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.7768875940762323,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.7768875940762323,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "roughness 3 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms3",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 1.306826178747361,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 8.497208060208791,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 9.419762078174317,
+    "craters": {
+     "missed": 4,
+     "n": 39,
+     "rate": 0.10256410256410256,
+     "lo": 0.04061265558286986,
+     "hi": 0.2357915870224483
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 4,
+     "n": 92,
+     "rate": 0.043478260869565216,
+     "lo": 0.01703544061158062,
+     "hi": 0.10651842326381375
+    }
+   }
+  },
+  {
+   "case": "roughness 3 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms3",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.8866995073891626,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 4.467103665938336,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 6.360767176499152,
+    "craters": {
+     "missed": 5,
+     "n": 39,
+     "rate": 0.1282051282051282,
+     "lo": 0.05602734948028318,
+     "hi": 0.26706049037630475
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 5,
+     "n": 92,
+     "rate": 0.05434782608695652,
+     "lo": 0.023434718368504144,
+     "hi": 0.12098691065271419
+    }
+   }
+  },
+  {
+   "case": "roughness 3 cm",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms3",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 1.0967628430682619,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 9.031318281136201,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 10.487982520029137,
+    "craters": {
+     "missed": 4,
+     "n": 39,
+     "rate": 0.10256410256410256,
+     "lo": 0.04061265558286986,
+     "hi": 0.2357915870224483
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 4,
+     "n": 92,
+     "rate": 0.043478260869565216,
+     "lo": 0.01703544061158062,
+     "hi": 0.10651842326381375
+    }
+   }
+  },
+  {
+   "case": "roughness 3 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms3_l20s",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.2997888810696692,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 2.136440883709639,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 2.330662782228697,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "roughness 3 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms3_l20s",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.2083040112596763,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 1.408108764263171,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.8936635105608164,
+    "craters": {
+     "missed": 4,
+     "n": 39,
+     "rate": 0.10256410256410256,
+     "lo": 0.04061265558286986,
+     "hi": 0.2357915870224483
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 4,
+     "n": 92,
+     "rate": 0.043478260869565216,
+     "lo": 0.01703544061158062,
+     "hi": 0.10651842326381375
+    }
+   }
+  },
+  {
+   "case": "roughness 3 cm, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/rms3_l20s",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.25404644616467276,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 2.3792182568584614,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 2.719106579266813,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "pitch error 1 deg",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch1",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "pitch error 1 deg",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch1",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "pitch error 1 deg",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch1",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "pitch error 2 deg",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch2",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.018296973961998593,
+   "map_fa_neg": 2.9584799437016187,
+   "v0.75": {
+    "phantom_per_10m": 14.760864287448415,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 14.760864287448415,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "pitch error 2 deg",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch2",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0014074595355383533,
+   "map_fa_neg": 0.4757213230119634,
+   "v0.75": {
+    "phantom_per_10m": 10.19664967225055,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 10.245205146880314,
+    "craters": {
+     "missed": 3,
+     "n": 39,
+     "rate": 0.07692307692307693,
+     "lo": 0.026506914073495688,
+     "hi": 0.2032137312805527
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 3,
+     "n": 92,
+     "rate": 0.03260869565217391,
+     "lo": 0.011150975342623229,
+     "hi": 0.09153512338694722
+    }
+   }
+  },
+  {
+   "case": "pitch error 2 deg",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch2",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.009852216748768473,
+   "map_fa_neg": 1.717100633356791,
+   "v0.75": {
+    "phantom_per_10m": 17.479970866715227,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 17.528526341344993,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   }
+  },
+  {
+   "case": "pitch error 2 deg, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch2_l20s",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.7515833919774807,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "pitch error 2 deg, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch2_l20s",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 3,
+     "n": 39,
+     "rate": 0.07692307692307693,
+     "lo": 0.026506914073495688,
+     "hi": 0.2032137312805527
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 3,
+     "n": 92,
+     "rate": 0.03260869565217391,
+     "lo": 0.011150975342623229,
+     "hi": 0.09153512338694722
+    }
+   }
+  },
+  {
+   "case": "pitch error 2 deg, local ground fit (20 cm window, cells under 10 cm spread)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/pitch2_l20s",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.37579169598874035,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20",
+   "dust": true,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 1.2181562280084448,
+   "map_fa_neg": 0.14919071076706544,
+   "v0.75": {
+    "phantom_per_10m": 1.3595532896334066,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.3595532896334066,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20",
+   "dust": true,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.0007037297677691766,
+   "map_fa_neg": 0.0,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 3,
+     "n": 39,
+     "rate": 0.07692307692307693,
+     "lo": 0.026506914073495688,
+     "hi": 0.2032137312805527
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 3,
+     "n": 92,
+     "rate": 0.03260869565217391,
+     "lo": 0.011150975342623229,
+     "hi": 0.09153512338694722
+    }
+   }
+  },
+  {
+   "case": "baseline (1 cm roughness, flat, exact attitude), local ground fit (20 cm window), dust plume",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/base_l20",
+   "dust": true,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.609429978888107,
+   "map_fa_neg": 0.07459535538353272,
+   "v0.75": {
+    "phantom_per_10m": 1.3595532896334066,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.3595532896334066,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm, local ground fit (15 cm window)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4_l15",
+   "dust": false,
+   "sensor": "spin16",
+   "n_arenas": 48,
+   "map_fa_pos": 0.061224489795918366,
+   "map_fa_neg": 2.086558761435609,
+   "v0.75": {
+    "phantom_per_10m": 0.14566642388929357,
+    "craters": {
+     "missed": 1,
+     "n": 39,
+     "rate": 0.02564102564102564,
+     "lo": 0.00454058606523737,
+     "hi": 0.13181286478627147
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 1,
+     "n": 92,
+     "rate": 0.010869565217391304,
+     "lo": 0.0019212795763616508,
+     "hi": 0.05902928886156091
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.5537751881524646,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm, local ground fit (15 cm window)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4_l15",
+   "dust": false,
+   "sensor": "d455",
+   "n_arenas": 48,
+   "map_fa_pos": 0.04081632653061224,
+   "map_fa_neg": 0.6516537649542575,
+   "v0.75": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 0.0,
+    "craters": {
+     "missed": 4,
+     "n": 39,
+     "rate": 0.10256410256410256,
+     "lo": 0.04061265558286986,
+     "hi": 0.2357915870224483
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 4,
+     "n": 92,
+     "rate": 0.043478260869565216,
+     "lo": 0.01703544061158062,
+     "hi": 0.10651842326381375
+    }
+   }
+  },
+  {
+   "case": "floor waves 4 cm, local ground fit (15 cm window)",
+   "dir": "/mnt/project-files/step2/bp1_sandbox/results_rob/und4_l15",
+   "dust": false,
+   "sensor": "fused",
+   "n_arenas": 48,
+   "map_fa_pos": 0.05102040816326531,
+   "map_fa_neg": 1.3691062631949331,
+   "v0.75": {
+    "phantom_per_10m": 0.14566642388929357,
+    "craters": {
+     "missed": 0,
+     "n": 39,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.08966985360023902
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 0,
+     "n": 92,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.04008280329209862
+    }
+   },
+   "v1.0": {
+    "phantom_per_10m": 1.5537751881524646,
+    "craters": {
+     "missed": 2,
+     "n": 39,
+     "rate": 0.05128205128205128,
+     "lo": 0.014177657646399527,
+     "hi": 0.1688593904563791
+    },
+    "boulders": {
+     "missed": 0,
+     "n": 53,
+     "rate": 0.0,
+     "lo": 0.0,
+     "hi": 0.06758430445307662
+    },
+    "all": {
+     "missed": 2,
+     "n": 92,
+     "rate": 0.021739130434782608,
+     "lo": 0.005981915837670909,
+     "hi": 0.0758364177460756
+    }
+   }
+  }
+ ]
+}

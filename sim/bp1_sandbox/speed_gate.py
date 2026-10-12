@@ -41,8 +41,21 @@ PHANTOM_LIMIT = 0.5                      # phantom stops per 10 m allowed when p
 UNSURE = v(pr.DETECT, "l_occ")           # one net supporting observation makes a candidate "unresolved"
 NEAR = 2 * v(pr.DETECT, "match_margin")  # a candidate this close to a real obstacle's edge is a displaced view of it
 SWEEP = {"spin16": [1.7, 2.55, 3.4, 5.1, 6.8, 8.5, 10.2, 12.75, 17.0],
+         "l1": [0.85, 1.7, 2.55, 3.4, 5.1, 6.8, 8.5, 10.2, 12.75, 17.0],
          "d455": [0.85, 1.7, 2.55, 3.4, 5.1, 6.8, 8.5, 10.2]}
-LABEL = {"spin16": "16-beam LiDAR", "d455": "D455", "fused": "LiDAR or D455"}
+LABEL = {"spin16": "16-beam LiDAR", "l1": "Unitree L1", "d455": "D455", "fused": "LiDAR or D455"}
+LIDAR, SENSORS = "spin16", ("spin16", "d455")     # set by load() from the records
+
+
+def set_sensors(runs):
+    """The LiDAR in the records (spin16 or l1) and the sensors present."""
+    global LIDAR, SENSORS
+    names = {s for s, _ in runs}
+    lidars = sorted(names - {"d455"})
+    assert len(lidars) <= 1, f"records mix LiDARs {lidars}"
+    LIDAR = lidars[0] if lidars else None
+    SENSORS = tuple(s for s in (LIDAR, "d455") if s in names)
+    return SENSORS + (("fused",) if len(SENSORS) == 2 else ())
 KINDS = (("craters", ("crater",)), ("boulders", ("boulder", "column")), ("all", ("crater", "boulder", "column")))
 
 
@@ -181,12 +194,13 @@ def load(paths):
             for r in t["runs"]:
                 runs.setdefault((r["sensor"], r["dust"]), []).append((t["seed"], Run(t, r, data["meta"], every)))
         by_dir.append(sorted(seeds))
+    set_sensors(runs)
     return meta, runs, by_dir
 
 
 def groups(runs, sensor, dust, seeds):
     if sensor == "fused":
-        a = dict(runs[("spin16", dust)])
+        a = dict(runs[(LIDAR, dust)])
         b = dict(runs[("d455", dust)])
         return [[a[s], b[s]] for s in seeds if s in a and s in b]
     d = dict(runs[(sensor, dust)])
@@ -194,7 +208,7 @@ def groups(runs, sensor, dust, seeds):
 
 
 def thr_for(sensor, chosen):
-    return [chosen["spin16"], chosen["d455"]] if sensor == "fused" else [chosen[sensor]]
+    return [chosen[LIDAR], chosen["d455"]] if sensor == "fused" else [chosen[sensor]]
 
 
 def main():
@@ -212,8 +226,10 @@ def main():
               "sweep": [], "constant": [], "gate": [], "confirm_clearance": []}
 
     # 1. Threshold sweep on the tuning seeds: missed hazards and phantom stops at constant speeds, per sensor and air.
-    for sensor in ("spin16", "d455"):
+    for sensor in SENSORS:
         for dust in (False, True):
+            if (sensor, dust) not in runs:
+                continue
             g = groups(runs, sensor, dust, tune)
             for thr in SWEEP[sensor]:
                 for vel in (0.75, 1.0, 1.25):
@@ -226,16 +242,19 @@ def main():
                                             **{k: s[k]["rate"] for k in s}})
     # Pick per sensor: the lowest threshold whose phantom stops stay within the limit at TUNE_SPEED in dust.
     chosen = {}
-    for sensor in ("spin16", "d455"):
-        ok = [r["thr"] for r in report["sweep"] if r["sensor"] == sensor and r["dust"] and r["speed"] == TUNE_SPEED
-              and r["phantom_per_10m"] <= PHANTOM_LIMIT]
+    tune_dust = any(k[1] for k in runs)          # clear-only records are tuned in clear air
+    for sensor in SENSORS:
+        ok = [r["thr"] for r in report["sweep"] if r["sensor"] == sensor and r["dust"] == tune_dust
+              and r["speed"] == TUNE_SPEED and r["phantom_per_10m"] <= PHANTOM_LIMIT]
         chosen[sensor] = min(ok) if ok else max(SWEEP[sensor])
     report["chosen"] = chosen
 
     # 2. Test seeds, chosen thresholds: constant speeds, the gate, and how far ahead hazards are confirmed.
-    for sensor in ("spin16", "d455", "fused"):
+    for sensor in SENSORS + (("fused",) if len(SENSORS) == 2 else ()):
         thr = thr_for(sensor, chosen)
         for dust in (False, True):
+            if (LIDAR if sensor == "fused" else sensor, dust) not in runs:
+                continue
             g = groups(runs, sensor, dust, test)
             for vel in SPEEDS:
                 rec, ph, mean_v, _ = drive(g, thr, vel, gate=False)
@@ -273,9 +292,10 @@ def write_tables(rep, path):
     tu, te = rep["tune_seeds"], rep["test_seeds"]
     L = [f"# Speed gate and threshold sweep ({tu[2] + te[2]} approaches)",
          "",
-         f"Thresholds tuned on seeds {tu[0]}-{tu[1]} ({tu[2]} arenas): 16-beam LiDAR {rep['chosen']['spin16']}, "
-         f"D455 {rep['chosen']['d455']} (the lowest with at most {a['PHANTOM_LIMIT']} phantom stops per 10 m at "
-         f"{a['TUNE_SPEED']} m/s in dust). Everything below is on seeds {te[0]}-{te[1]} ({te[2]} arenas), not used for tuning.",
+         f"Thresholds tuned on seeds {tu[0]}-{tu[1]} ({tu[2]} arenas): "
+         + ", ".join(f"{LABEL[k]} {t}" for k, t in rep["chosen"].items())
+         + f" (the lowest with at most {a['PHANTOM_LIMIT']} phantom stops per 10 m at "
+         f"{a['TUNE_SPEED']} m/s in dust, or in clear air when the records have no dust). Everything below is on seeds {te[0]}-{te[1]} ({te[2]} arenas), not used for tuning.",
          f"The robot starts from rest and speeds up or brakes at {ACCEL} / {DECEL} m/s^2. Stopping distance "
          f"d_stop(v) = v x {T_LAT} s + v^2 / (2 x {DECEL} m/s^2) + {MARGIN} m. Candidates within {NEAR:.2f} m of a real "
          f"obstacle's edge count as views of it, not phantoms. All of these numbers are Assumed. Frames every {m['DS']} m; "
@@ -308,7 +328,7 @@ def write_tables(rep, path):
         f.write("\n".join(L) + "\n")
 
 
-COLOR = {"spin16": "#2a78d6", "d455": "#1baf7a", "fused": "#6250d6"}     # validated: CVD and normal-vision separation pass
+COLOR = {"spin16": "#2a78d6", "l1": "#2a78d6", "d455": "#1baf7a", "fused": "#6250d6"}     # validated: CVD and normal-vision separation pass
 
 
 def plot(rep, d):
@@ -317,8 +337,8 @@ def plot(rep, d):
     a = rep["assumed"]
     air = ((False, "--", "clear air"), (True, "-", "dust plume ahead"))
     # 1. Threshold sweep: phantom stops (top) and missed hazards (bottom) at the tuning speed, per sensor.
-    fig, axes = plt.subplots(2, 2, figsize=(10, 6.4), sharex="col")
-    for j, sensor in enumerate(("spin16", "d455")):
+    fig, axes = plt.subplots(2, len(SENSORS), figsize=(5 * len(SENSORS), 6.4), sharex="col", squeeze=False)
+    for j, sensor in enumerate(SENSORS):
         for dust, ls, lab in air:
             rows = sorted((r for r in rep["sweep"] if r["sensor"] == sensor and r["dust"] == dust
                            and r["speed"] == a["TUNE_SPEED"]), key=lambda r: r["thr"])
@@ -347,10 +367,14 @@ def plot(rep, d):
     plt.close(fig)
 
     # 2. Missed hazards against mean speed, per sensor: constant speeds (lines) and the speed gate (diamonds).
-    fig, axes = plt.subplots(1, 3, figsize=(11, 4.2), sharey=True)
-    for ax, sensor in zip(axes, ("spin16", "d455", "fused")):
+    shown = SENSORS + (("fused",) if len(SENSORS) == 2 else ())
+    fig, axes = plt.subplots(1, len(shown), figsize=(3.7 * len(shown), 4.2), sharey=True, squeeze=False)
+    axes = axes[0]
+    for ax, sensor in zip(axes, shown):
         for dust, ls, lab in air:
             rows = [r for r in rep["constant"] if r["sensor"] == sensor and r["dust"] == dust]
+            if not rows:
+                continue
             x = [r["mean_speed"] for r in rows]
             y = np.array([[100 * r["all"][k] for k in ("rate", "lo", "hi")] for r in rows])
             ax.plot(x, y[:, 0], ls, color=COLOR[sensor], lw=2, marker="o", ms=4, mec=SURF, mew=1,

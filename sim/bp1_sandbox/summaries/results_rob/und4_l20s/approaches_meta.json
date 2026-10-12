@@ -1,0 +1,32 @@
+{
+ "meta": {
+  "n_arenas": 48,
+  "seed0": 3000,
+  "seconds": 1025.162942647934,
+  "DS": 0.15,
+  "FRONT": 0.35,
+  "HALF_W": 0.4,
+  "X_END": 4.9,
+  "PLUME_AHEAD": 1.2,
+  "LOOK": 3.0,
+  "surface_rms": 0.01,
+  "ground_fit": "local",
+  "ground_sigma": 0.2,
+  "ground_spread": 0.1,
+  "undulation": 0.04,
+  "pitch_err": 0.0,
+  "clear_only": true,
+  "det_fields": [
+   "kind",
+   "x",
+   "y",
+   "evidence",
+   "cells",
+   "along",
+   "lateral",
+   "class",
+   "match"
+  ]
+ },
+ "source_size": 2492364
+}

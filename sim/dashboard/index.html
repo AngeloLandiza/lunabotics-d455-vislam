@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sandbox Dashboard</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle><circle cx="9" cy="10" r="1.6"></circle><circle cx="15" cy="14.5" r="2.2"></circle><circle cx="14.5" cy="7.5" r="0.9"></circle>
+      </svg>
+      <span>Lunabotics sandbox</span>
+      <span class="host" id="host"></span>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#live" data-tab="live">Live</a>
+      <a href="#runs" data-tab="runs">Runs</a>
+      <a href="#results" data-tab="results">Results</a>
+      <a href="#params" data-tab="params">Parameters</a>
+      <a href="#research" data-tab="research">Research</a>
+    </nav>
+    <div class="conn" id="conn" role="status" aria-live="polite"><span class="dot"></span><span id="conn-text">Connecting...</span></div>
+  </div>
+</header>
+<main>
+  <section id="tab-live" class="tab" hidden aria-labelledby="h-live">
+    <div>
+      <div class="section-head"><h2 id="h-live">This computer</h2><span class="sub" id="live-sub"></span></div>
+      <div class="grid meters" id="live-meters"></div>
+    </div>
+    <div>
+      <div class="section-head"><h2>Runs in progress</h2><span class="sub">plus runs that finished in the last 15 minutes</span></div>
+      <div id="live-runs"></div>
+    </div>
+    <div>
+      <div class="section-head"><h2>Running simulation programs</h2><span class="sub">Python programs running approach.py, robustness.py, speed_gate.py, evaluate.py, Isaac Sim or the live view</span></div>
+      <div id="live-procs"></div>
+    </div>
+  </section>
+
+  <section id="tab-runs" class="tab" hidden aria-labelledby="h-runs">
+    <div id="run-detail"></div>
+    <div>
+      <div class="section-head"><h2 id="h-runs">All runs</h2><span class="sub" id="runs-sub"></span></div>
+      <div class="toolbar" style="margin-bottom:10px">
+        <input type="search" id="runs-filter" placeholder="Filter by kind, label or host" aria-label="Filter runs">
+        <select id="runs-status" aria-label="Status">
+          <option value="">Any status</option>
+          <option value="running">Running</option>
+          <option value="done">Finished</option>
+          <option value="error">Failed</option>
+          <option value="stale">No updates</option>
+          <option value="stopped">Stopped</option>
+        </select>
+      </div>
+      <div id="runs-table"></div>
+    </div>
+  </section>
+
+  <section id="tab-results" class="tab" hidden aria-labelledby="h-results">
+    <div>
+      <div class="section-head"><h2 id="h-results">Simulation results</h2><span class="sub" id="results-sub"></span></div>
+      <p class="lead">Result files found in <code>sim/bp1_sandbox/results*</code> and <code>sim/bp1_sandbox/summaries</code>. The file each table and chart comes from is shown under it. Refreshes every 30 s.</p>
+    </div>
+    <div id="results-body"></div>
+  </section>
+
+  <section id="tab-params" class="tab" hidden aria-labelledby="h-params">
+    <div>
+      <div class="section-head"><h2 id="h-params">Simulation parameters</h2><span class="sub" id="params-sub"></span></div>
+      <p class="lead">Every number the sandbox uses, from <code>sim/bp1_sandbox/params.py</code>. <b>Verified</b>: read in a source. <b>Inferred</b>: worked out from verified facts. <b>Assumed</b>: a placeholder to replace with a measured or sourced value.</p>
+    </div>
+    <div class="tiles" id="params-tiles"></div>
+    <div class="toolbar"><input type="search" id="params-filter" placeholder="Filter by name, value or source" aria-label="Filter parameters"></div>
+    <div id="params-body"></div>
+  </section>
+
+  <section id="tab-research" class="tab" hidden aria-labelledby="h-research">
+    <div>
+      <div class="section-head"><h2 id="h-research">Research checks</h2><span class="sub" id="research-sub"></span></div>
+      <p class="lead">Each research file had its claims re-checked against the sources it cites. A check file counts, per research file, how many claim rows were confirmed, did not match, were not found, could not be opened or were not checked.</p>
+    </div>
+    <div id="research-body"></div>
+  </section>
+</main>
+<div class="tip" id="tip" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>

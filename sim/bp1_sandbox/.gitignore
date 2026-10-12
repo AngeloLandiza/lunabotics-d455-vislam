@@ -3,3 +3,5 @@ results_v*/
 isaac_out/
 results_approach*/
 results_rob/
+results_selfmask/
+!/summaries/**/

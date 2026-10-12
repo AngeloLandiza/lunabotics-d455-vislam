@@ -1,0 +1,2899 @@
+{
+ "meta": {
+  "n_arenas": 48,
+  "seed0": 3000,
+  "seconds": 2114.105335712433,
+  "DS": 0.15,
+  "FRONT": 0.35,
+  "HALF_W": 0.4,
+  "X_END": 4.9,
+  "PLUME_AHEAD": 1.2,
+  "LOOK": 3.0,
+  "det_fields": [
+   "kind",
+   "x",
+   "y",
+   "evidence",
+   "cells",
+   "along",
+   "lateral",
+   "class",
+   "match"
+  ]
+ },
+ "dirs": [
+  "/mnt/project-files/step2/bp1_sandbox/results_approach",
+  "/mnt/project-files/step2/bp1_sandbox/results_approach_b"
+ ],
+ "tune_seeds": [
+  3000,
+  3047,
+  48
+ ],
+ "test_seeds": [
+  3048,
+  3095,
+  48
+ ],
+ "assumed": {
+  "T_LAT": 0.3,
+  "DECEL": 0.5,
+  "ACCEL": 0.5,
+  "MARGIN": 0.1,
+  "V_SLOW": 0.25,
+  "UNSURE": 0.85,
+  "NEAR": 0.3,
+  "TUNE_SPEED": 1.0,
+  "PHANTOM_LIMIT": 0.5
+ },
+ "sweep": [
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 1.7,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 1.7,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 1.7,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 2.55,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 2.55,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 2.55,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 3.4,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 3.4,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 3.4,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 5.1,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 5.1,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 5.1,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 6.8,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 6.8,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 6.8,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.10256410256410256,
+   "boulders": 0.0,
+   "all": 0.043478260869565216
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 8.5,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 8.5,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 8.5,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.10256410256410256,
+   "boulders": 0.0,
+   "all": 0.043478260869565216
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 10.2,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 10.2,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 10.2,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.15384615384615385,
+   "boulders": 0.0,
+   "all": 0.06521739130434782
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 12.75,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 12.75,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.10256410256410256,
+   "boulders": 0.0,
+   "all": 0.043478260869565216
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 12.75,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.20512820512820512,
+   "boulders": 0.018867924528301886,
+   "all": 0.09782608695652174
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 17.0,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0769066839744907,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 17.0,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0769066839744907,
+   "never": 0.0,
+   "craters": 0.1282051282051282,
+   "boulders": 0.0,
+   "all": 0.05434782608695652
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "thr": 17.0,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0769066839744907,
+   "never": 0.0,
+   "craters": 0.20512820512820512,
+   "boulders": 0.03773584905660377,
+   "all": 0.10869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 1.7,
+   "speed": 0.75,
+   "phantom_per_10m": 1.8451080359310519,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 1.7,
+   "speed": 1.0,
+   "phantom_per_10m": 1.8451080359310519,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 1.7,
+   "speed": 1.25,
+   "phantom_per_10m": 1.8451080359310519,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 2.55,
+   "speed": 0.75,
+   "phantom_per_10m": 1.6023306627822291,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 2.55,
+   "speed": 1.0,
+   "phantom_per_10m": 1.6023306627822291,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 2.55,
+   "speed": 1.25,
+   "phantom_per_10m": 1.6023306627822291,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 3.4,
+   "speed": 0.75,
+   "phantom_per_10m": 1.116775916484584,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 3.4,
+   "speed": 1.0,
+   "phantom_per_10m": 1.116775916484584,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 3.4,
+   "speed": 1.25,
+   "phantom_per_10m": 1.116775916484584,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 5.1,
+   "speed": 0.75,
+   "phantom_per_10m": 0.2427773731488226,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 5.1,
+   "speed": 1.0,
+   "phantom_per_10m": 0.2427773731488226,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 5.1,
+   "speed": 1.25,
+   "phantom_per_10m": 0.2427773731488226,
+   "warn_p10": 1.1423225628882596,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 6.8,
+   "speed": 0.75,
+   "phantom_per_10m": 0.04855547462976452,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 6.8,
+   "speed": 1.0,
+   "phantom_per_10m": 0.04855547462976452,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 6.8,
+   "speed": 1.25,
+   "phantom_per_10m": 0.04855547462976452,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.10256410256410256,
+   "boulders": 0.0,
+   "all": 0.043478260869565216
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 8.5,
+   "speed": 0.75,
+   "phantom_per_10m": 0.04855547462976452,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 8.5,
+   "speed": 1.0,
+   "phantom_per_10m": 0.04855547462976452,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 8.5,
+   "speed": 1.25,
+   "phantom_per_10m": 0.04855547462976452,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.10256410256410256,
+   "boulders": 0.0,
+   "all": 0.043478260869565216
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 10.2,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 10.2,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 10.2,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.10256410256410256,
+   "boulders": 0.018867924528301886,
+   "all": 0.05434782608695652
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 12.75,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 12.75,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 12.75,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.15384615384615385,
+   "boulders": 0.018867924528301886,
+   "all": 0.07608695652173914
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 17.0,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743449861313839,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 17.0,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743449861313839,
+   "never": 0.0,
+   "craters": 0.10256410256410256,
+   "boulders": 0.0,
+   "all": 0.043478260869565216
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "thr": 17.0,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743449861313839,
+   "never": 0.0,
+   "craters": 0.2564102564102564,
+   "boulders": 0.03773584905660377,
+   "all": 0.13043478260869565
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 0.85,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 0.85,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 0.85,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.15384615384615385,
+   "boulders": 0.0,
+   "all": 0.06521739130434782
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 1.7,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 1.7,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 1.7,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.15384615384615385,
+   "boulders": 0.0,
+   "all": 0.06521739130434782
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 2.55,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 2.55,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 2.55,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.1794871794871795,
+   "boulders": 0.0,
+   "all": 0.07608695652173914
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 3.4,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 3.4,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 3.4,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.23076923076923078,
+   "boulders": 0.0,
+   "all": 0.09782608695652174
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 5.1,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 5.1,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 5.1,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.23076923076923078,
+   "boulders": 0.0,
+   "all": 0.09782608695652174
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 6.8,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 6.8,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 6.8,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.23076923076923078,
+   "boulders": 0.0,
+   "all": 0.09782608695652174
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 8.5,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 8.5,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 8.5,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.23076923076923078,
+   "boulders": 0.0,
+   "all": 0.09782608695652174
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 10.2,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 10.2,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.05128205128205128,
+   "boulders": 0.0,
+   "all": 0.021739130434782608
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "thr": 10.2,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.133961924159407,
+   "never": 0.0,
+   "craters": 0.23076923076923078,
+   "boulders": 0.0,
+   "all": 0.09782608695652174
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 0.85,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 0.85,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 0.85,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1081814212509018,
+   "never": 0.0,
+   "craters": 0.20512820512820512,
+   "boulders": 0.0,
+   "all": 0.08695652173913043
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 1.7,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 1.7,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 1.7,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.20512820512820512,
+   "boulders": 0.0,
+   "all": 0.08695652173913043
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 2.55,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 2.55,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 2.55,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.20512820512820512,
+   "boulders": 0.0,
+   "all": 0.08695652173913043
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 3.4,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 3.4,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 3.4,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.1006806448585276,
+   "never": 0.0,
+   "craters": 0.20512820512820512,
+   "boulders": 0.0,
+   "all": 0.08695652173913043
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 5.1,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0769066839744907,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 5.1,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0769066839744907,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 5.1,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0769066839744907,
+   "never": 0.0,
+   "craters": 0.23076923076923078,
+   "boulders": 0.0,
+   "all": 0.09782608695652174
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 6.8,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 6.8,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 6.8,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.23076923076923078,
+   "boulders": 0.0,
+   "all": 0.09782608695652174
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 8.5,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.0,
+   "boulders": 0.0,
+   "all": 0.0
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 8.5,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.07692307692307693,
+   "boulders": 0.0,
+   "all": 0.03260869565217391
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 8.5,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.2564102564102564,
+   "boulders": 0.0,
+   "all": 0.10869565217391304
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 10.2,
+   "speed": 0.75,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.02564102564102564,
+   "boulders": 0.0,
+   "all": 0.010869565217391304
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 10.2,
+   "speed": 1.0,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.10256410256410256,
+   "boulders": 0.0,
+   "all": 0.043478260869565216
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "thr": 10.2,
+   "speed": 1.25,
+   "phantom_per_10m": 0.0,
+   "warn_p10": 1.0743597742163364,
+   "never": 0.0,
+   "craters": 0.3076923076923077,
+   "boulders": 0.0,
+   "all": 0.13043478260869565
+  }
+ ],
+ "constant": [
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "speed": 0.25,
+   "d_stop": 0.23750000000000002,
+   "mean_speed": 0.24147121535181235,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "speed": 0.5,
+   "d_stop": 0.5,
+   "mean_speed": 0.4715369779116185,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "speed": 0.75,
+   "d_stop": 0.8875,
+   "mean_speed": 0.6619930478896471,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "speed": 1.0,
+   "d_stop": 1.4000000000000001,
+   "mean_speed": 0.809207292946723,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "speed": 1.25,
+   "d_stop": 2.0375,
+   "mean_speed": 0.9136573038566558,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 3,
+    "n": 29,
+    "rate": 0.10344827586206896,
+    "lo": 0.035814240381301043,
+    "hi": 0.26385447247069155
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 3,
+    "n": 87,
+    "rate": 0.034482758620689655,
+    "lo": 0.011795606761416902,
+    "hi": 0.09654242339216913
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "speed": 0.25,
+   "d_stop": 0.23750000000000002,
+   "mean_speed": 0.24147121535181235,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "speed": 0.5,
+   "d_stop": 0.5,
+   "mean_speed": 0.4715369779116185,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "speed": 0.75,
+   "d_stop": 0.8875,
+   "mean_speed": 0.6619930478896471,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "speed": 1.0,
+   "d_stop": 1.4000000000000001,
+   "mean_speed": 0.809207292946723,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "speed": 1.25,
+   "d_stop": 2.0375,
+   "mean_speed": 0.9136573038566558,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 3,
+    "n": 29,
+    "rate": 0.10344827586206896,
+    "lo": 0.035814240381301043,
+    "hi": 0.26385447247069155
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 3,
+    "n": 87,
+    "rate": 0.034482758620689655,
+    "lo": 0.011795606761416902,
+    "hi": 0.09654242339216913
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "speed": 0.25,
+   "d_stop": 0.23750000000000002,
+   "mean_speed": 0.24147121535181235,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "speed": 0.5,
+   "d_stop": 0.5,
+   "mean_speed": 0.4715369779116185,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "speed": 0.75,
+   "d_stop": 0.8875,
+   "mean_speed": 0.6619930478896471,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "speed": 1.0,
+   "d_stop": 1.4000000000000001,
+   "mean_speed": 0.809207292946723,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 1,
+    "n": 29,
+    "rate": 0.034482758620689655,
+    "lo": 0.006113056614032261,
+    "hi": 0.1717589106470025
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 1,
+    "n": 87,
+    "rate": 0.011494252873563218,
+    "lo": 0.0020318554244781045,
+    "hi": 0.062273484860149206
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "speed": 1.25,
+   "d_stop": 2.0375,
+   "mean_speed": 0.9136573038566558,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 5,
+    "n": 29,
+    "rate": 0.1724137931034483,
+    "lo": 0.07597745271479928,
+    "hi": 0.34548800572815114
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 5,
+    "n": 87,
+    "rate": 0.05747126436781609,
+    "lo": 0.024795272156794536,
+    "hi": 0.1275754478657502
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "speed": 0.25,
+   "d_stop": 0.23750000000000002,
+   "mean_speed": 0.24147121535181235,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "speed": 0.5,
+   "d_stop": 0.5,
+   "mean_speed": 0.4715369779116185,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "speed": 0.75,
+   "d_stop": 0.8875,
+   "mean_speed": 0.6619930478896471,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "speed": 1.0,
+   "d_stop": 1.4000000000000001,
+   "mean_speed": 0.809207292946723,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 1,
+    "n": 29,
+    "rate": 0.034482758620689655,
+    "lo": 0.006113056614032261,
+    "hi": 0.1717589106470025
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 1,
+    "n": 87,
+    "rate": 0.011494252873563218,
+    "lo": 0.0020318554244781045,
+    "hi": 0.062273484860149206
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "speed": 1.25,
+   "d_stop": 2.0375,
+   "mean_speed": 0.9136573038566558,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 5,
+    "n": 29,
+    "rate": 0.1724137931034483,
+    "lo": 0.07597745271479928,
+    "hi": 0.34548800572815114
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 5,
+    "n": 87,
+    "rate": 0.05747126436781609,
+    "lo": 0.024795272156794536,
+    "hi": 0.1275754478657502
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "speed": 0.25,
+   "d_stop": 0.23750000000000002,
+   "mean_speed": 0.24147121535181235,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "speed": 0.5,
+   "d_stop": 0.5,
+   "mean_speed": 0.4715369779116185,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "speed": 0.75,
+   "d_stop": 0.8875,
+   "mean_speed": 0.6619930478896471,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "speed": 1.0,
+   "d_stop": 1.4000000000000001,
+   "mean_speed": 0.809207292946723,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "speed": 1.25,
+   "d_stop": 2.0375,
+   "mean_speed": 0.9136573038566558,
+   "phantom_per_10m": 0.0,
+   "craters": {
+    "missed": 3,
+    "n": 29,
+    "rate": 0.10344827586206896,
+    "lo": 0.035814240381301043,
+    "hi": 0.26385447247069155
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 3,
+    "n": 87,
+    "rate": 0.034482758620689655,
+    "lo": 0.011795606761416902,
+    "hi": 0.09654242339216913
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "speed": 0.25,
+   "d_stop": 0.23750000000000002,
+   "mean_speed": 0.24147121535181235,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "speed": 0.5,
+   "d_stop": 0.5,
+   "mean_speed": 0.4715369779116185,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "speed": 0.75,
+   "d_stop": 0.8875,
+   "mean_speed": 0.6619930478896471,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "speed": 1.0,
+   "d_stop": 1.4000000000000001,
+   "mean_speed": 0.809207292946723,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "speed": 1.25,
+   "d_stop": 2.0375,
+   "mean_speed": 0.9136573038566558,
+   "phantom_per_10m": 0.09811135638950212,
+   "craters": {
+    "missed": 3,
+    "n": 29,
+    "rate": 0.10344827586206896,
+    "lo": 0.035814240381301043,
+    "hi": 0.26385447247069155
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 3,
+    "n": 87,
+    "rate": 0.034482758620689655,
+    "lo": 0.011795606761416902,
+    "hi": 0.09654242339216913
+   }
+  }
+ ],
+ "gate": [
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "v_fast": 0.75,
+   "v_slow": 0.25,
+   "mean_speed": 0.5437705474334353,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.1530537159676227,
+    "candidate": 0.0,
+    "any": 0.1530537159676227
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "v_fast": 1.0,
+   "v_slow": 0.25,
+   "mean_speed": 0.5830122135411633,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.2141280353200872,
+    "candidate": 0.0,
+    "any": 0.2141280353200872
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "v_fast": 1.25,
+   "v_slow": 0.25,
+   "mean_speed": 0.46878934484195967,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.3760117733627671,
+    "candidate": 0.0029433406916850634,
+    "any": 0.37821927888153095
+   },
+   "craters": {
+    "missed": 2,
+    "n": 29,
+    "rate": 0.06896551724137931,
+    "lo": 0.019120864097994433,
+    "hi": 0.21964947595851925
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 2,
+    "n": 87,
+    "rate": 0.022988505747126436,
+    "lo": 0.006326952471398799,
+    "hi": 0.07999473274770788
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "v_fast": 0.75,
+   "v_slow": 0.25,
+   "mean_speed": 0.474495430854833,
+   "phantom_per_10m": 0.09811135638950212,
+   "slow_share": {
+    "unseen": 0.15599705665930777,
+    "candidate": 0.0890360559234732,
+    "any": 0.24356144223693757
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "v_fast": 1.0,
+   "v_slow": 0.25,
+   "mean_speed": 0.4588680187577883,
+   "phantom_per_10m": 0.09811135638950212,
+   "slow_share": {
+    "unseen": 0.23473142016188245,
+    "candidate": 0.10375275938189837,
+    "any": 0.32082413539367005
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "v_fast": 1.25,
+   "v_slow": 0.25,
+   "mean_speed": 0.40586360879634004,
+   "phantom_per_10m": 0.09811135638950212,
+   "slow_share": {
+    "unseen": 0.44076526857984094,
+    "candidate": 0.10448859455481964,
+    "any": 0.44959529065489645
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "v_fast": 0.75,
+   "v_slow": 0.25,
+   "mean_speed": 0.5162502950418112,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.1729212656364967,
+    "candidate": 0.0,
+    "any": 0.1729212656364967
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "v_fast": 1.0,
+   "v_slow": 0.25,
+   "mean_speed": 0.547333272288023,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.23105224429727617,
+    "candidate": 0.0,
+    "any": 0.23105224429727617
+   },
+   "craters": {
+    "missed": 1,
+    "n": 29,
+    "rate": 0.034482758620689655,
+    "lo": 0.006113056614032261,
+    "hi": 0.1717589106470025
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 1,
+    "n": 87,
+    "rate": 0.011494252873563218,
+    "lo": 0.0020318554244781045,
+    "hi": 0.062273484860149206
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "v_fast": 1.25,
+   "v_slow": 0.25,
+   "mean_speed": 0.46748044162460445,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.32082413539367005,
+    "candidate": 0.0,
+    "any": 0.32082413539367005
+   },
+   "craters": {
+    "missed": 2,
+    "n": 29,
+    "rate": 0.06896551724137931,
+    "lo": 0.019120864097994433,
+    "hi": 0.21964947595851925
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 2,
+    "n": 87,
+    "rate": 0.022988505747126436,
+    "lo": 0.006326952471398799,
+    "hi": 0.07999473274770788
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "v_fast": 0.75,
+   "v_slow": 0.25,
+   "mean_speed": 0.5210002559397494,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.1662987490802054,
+    "candidate": 0.0,
+    "any": 0.1662987490802054
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "v_fast": 1.0,
+   "v_slow": 0.25,
+   "mean_speed": 0.5611105720850318,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.2214863870492998,
+    "candidate": 0.0,
+    "any": 0.2214863870492998
+   },
+   "craters": {
+    "missed": 1,
+    "n": 29,
+    "rate": 0.034482758620689655,
+    "lo": 0.006113056614032261,
+    "hi": 0.1717589106470025
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 1,
+    "n": 87,
+    "rate": 0.011494252873563218,
+    "lo": 0.0020318554244781045,
+    "hi": 0.062273484860149206
+   }
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "v_fast": 1.25,
+   "v_slow": 0.25,
+   "mean_speed": 0.460905439038675,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.328182487122883,
+    "candidate": 0.0,
+    "any": 0.328182487122883
+   },
+   "craters": {
+    "missed": 2,
+    "n": 29,
+    "rate": 0.06896551724137931,
+    "lo": 0.019120864097994433,
+    "hi": 0.21964947595851925
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 2,
+    "n": 87,
+    "rate": 0.022988505747126436,
+    "lo": 0.006326952471398799,
+    "hi": 0.07999473274770788
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "v_fast": 0.75,
+   "v_slow": 0.25,
+   "mean_speed": 0.5054580594826132,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.1891096394407644,
+    "candidate": 0.0,
+    "any": 0.1891096394407644
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "v_fast": 1.0,
+   "v_slow": 0.25,
+   "mean_speed": 0.5303225103130226,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.2501839587932289,
+    "candidate": 0.0,
+    "any": 0.2501839587932289
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "v_fast": 1.25,
+   "v_slow": 0.25,
+   "mean_speed": 0.44312528757446,
+   "phantom_per_10m": 0.0,
+   "slow_share": {
+    "unseen": 0.40397350993377623,
+    "candidate": 0.0029433406916850634,
+    "any": 0.40544518027961884
+   },
+   "craters": {
+    "missed": 1,
+    "n": 29,
+    "rate": 0.034482758620689655,
+    "lo": 0.006113056614032261,
+    "hi": 0.1717589106470025
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 1,
+    "n": 87,
+    "rate": 0.011494252873563218,
+    "lo": 0.0020318554244781045,
+    "hi": 0.062273484860149206
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "v_fast": 0.75,
+   "v_slow": 0.25,
+   "mean_speed": 0.46770195070856924,
+   "phantom_per_10m": 0.09811135638950212,
+   "slow_share": {
+    "unseen": 0.19131714495952817,
+    "candidate": 0.0890360559234732,
+    "any": 0.25091979396615016
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "v_fast": 1.0,
+   "v_slow": 0.25,
+   "mean_speed": 0.4565288232010095,
+   "phantom_per_10m": 0.09811135638950212,
+   "slow_share": {
+    "unseen": 0.2582781456953627,
+    "candidate": 0.10375275938189837,
+    "any": 0.3237674760853552
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "v_fast": 1.25,
+   "v_slow": 0.25,
+   "mean_speed": 0.40586360879634004,
+   "phantom_per_10m": 0.09811135638950212,
+   "slow_share": {
+    "unseen": 0.44076526857984094,
+    "candidate": 0.10448859455481964,
+    "any": 0.44959529065489645
+   },
+   "craters": {
+    "missed": 0,
+    "n": 29,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.11697359446555587
+   },
+   "boulders": {
+    "missed": 0,
+    "n": 58,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.062119996895293766
+   },
+   "all": {
+    "missed": 0,
+    "n": 87,
+    "rate": 0.0,
+    "lo": 0.0,
+    "hi": 0.04228899535014795
+   }
+  }
+ ],
+ "confirm_clearance": [
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "kind": "craters",
+   "n": 29,
+   "at_start": 15,
+   "while_driving": 14,
+   "never": 0,
+   "median_m": 1.8718299641855325,
+   "p10_m": 1.530583201311711
+  },
+  {
+   "sensor": "spin16",
+   "dust": false,
+   "kind": "boulders",
+   "n": 58,
+   "at_start": 32,
+   "while_driving": 26,
+   "never": 0,
+   "median_m": 2.2472131339690677,
+   "p10_m": 2.1821199384940604
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "kind": "craters",
+   "n": 29,
+   "at_start": 14,
+   "while_driving": 15,
+   "never": 0,
+   "median_m": 1.866887794322904,
+   "p10_m": 1.4100524375488412
+  },
+  {
+   "sensor": "spin16",
+   "dust": true,
+   "kind": "boulders",
+   "n": 58,
+   "at_start": 29,
+   "while_driving": 29,
+   "never": 0,
+   "median_m": 2.2051640220072843,
+   "p10_m": 2.141251582370453
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "kind": "craters",
+   "n": 29,
+   "at_start": 20,
+   "while_driving": 9,
+   "never": 0,
+   "median_m": 1.576772134048161,
+   "p10_m": 1.372605507449043
+  },
+  {
+   "sensor": "d455",
+   "dust": false,
+   "kind": "boulders",
+   "n": 58,
+   "at_start": 45,
+   "while_driving": 13,
+   "never": 0,
+   "median_m": 2.5051640220072846,
+   "p10_m": 2.4534607266856536
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "kind": "craters",
+   "n": 29,
+   "at_start": 10,
+   "while_driving": 19,
+   "never": 0,
+   "median_m": 1.5171289541156847,
+   "p10_m": 1.2135075025620432
+  },
+  {
+   "sensor": "d455",
+   "dust": true,
+   "kind": "boulders",
+   "n": 58,
+   "at_start": 33,
+   "while_driving": 25,
+   "never": 0,
+   "median_m": 2.3981394257474133,
+   "p10_m": 2.2612072945726385
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "kind": "craters",
+   "n": 29,
+   "at_start": 20,
+   "while_driving": 9,
+   "never": 0,
+   "median_m": 2.1301956087798906,
+   "p10_m": 1.734946895722926
+  },
+  {
+   "sensor": "fused",
+   "dust": false,
+   "kind": "boulders",
+   "n": 58,
+   "at_start": 45,
+   "while_driving": 13,
+   "never": 0,
+   "median_m": 2.5051640220072846,
+   "p10_m": 2.4534607266856536
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "kind": "craters",
+   "n": 29,
+   "at_start": 15,
+   "while_driving": 14,
+   "never": 0,
+   "median_m": 1.9826456152626595,
+   "p10_m": 1.4501208530849539
+  },
+  {
+   "sensor": "fused",
+   "dust": true,
+   "kind": "boulders",
+   "n": 58,
+   "at_start": 34,
+   "while_driving": 24,
+   "never": 0,
+   "median_m": 2.4033609040250425,
+   "p10_m": 2.2646367284251623
+  }
+ ],
+ "chosen": {
+  "spin16": 5.1,
+  "d455": 0.85
+ }
+}

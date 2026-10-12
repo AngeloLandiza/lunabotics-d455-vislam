@@ -1,0 +1,831 @@
+{
+ "generated": "2026-10-12T02:38:03+0000",
+ "root": "/mnt/project-files/research",
+ "categories": [
+  "confirmed",
+  "partly_confirmed",
+  "mismatch",
+  "not_found",
+  "could_not_open",
+  "not_checked"
+ ],
+ "labels": {
+  "confirmed": "Confirmed",
+  "partly_confirmed": "Partly confirmed",
+  "mismatch": "Mismatch",
+  "not_found": "Not found",
+  "could_not_open": "Could not open",
+  "not_checked": "Not checked"
+ },
+ "files": [
+  {
+   "step": "step1",
+   "file": "01-lidar-occlusion.md",
+   "path": "step1/01-lidar-occlusion.md",
+   "title": "LiDAR Self-Occlusion Filtering and LiDAR Behavior on Regolith",
+   "size": 20398,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-01-02.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-01-02.md"
+  },
+  {
+   "step": "step1",
+   "file": "02-lidar-odometry.md",
+   "path": "step1/02-lidar-odometry.md",
+   "title": "LiDAR Odometry and Point-Cloud Registration in Feature-Poor Spaces",
+   "size": 21006,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-01-02.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-01-02.md"
+  },
+  {
+   "step": "step1",
+   "file": "03-fusion.md",
+   "path": "step1/03-fusion.md",
+   "title": "Tightly coupled LiDAR-visual-inertial fusion",
+   "size": 21693,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-03-04.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-03-04.md"
+  },
+  {
+   "step": "step1",
+   "file": "04-estimator-efficiency.md",
+   "path": "step1/04-estimator-efficiency.md",
+   "title": "Estimator efficiency and memory on limited onboard compute",
+   "size": 26604,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-03-04.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-03-04.md"
+  },
+  {
+   "step": "step1",
+   "file": "05-fiducials.md",
+   "path": "step1/05-fiducials.md",
+   "title": "05 Fiducial markers: monocular pose estimation",
+   "size": 20767,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-05-06.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-05-06.md"
+  },
+  {
+   "step": "step1",
+   "file": "06-global-localization.md",
+   "path": "step1/06-global-localization.md",
+   "title": "Global Initialization, Map Anchoring and Relocalization",
+   "size": 23535,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-05-06.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-05-06.md"
+  },
+  {
+   "step": "step1",
+   "file": "07-stereo-vo.md",
+   "path": "step1/07-stereo-vo.md",
+   "title": "Stereo depth and visual odometry on low-texture lunar-like terrain",
+   "size": 21674,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-07-08.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-07-08.md"
+  },
+  {
+   "step": "step1",
+   "file": "08-terrain-mapping.md",
+   "path": "step1/08-terrain-mapping.md",
+   "title": "Terrain Mapping, Traversability, and Boulder/Crater Detection",
+   "size": 19603,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-07-08.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-07-08.md"
+  },
+  {
+   "step": "step1",
+   "file": "09-planning-control.md",
+   "path": "step1/09-planning-control.md",
+   "title": "Path planning and control for fast, safe cycles",
+   "size": 21227,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-09-10.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-09-10.md"
+  },
+  {
+   "step": "step1",
+   "file": "10-prior-work-datasets.md",
+   "path": "step1/10-prior-work-datasets.md",
+   "title": "Prior Work and Datasets: Lunabotics Autonomy, Lunar/Planetary Navigation, Step 2 Test Data",
+   "size": 25640,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-09-10.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-09-10.md"
+  },
+  {
+   "step": "step1",
+   "file": "11-fiducial-gaps.md",
+   "path": "step1/11-fiducial-gaps.md",
+   "title": "Fiducial gaps: covariance, ambiguity, accuracy, multi-plane tags, active search",
+   "size": 22089,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-11-13.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-11-13.md"
+  },
+  {
+   "step": "step1",
+   "file": "12-terrain-gaps.md",
+   "path": "step1/12-terrain-gaps.md",
+   "title": "Terrain gaps: negative obstacles, rover rock and crater detection, regolith LiDAR, map structures",
+   "size": 24248,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-11-13.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-11-13.md"
+  },
+  {
+   "step": "step1",
+   "file": "13-crossfield-cycle-time.md",
+   "path": "step1/13-crossfield-cycle-time.md",
+   "title": "Cross-field parts and cycle-time methods",
+   "size": 20405,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-11-13.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step1/verify/verify-11-13.md"
+  },
+  {
+   "step": "step2",
+   "file": "00-guidebook-arena-bp1.md",
+   "path": "step2/00-guidebook-arena-bp1.md",
+   "title": "2027 guidebook: arena and BP-1 facts for the simulator",
+   "size": 3122,
+   "check_note": null,
+   "check_file": null
+  },
+  {
+   "step": "step2",
+   "file": "14-bp1-properties.md",
+   "path": "step2/14-bp1-properties.md",
+   "title": "BP-1 (Black Point-1) regolith simulant: properties a simulator needs",
+   "size": 21408,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-14-15.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step2/verify/verify-14-15.md"
+  },
+  {
+   "step": "step2",
+   "file": "15-dust-sensor-physics.md",
+   "path": "step2/15-dust-sensor-physics.md",
+   "title": "Dust and airborne-particle physics for LiDAR and stereo/IR cameras",
+   "size": 21850,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-14-15.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step2/verify/verify-14-15.md"
+  },
+  {
+   "step": "step2",
+   "file": "16-isaac-sensors.md",
+   "path": "step2/16-isaac-sensors.md",
+   "title": "Isaac Sim sensor simulation and what runs on Jetson",
+   "size": 28865,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-16-17.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step2/verify/verify-16-17.md"
+  },
+  {
+   "step": "step2",
+   "file": "17-terrain-dust-sim.md",
+   "path": "step2/17-terrain-dust-sim.md",
+   "title": "Terrain, Deformation, and Dust Simulation for Lunar Robotics",
+   "size": 25168,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-16-17.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step2/verify/verify-16-17.md"
+  },
+  {
+   "step": "step2",
+   "file": "18-detection-math.md",
+   "path": "step2/18-detection-math.md",
+   "title": "Detection Math: Statistical and Bayesian Building Blocks for Boulder and Crater Detection",
+   "size": 18746,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-18-20.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step2/verify/verify-18-20.md"
+  },
+  {
+   "step": "step2",
+   "file": "19-jetson-orin-nx.md",
+   "path": "step2/19-jetson-orin-nx.md",
+   "title": "Jetson Orin NX 16GB: what it runs and the measured numbers",
+   "size": 24135,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-19-21.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step2/verify/verify-19-21.md"
+  },
+  {
+   "step": "step2",
+   "file": "20-lidar-agnostic.md",
+   "path": "step2/20-lidar-agnostic.md",
+   "title": "LiDAR-agnostic pipeline: specs, algorithm support, point-cloud conventions",
+   "size": 16593,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-18-20.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step2/verify/verify-18-20.md"
+  },
+  {
+   "step": "step2",
+   "file": "21-custom-planner.md",
+   "path": "step2/21-custom-planner.md",
+   "title": "Mathematically Optimized Planning and Control for a Small Known Arena",
+   "size": 25159,
+   "check_note": "Check status (2026-10-11): the claims here were re-checked against their sources in verify/verify-19-21.md (rows marked Not checked there were not reached). Where the two disagree, the check wins. Read its \"Problems found\" section before reusing a quote or number from this file.",
+   "check_file": "step2/verify/verify-19-21.md"
+  }
+ ],
+ "checks": [
+  {
+   "step": "step1",
+   "file": "verify-01-02.md",
+   "path": "step1/verify/verify-01-02.md",
+   "title": "Citation check: files 01 and 02",
+   "size": 46332,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Could not open",
+    "Not checked"
+   ],
+   "rows": [
+    {
+     "file": "01 lidar-occlusion",
+     "research_file": "step1/01-lidar-occlusion.md",
+     "rows": 94,
+     "rows_given": false,
+     "confirmed": 77,
+     "partly_confirmed": null,
+     "mismatch": 9,
+     "not_found": 1,
+     "could_not_open": 0,
+     "not_checked": 7
+    },
+    {
+     "file": "02 lidar-odometry",
+     "research_file": "step1/02-lidar-odometry.md",
+     "rows": 116,
+     "rows_given": false,
+     "confirmed": 96,
+     "partly_confirmed": null,
+     "mismatch": 7,
+     "not_found": 0,
+     "could_not_open": 0,
+     "not_checked": 13
+    }
+   ],
+   "warnings": [],
+   "reported_total": null,
+   "totals": {
+    "rows": 210,
+    "files": 2,
+    "confirmed": 173,
+    "partly_confirmed": 0,
+    "mismatch": 16,
+    "not_found": 1,
+    "could_not_open": 0,
+    "not_checked": 20
+   }
+  },
+  {
+   "step": "step1",
+   "file": "verify-03-04.md",
+   "path": "step1/verify/verify-03-04.md",
+   "title": "Citation check: files 03 and 04",
+   "size": 40459,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Claims checked",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Could not open"
+   ],
+   "rows": [
+    {
+     "file": "03-fusion.md",
+     "research_file": "step1/03-fusion.md",
+     "rows": 92,
+     "rows_given": true,
+     "confirmed": 84,
+     "partly_confirmed": null,
+     "mismatch": 7,
+     "not_found": 1,
+     "could_not_open": 0,
+     "not_checked": null
+    },
+    {
+     "file": "04-estimator-efficiency.md",
+     "research_file": "step1/04-estimator-efficiency.md",
+     "rows": 90,
+     "rows_given": true,
+     "confirmed": 83,
+     "partly_confirmed": null,
+     "mismatch": 5,
+     "not_found": 2,
+     "could_not_open": 0,
+     "not_checked": null
+    }
+   ],
+   "warnings": [],
+   "reported_total": null,
+   "totals": {
+    "rows": 182,
+    "files": 2,
+    "confirmed": 167,
+    "partly_confirmed": 0,
+    "mismatch": 12,
+    "not_found": 3,
+    "could_not_open": 0,
+    "not_checked": 0
+   }
+  },
+  {
+   "step": "step1",
+   "file": "verify-05-06.md",
+   "path": "step1/verify/verify-05-06.md",
+   "title": "Citation check: files 05 and 06",
+   "size": 44095,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Rows",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Could not open",
+    "Not checked"
+   ],
+   "rows": [
+    {
+     "file": "05-fiducials.md",
+     "research_file": "step1/05-fiducials.md",
+     "rows": 98,
+     "rows_given": true,
+     "confirmed": 86,
+     "partly_confirmed": null,
+     "mismatch": 5,
+     "not_found": 1,
+     "could_not_open": 0,
+     "not_checked": 6
+    },
+    {
+     "file": "06-global-localization.md",
+     "research_file": "step1/06-global-localization.md",
+     "rows": 95,
+     "rows_given": true,
+     "confirmed": 83,
+     "partly_confirmed": null,
+     "mismatch": 4,
+     "not_found": 4,
+     "could_not_open": 0,
+     "not_checked": 4
+    }
+   ],
+   "warnings": [],
+   "reported_total": null,
+   "totals": {
+    "rows": 193,
+    "files": 2,
+    "confirmed": 169,
+    "partly_confirmed": 0,
+    "mismatch": 9,
+    "not_found": 5,
+    "could_not_open": 0,
+    "not_checked": 10
+   }
+  },
+  {
+   "step": "step1",
+   "file": "verify-07-08.md",
+   "path": "step1/verify/verify-07-08.md",
+   "title": "Citation check: files 07 and 08",
+   "size": 45605,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Could not open",
+    "Not checked (budget or not in extracted text)",
+    "Total"
+   ],
+   "rows": [
+    {
+     "file": "07-stereo-vo.md",
+     "research_file": "step1/07-stereo-vo.md",
+     "rows": 115,
+     "rows_given": true,
+     "confirmed": 98,
+     "partly_confirmed": null,
+     "mismatch": 6,
+     "not_found": 3,
+     "could_not_open": 0,
+     "not_checked": 8
+    },
+    {
+     "file": "08-terrain-mapping.md",
+     "research_file": "step1/08-terrain-mapping.md",
+     "rows": 61,
+     "rows_given": true,
+     "confirmed": 54,
+     "partly_confirmed": null,
+     "mismatch": 1,
+     "not_found": 1,
+     "could_not_open": 0,
+     "not_checked": 5
+    }
+   ],
+   "warnings": [],
+   "reported_total": {
+    "rows": 176,
+    "confirmed": 152,
+    "partly_confirmed": null,
+    "mismatch": 7,
+    "not_found": 4,
+    "could_not_open": 0,
+    "not_checked": 13
+   },
+   "totals": {
+    "rows": 176,
+    "files": 2,
+    "confirmed": 152,
+    "partly_confirmed": 0,
+    "mismatch": 7,
+    "not_found": 4,
+    "could_not_open": 0,
+    "not_checked": 13
+   }
+  },
+  {
+   "step": "step1",
+   "file": "verify-09-10.md",
+   "path": "step1/verify/verify-09-10.md",
+   "title": "Citation check: files 09 and 10",
+   "size": 52740,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Claims",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Partly confirmed",
+    "Could not open",
+    "Not checked"
+   ],
+   "rows": [
+    {
+     "file": "09-planning-control.md",
+     "research_file": "step1/09-planning-control.md",
+     "rows": 86,
+     "rows_given": true,
+     "confirmed": 68,
+     "partly_confirmed": 4,
+     "mismatch": 8,
+     "not_found": 1,
+     "could_not_open": 0,
+     "not_checked": 5
+    },
+    {
+     "file": "10-prior-work-datasets.md",
+     "research_file": "step1/10-prior-work-datasets.md",
+     "rows": 130,
+     "rows_given": true,
+     "confirmed": 98,
+     "partly_confirmed": 13,
+     "mismatch": 6,
+     "not_found": 3,
+     "could_not_open": 0,
+     "not_checked": 10
+    }
+   ],
+   "warnings": [],
+   "reported_total": null,
+   "totals": {
+    "rows": 216,
+    "files": 2,
+    "confirmed": 166,
+    "partly_confirmed": 17,
+    "mismatch": 14,
+    "not_found": 4,
+    "could_not_open": 0,
+    "not_checked": 15
+   }
+  },
+  {
+   "step": "step1",
+   "file": "verify-11-13.md",
+   "path": "step1/verify/verify-11-13.md",
+   "title": "Citation check: files 11, 12 and 13",
+   "size": 58571,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Could not open",
+    "Not checked",
+    "Rows"
+   ],
+   "rows": [
+    {
+     "file": "11-fiducial-gaps.md",
+     "research_file": "step1/11-fiducial-gaps.md",
+     "rows": 92,
+     "rows_given": true,
+     "confirmed": 77,
+     "partly_confirmed": null,
+     "mismatch": 7,
+     "not_found": 2,
+     "could_not_open": 0,
+     "not_checked": 6
+    },
+    {
+     "file": "12-terrain-gaps.md",
+     "research_file": "step1/12-terrain-gaps.md",
+     "rows": 107,
+     "rows_given": true,
+     "confirmed": 89,
+     "partly_confirmed": null,
+     "mismatch": 7,
+     "not_found": 1,
+     "could_not_open": 0,
+     "not_checked": 10
+    },
+    {
+     "file": "13-crossfield-cycle-time.md",
+     "research_file": "step1/13-crossfield-cycle-time.md",
+     "rows": 98,
+     "rows_given": true,
+     "confirmed": 87,
+     "partly_confirmed": null,
+     "mismatch": 2,
+     "not_found": 0,
+     "could_not_open": 0,
+     "not_checked": 9
+    }
+   ],
+   "warnings": [],
+   "reported_total": {
+    "rows": 297,
+    "confirmed": 253,
+    "partly_confirmed": null,
+    "mismatch": 16,
+    "not_found": 3,
+    "could_not_open": 0,
+    "not_checked": 25
+   },
+   "totals": {
+    "rows": 297,
+    "files": 3,
+    "confirmed": 253,
+    "partly_confirmed": 0,
+    "mismatch": 16,
+    "not_found": 3,
+    "could_not_open": 0,
+    "not_checked": 25
+   }
+  },
+  {
+   "step": "step2",
+   "file": "verify-14-15.md",
+   "path": "step2/verify/verify-14-15.md",
+   "title": "Citation check: files 14 and 15",
+   "size": 56056,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Rows checked",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Could not open",
+    "Not checked"
+   ],
+   "rows": [
+    {
+     "file": "14-bp1-properties.md",
+     "research_file": "step2/14-bp1-properties.md",
+     "rows": 92,
+     "rows_given": true,
+     "confirmed": 68,
+     "partly_confirmed": null,
+     "mismatch": 19,
+     "not_found": 1,
+     "could_not_open": 0,
+     "not_checked": 4
+    },
+    {
+     "file": "15-dust-sensor-physics.md",
+     "research_file": "step2/15-dust-sensor-physics.md",
+     "rows": 107,
+     "rows_given": true,
+     "confirmed": 83,
+     "partly_confirmed": null,
+     "mismatch": 4,
+     "not_found": 9,
+     "could_not_open": 0,
+     "not_checked": 11
+    }
+   ],
+   "warnings": [],
+   "reported_total": null,
+   "totals": {
+    "rows": 199,
+    "files": 2,
+    "confirmed": 151,
+    "partly_confirmed": 0,
+    "mismatch": 23,
+    "not_found": 10,
+    "could_not_open": 0,
+    "not_checked": 15
+   }
+  },
+  {
+   "step": "step2",
+   "file": "verify-16-17.md",
+   "path": "step2/verify/verify-16-17.md",
+   "title": "Citation check: files 16 and 17",
+   "size": 44456,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Could not open",
+    "Not checked",
+    "Total rows"
+   ],
+   "rows": [
+    {
+     "file": "16-isaac-sensors.md",
+     "research_file": "step2/16-isaac-sensors.md",
+     "rows": 65,
+     "rows_given": true,
+     "confirmed": 49,
+     "partly_confirmed": null,
+     "mismatch": 2,
+     "not_found": 0,
+     "could_not_open": 0,
+     "not_checked": 14
+    },
+    {
+     "file": "17-terrain-dust-sim.md",
+     "research_file": "step2/17-terrain-dust-sim.md",
+     "rows": 79,
+     "rows_given": true,
+     "confirmed": 61,
+     "partly_confirmed": null,
+     "mismatch": 8,
+     "not_found": 2,
+     "could_not_open": 0,
+     "not_checked": 8
+    }
+   ],
+   "warnings": [],
+   "reported_total": null,
+   "totals": {
+    "rows": 144,
+    "files": 2,
+    "confirmed": 110,
+    "partly_confirmed": 0,
+    "mismatch": 10,
+    "not_found": 2,
+    "could_not_open": 0,
+    "not_checked": 22
+   }
+  },
+  {
+   "step": "step2",
+   "file": "verify-18-20.md",
+   "path": "step2/verify/verify-18-20.md",
+   "title": "Citation check: files 18 and 20",
+   "size": 34704,
+   "parse": "table",
+   "columns": [
+    "File",
+    "Confirmed",
+    "Mismatch",
+    "Not found",
+    "Could not open",
+    "Not checked",
+    "Rows"
+   ],
+   "rows": [
+    {
+     "file": "18-detection-math.md",
+     "research_file": "step2/18-detection-math.md",
+     "rows": 75,
+     "rows_given": true,
+     "confirmed": 59,
+     "partly_confirmed": null,
+     "mismatch": 3,
+     "not_found": 3,
+     "could_not_open": 0,
+     "not_checked": 10
+    },
+    {
+     "file": "20-lidar-agnostic.md",
+     "research_file": "step2/20-lidar-agnostic.md",
+     "rows": 68,
+     "rows_given": true,
+     "confirmed": 60,
+     "partly_confirmed": null,
+     "mismatch": 1,
+     "not_found": 1,
+     "could_not_open": 0,
+     "not_checked": 6
+    }
+   ],
+   "warnings": [],
+   "reported_total": {
+    "rows": 143,
+    "confirmed": 119,
+    "partly_confirmed": null,
+    "mismatch": 4,
+    "not_found": 4,
+    "could_not_open": 0,
+    "not_checked": 16
+   },
+   "totals": {
+    "rows": 143,
+    "files": 2,
+    "confirmed": 119,
+    "partly_confirmed": 0,
+    "mismatch": 4,
+    "not_found": 4,
+    "could_not_open": 0,
+    "not_checked": 16
+   }
+  },
+  {
+   "step": "step2",
+   "file": "verify-19-21.md",
+   "path": "step2/verify/verify-19-21.md",
+   "title": "Citation check: files 19 and 21",
+   "size": 39632,
+   "parse": "text",
+   "columns": [],
+   "rows": [
+    {
+     "file": "19-jetson-orin-nx.md",
+     "research_file": "step2/19-jetson-orin-nx.md",
+     "rows": 90,
+     "rows_given": true,
+     "confirmed": 71,
+     "partly_confirmed": null,
+     "mismatch": 5,
+     "not_found": 4,
+     "could_not_open": 0,
+     "not_checked": 10
+    },
+    {
+     "file": "21-custom-planner.md",
+     "research_file": "step2/21-custom-planner.md",
+     "rows": 64,
+     "rows_given": true,
+     "confirmed": 50,
+     "partly_confirmed": null,
+     "mismatch": 4,
+     "not_found": 0,
+     "could_not_open": 0,
+     "not_checked": 10
+    }
+   ],
+   "warnings": [],
+   "reported_total": null,
+   "totals": {
+    "rows": 154,
+    "files": 2,
+    "confirmed": 121,
+    "partly_confirmed": 0,
+    "mismatch": 9,
+    "not_found": 4,
+    "could_not_open": 0,
+    "not_checked": 20
+   }
+  }
+ ],
+ "totals": {
+  "overall": {
+   "rows": 1914,
+   "files": 21,
+   "confirmed": 1581,
+   "partly_confirmed": 17,
+   "mismatch": 120,
+   "not_found": 40,
+   "could_not_open": 0,
+   "not_checked": 156
+  },
+  "step1": {
+   "rows": 1274,
+   "files": 13,
+   "confirmed": 1080,
+   "partly_confirmed": 17,
+   "mismatch": 74,
+   "not_found": 20,
+   "could_not_open": 0,
+   "not_checked": 83
+  },
+  "step2": {
+   "rows": 640,
+   "files": 8,
+   "confirmed": 501,
+   "partly_confirmed": 0,
+   "mismatch": 46,
+   "not_found": 20,
+   "could_not_open": 0,
+   "not_checked": 73
+  }
+ }
+}

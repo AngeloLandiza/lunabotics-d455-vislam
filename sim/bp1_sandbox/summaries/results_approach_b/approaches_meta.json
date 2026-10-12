@@ -1,0 +1,25 @@
+{
+ "meta": {
+  "n_arenas": 48,
+  "seed0": 3048,
+  "seconds": 2089.8512003421783,
+  "DS": 0.15,
+  "FRONT": 0.35,
+  "HALF_W": 0.4,
+  "X_END": 4.9,
+  "PLUME_AHEAD": 1.2,
+  "LOOK": 3.0,
+  "det_fields": [
+   "kind",
+   "x",
+   "y",
+   "evidence",
+   "cells",
+   "along",
+   "lateral",
+   "class",
+   "match"
+  ]
+ },
+ "source_size": 4566134
+}
