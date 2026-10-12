@@ -3,19 +3,20 @@
 # kept apart from the 3000-3099 test arenas) side by side, one ROS_DOMAIN_ID each. Pick the best variant from
 # ../compare.py --merge on the outputs, then run it on the test arenas with run_nav2.sh and the same --set flags.
 #
-# Usage: ./tune.sh OUT_DIR [--seeds 20] [--slip nominal] [--rtf 2.0] [--jobs 3]
+# Usage: ./tune.sh OUT_DIR [--seeds 20] [--slip nominal] [--rtf 2.0] [--jobs 3] [--only name,name]
 # The variants are a first guess from the MPPI README's tuning notes and this robot (Assumed), meant to be revised.
 set -eo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 [ $# -ge 1 ] || { sed -n '6p' "$0"; exit 2; }
 OUT=$(realpath -m "$1"); shift
-SEEDS=20 SLIP=nominal RTF=2.0 JOBS=3
+SEEDS=20 SLIP=nominal RTF=2.0 JOBS=3 ONLY=
 while [ $# -gt 0 ]; do
   case $1 in
     --seeds) SEEDS=$2; shift 2 ;;
     --slip) SLIP=$2; shift 2 ;;
     --rtf) RTF=$2; shift 2 ;;
     --jobs) JOBS=$2; shift 2 ;;
+    --only) ONLY=$2; shift 2 ;;
     *) echo "unknown option $1"; exit 2 ;;
   esac
 done
@@ -42,6 +43,11 @@ declare -A V=(
   [slowturn]="$C.wz_max=0.9 $C.GoalAngleCritic.cost_weight=8.0"
   # all of the above together
   [combo]="costmaps.inflation_layer.inflation_radius=0.45 costmaps.inflation_layer.cost_scaling_factor=6.0 $C.wz_max=0.9 $C.GoalAngleCritic.cost_weight=8.0 planner_server.GridBased.allow_reverse_expansion=true planner_server.GridBased.max_planning_time=8.0"
+  # round 2, after the spinning at goals in round 1: turn slowly enough that the wheels' spin-down overshoot
+  # (w^2 / 2 alpha, alpha ~1.2-1.85 rad/s^2) stays under the heading tolerance: 0.5 rad/s gives ~4-6 deg against 8 deg;
+  # and a longer progress allowance so the final turn is not cut short by the progress checker and its spin recovery
+  [finalturn]="$C.wz_max=0.5 $C.GoalAngleCritic.cost_weight=8.0 $C.GoalAngleCritic.threshold_to_consider=1.0 controller_server.general_goal_checker.yaw_goal_tolerance=0.14 controller_server.progress_checker.movement_time_allowance=20.0"
+  [finalcombo]="$C.wz_max=0.5 $C.GoalAngleCritic.cost_weight=8.0 $C.GoalAngleCritic.threshold_to_consider=1.0 controller_server.general_goal_checker.yaw_goal_tolerance=0.14 controller_server.progress_checker.movement_time_allowance=20.0 costmaps.inflation_layer.inflation_radius=0.45 costmaps.inflation_layer.cost_scaling_factor=6.0 planner_server.GridBased.allow_reverse_expansion=true planner_server.GridBased.max_planning_time=8.0"
   # cheaper in-place turns for the lattice planner
   [turns]="planner_server.GridBased.rotation_penalty=2.0 planner_server.GridBased.non_straight_penalty=1.0"
 )
@@ -51,6 +57,7 @@ domain=60
 running=0
 VIZ_PID=
 for name in "${!V[@]}"; do
+  [ -z "$ONLY" ] || [[ ",$ONLY," == *",$name,"* ]] || continue
   sets=()
   for kv in ${V[$name]}; do sets+=(--set "$kv"); done
   echo "variant $name: ${V[$name]:-(defaults)}"
