@@ -15,6 +15,7 @@ Publishes what the real D455 driver does, so the SLAM stack runs unchanged (sim:
   /ground_truth/camera_pose (camera_link in the world frame, for checking SLAM)
   /arena/heightmap (true terrain, 32FC1 rows = x)   /arena/volume ([cut, fill, berm] m^3)
   /l1/points (team robot: Unitree L1 PointCloud2, frame lidar3d_link, ~10 Hz; body returns left in)
+  /rear_camera/image_raw + camera_info (team robot: wide rear camera for the start-zone tags, rgb8 1280 x 720)
   /wheel/odom (encoder odometry, frame wheel_odom: over-reads by 1/(1 - slip) like real encoders on loose BP-1)
 --realism nominal|heavy (default nominal; off = ideal sensors, rigid ground) adds the BP-1 layers of sim/realism.py:
 D455 depth noise / dropouts / dust and IR noise, wheel slip, ruts, dust plumes after digs, the L1 BP-1 layer, and
@@ -37,6 +38,10 @@ parser.add_argument('--world', choices=['arena', 'lunar'], default='lunar')
 parser.add_argument('--seed', type=int, default=0, help='terrain / obstacle layout / start pose')
 parser.add_argument('--start-heading', default='random', help='arena: N, E, S, W or random')
 parser.add_argument('--no-lidar', action='store_true', help='team robot: leave out the Unitree L1')
+parser.add_argument('--light', choices=['arena', 'low'], default='arena',
+                    help='arena: the hall lights; low: hall lights at 1/4 and a sun 15 deg above the horizon (the VO '
+                         'test\'s low light: long shadows, glare)')
+parser.add_argument('--no-tags', action='store_true', help='arena: leave out the two start-zone AprilTags')
 parser.add_argument('--earlier-trips', type=int, default=0,
                     help='arena, team robot: start with the ruts of N earlier drives across the bed (a used bed)')
 parser.add_argument('--realism', choices=['off', 'nominal', 'heavy'], default='nominal',
@@ -138,6 +143,63 @@ if args.world == 'arena':
     xs, ys, H = terrain.xs, terrain.ys, terrain.H
     start_x, start_y, start_yaw = A.start_pose(args.seed, args.start_heading)
     WORLD_FRAME = 'arena'
+    if not args.no_tags:
+        # Start-zone tags (sim/fiducial, results/isaac_tags_v1: the two-tag layout): tag36h11 ids 0 and 1, 16.51 cm
+        # black square (the team's apriltag params, Verified) with a one-cell white margin, centre 0.30 m above the
+        # bed, 1.0 m along the two bin walls of the start-zone corner. The walls stand behind the 17 cm ducts, so the
+        # tag faces are at y = -0.17 and x = -0.17 (the Python test put the walls at 0).
+        import cv2  # noqa: E402
+        from pxr import Vt  # noqa: E402
+        _aruco = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_36h11)
+        TAGS = [(0, (1.0, -A.DUCT_D + 0.001), 90.0), (1, (-A.DUCT_D + 0.001, 1.0), 0.0)]   # id, centre xy, facing
+        for tid, (tx, ty), face in TAGS:
+            img = cv2.aruco.generateImageMarker(_aruco, tid, 640, borderBits=1)
+            img = cv2.copyMakeBorder(img, 80, 80, 80, 80, cv2.BORDER_CONSTANT, value=255)
+            png = os.path.join(CACHE, f'tag36h11_id{tid}.png')
+            cv2.imwrite(png, img)
+            n = np.array([np.cos(np.radians(face)), np.sin(np.radians(face)), 0.0])
+            right = np.array([-n[1], n[0], 0.0])
+            c, h = np.array([tx, ty, 0.30]), 0.1651 / 2 * 10 / 8
+            up = np.array([0.0, 0.0, 1.0])
+            corners = [c - right * h + up * h, c + right * h + up * h, c + right * h - up * h, c - right * h - up * h]
+            mat = UsdShade.Material.Define(stage, f'/World/Looks/tag{tid}')
+            pbr_ = UsdShade.Shader.Define(stage, f'/World/Looks/tag{tid}/pbr')
+            pbr_.CreateIdAttr('UsdPreviewSurface')
+            pbr_.CreateInput('roughness', Sdf.ValueTypeNames.Float).Set(0.9)
+            st_ = UsdShade.Shader.Define(stage, f'/World/Looks/tag{tid}/st')
+            st_.CreateIdAttr('UsdPrimvarReader_float2')
+            st_.CreateInput('varname', Sdf.ValueTypeNames.Token).Set('st')
+            tex = UsdShade.Shader.Define(stage, f'/World/Looks/tag{tid}/tex')
+            tex.CreateIdAttr('UsdUVTexture')
+            tex.CreateInput('file', Sdf.ValueTypeNames.Asset).Set(png)
+            tex.CreateInput('sourceColorSpace', Sdf.ValueTypeNames.Token).Set('sRGB')
+            tex.CreateInput('scale', Sdf.ValueTypeNames.Float4).Set(Gf.Vec4f(0.8, 0.8, 0.8, 1.0))   # paper white
+            tex.CreateInput('st', Sdf.ValueTypeNames.Float2).ConnectToSource(st_.ConnectableAPI(), 'result')
+            pbr_.CreateInput('diffuseColor', Sdf.ValueTypeNames.Color3f).ConnectToSource(tex.ConnectableAPI(), 'rgb')
+            mat.CreateSurfaceOutput().ConnectToSource(pbr_.ConnectableAPI(), 'surface')
+            q = UsdGeom.Mesh.Define(stage, f'/World/start_tags/tag{tid}')
+            q.CreatePointsAttr(Vt.Vec3fArray.FromNumpy(np.asarray(corners, np.float32)))
+            q.CreateFaceVertexCountsAttr([4])
+            q.CreateFaceVertexIndicesAttr([0, 1, 2, 3])
+            q.CreateSubdivisionSchemeAttr(UsdGeom.Tokens.none)
+            UsdGeom.PrimvarsAPI(q.GetPrim()).CreatePrimvar('st', Sdf.ValueTypeNames.TexCoord2fArray,
+                                                         UsdGeom.Tokens.vertex).Set(
+                Vt.Vec2fArray.FromNumpy(np.array([[0, 1], [1, 1], [1, 0], [0, 0]], np.float32)))
+            UsdShade.MaterialBindingAPI.Apply(q.GetPrim()).Bind(mat)
+        print(f'[sim] start-zone tags: ids 0, 1 (36h11, 16.51 cm) at {[t[1] for t in TAGS]}, 0.30 m high', flush=True)
+    if args.light == 'low':
+        # The VO test's low light (sim/odometry/isaac_vo.py): a sun 15 deg above the horizon, plus the hall lights
+        # dimmed to 1/4 so its long shadows and glare dominate
+        for prim in stage.Traverse():
+            if prim.GetTypeName() in ('RectLight', 'DomeLight', 'SphereLight', 'DiskLight'):
+                a = prim.GetAttribute('inputs:intensity')
+                if a and a.Get() is not None:
+                    a.Set(a.Get() * 0.25)
+        sun = UsdLux.DistantLight.Define(stage, '/World/low_sun')
+        sun.CreateIntensityAttr(250000.0)
+        sun.CreateAngleAttr(0.53)
+        UsdGeom.Xformable(sun.GetPrim()).AddRotateXYZOp().Set(Gf.Vec3f(75.0, 0.0, 135.0))
+        print('[sim] light: low sun (15 deg up), hall lights at 1/4', flush=True)
 else:
     terrain = None
     start_x, start_y, start_yaw = 0.0, 0.0, 0.0
@@ -247,6 +309,26 @@ for prim in stage.Traverse():
                 prim.RemoveAPI(api)
 app.update()
 
+REAR = None
+if ROBOT == 'team':
+    # Wide rear camera for the start-zone tags (sim/fiducial: 2.0 rad horizontal field of view, 1280 x 720, pitched
+    # 15 deg down at the xacro rear_cam position; the xacro has 1.2 rad and 15 deg up, which saw no tag from the zone)
+    REAR = BASE + '/rear_cam'
+    REAR_RES, REAR_HFOV = (1280, 720), 2.0
+    rc = UsdGeom.Camera.Define(stage, REAR)
+    rc.CreateFocalLengthAttr(10.0)
+    rc.CreateHorizontalApertureAttr(float(2 * 10.0 * np.tan(REAR_HFOV / 2)))
+    rc.CreateVerticalApertureAttr(float(2 * 10.0 * np.tan(REAR_HFOV / 2) * REAR_RES[1] / REAR_RES[0]))
+    rc.CreateClippingRangeAttr(Gf.Vec2f(0.02, 30.0))
+    _c, _s = np.cos(np.radians(15.0)), np.sin(np.radians(15.0))
+    R_bl = np.array([[-1, 0, 0], [0, -1, 0], [0, 0, 1.0]]) @ np.array([[_c, 0, _s], [0, 1, 0], [-_s, 0, _c]])  # yaw pi, 15 deg down
+    R_usd = R_bl @ np.array([[0.0, 0.0, -1.0], [-1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])   # USD camera: -Z forward, +Y up
+    m_ = np.eye(4)
+    m_[:3, :3], m_[3, :3] = R_usd.T, team_robot.REAR_CAM_MOUNT[0]
+    rxf = UsdGeom.Xformable(rc.GetPrim())
+    rxf.ClearXformOpOrder()
+    rxf.AddTransformOp().Set(Gf.Matrix4d(m_.tolist()))
+
 LEFT = find_prim(CAM, 'Left')
 RIGHT = find_prim(CAM, 'Right')
 DEPTH = find_prim(CAM, 'Depth')
@@ -312,6 +394,10 @@ if ROBOT == 'team' and not args.no_lidar:
 
 # ---------------------------------------------------------------- ROS 2 graphs
 annotators = {}
+rear_ann = None
+if REAR:
+    rear_ann = rep.AnnotatorRegistry.get_annotator('LdrColor')
+    rear_ann.attach(rep.create.render_product(REAR, REAR_RES))
 for name, prim, res, kind in [('infra1', LEFT, CAM_RES, 'LdrColor'), ('infra2', RIGHT, CAM_RES, 'LdrColor'),
                               ('depth', DEPTH, DEPTH_RES, 'distance_to_image_plane')]:
     ann = rep.AnnotatorRegistry.get_annotator(kind)
@@ -417,6 +503,8 @@ frames = {'camera_infra1_optical_frame': camera_axes(LEFT, True),
           'camera_depth_optical_frame': camera_axes(DEPTH, True)}
 imu_ax, imu_pos = world_frame(IMU)
 frames['camera_imu_optical_frame'] = (imu_ax.T, imu_pos)
+if REAR:
+    frames['rear_camera_optical_frame'] = camera_axes(REAR, True)
 if LIDAR:
     l1_ax, l1_pos = world_frame(LIDAR)
     frames['lidar3d_link'] = (l1_ax.T, l1_pos)       # the L1's own axes (columns = sensor x, y, z in the world)
@@ -480,7 +568,10 @@ tf_static.publish(tf_msg)
 pubs = {n: (ros.create_publisher(Image, f'/camera/{n}/image_rect_raw', 5),
             ros.create_publisher(CameraInfo, f'/camera/{n}/camera_info', 5)) for n in annotators}
 frame_ids = {'infra1': 'camera_infra1_optical_frame', 'infra2': 'camera_infra2_optical_frame',
-             'depth': 'camera_depth_optical_frame'}
+             'depth': 'camera_depth_optical_frame', 'rear': 'rear_camera_optical_frame'}
+if REAR:
+    rear_pubs = (ros.create_publisher(Image, '/rear_camera/image_raw', 2),
+                 ros.create_publisher(CameraInfo, '/rear_camera/camera_info', 2))
 baseline = float(np.linalg.norm(world_frame(RIGHT)[1] - world_frame(LEFT)[1]))
 import realism  # noqa: E402
 dust = realism.DustPlumes(args.realism) if args.realism != 'off' else None   # plumes after each dig / dump
@@ -710,6 +801,23 @@ def camera_info(name, prim, res):
 
 infos = {'infra1': camera_info('infra1', LEFT, CAM_RES), 'infra2': camera_info('infra2', RIGHT, CAM_RES),
          'depth': camera_info('depth', DEPTH, DEPTH_RES)}
+if REAR:
+    infos['rear'] = camera_info('rear', REAR, REAR_RES)
+
+
+def publish_rear(stamp):
+    data = rear_ann.get_data()
+    if data is None or np.size(data) == 0:
+        return
+    rgb = np.ascontiguousarray(np.asarray(data)[..., :3])
+    msg = Image()
+    msg.header.stamp, msg.header.frame_id = stamp, 'rear_camera_optical_frame'
+    msg.height, msg.width = rgb.shape[:2]
+    msg.encoding, msg.step = 'rgb8', rgb.shape[1] * 3
+    msg.data = array.array('B', rgb.tobytes())
+    infos['rear'].header.stamp = stamp
+    rear_pubs[1].publish(infos['rear'])
+    rear_pubs[0].publish(msg)
 print(f'[sim] stereo baseline {baseline:.4f} m, fx {infos["infra1"].k[0]:.1f}', flush=True)
 
 
@@ -751,6 +859,7 @@ dug = False
 yaw_i = 0.0
 terrain_dirty, last_terrain_pub = True, -1e9
 prof, n_prof = np.zeros(3), 0
+n_frame = 0
 print('[sim] running', flush=True)
 while app.is_running():
     # Skid-steer (tank) drive: same speed for every wheel on a side. Skid turns slip by an
@@ -780,6 +889,9 @@ while app.is_running():
     stamp = Time(sec=int(now), nanosec=int((now % 1) * 1e9))
     publish_gt_camera(stamp)
     publish_wheel_odom(stamp)
+    if REAR and n_frame % 3 == 0:                 # ~10 Hz is plenty for the tags
+        publish_rear(stamp)
+    n_frame += 1
     if ruts is not None and ruts.on:
         pos, q = rover.get_world_pose()
         Rb = quat_wxyz_to_R(np.asarray(q, float))
