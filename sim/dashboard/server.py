@@ -30,6 +30,7 @@ SANDBOX = os.path.join(REPO, "sim", "bp1_sandbox")
 SUMMARIES = os.path.join(SANDBOX, "summaries")
 FIDUCIAL_RESULTS = os.path.join(REPO, "sim", "fiducial", "results")
 ODOMETRY_RESULTS = os.path.join(REPO, "sim", "odometry", "results")
+AUTONOMY_RUNS = os.path.join(REPO, "sim", "autonomy_runs")
 RESEARCH_INDEX = os.path.join(DASH, "research_index.json")
 STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -433,20 +434,26 @@ def result_roots():
         roots.append(FIDUCIAL_RESULTS)
     if os.path.isdir(ODOMETRY_RESULTS):
         roots.append(ODOMETRY_RESULTS)
+    if os.path.isdir(AUTONOMY_RUNS):
+        roots.append(AUTONOMY_RUNS)
     return roots
 
 
 def result_kind(dirpath, name):
     """Kind of a result file by its name; summary.json is generic, so it counts only in a folder whose name says what it is:
-    isaac_tags* (fiducial tag table), drift_* (odometry drift, sim/odometry) or isaac_vo* (Isaac visual odometry, format not fixed yet)."""
+    isaac_tags* (fiducial tag table), drift_* (odometry drift, sim/odometry), isaac_vo* (Isaac visual odometry, format not fixed yet),
+    or autonomy_runs (arena.sh runs in sim/autonomy_runs)."""
     if name == "summary.json":
         folder = os.path.basename(dirpath)
+        parent_folder = os.path.basename(os.path.dirname(dirpath))
         if folder.startswith("isaac_tags"):
             return "isaac_tags"
         if folder.startswith("drift_"):
             return "odometry_drift"
         if folder.startswith("isaac_vo"):
             return "isaac_vo"
+        if parent_folder == "autonomy_runs":
+            return "autonomy_runs"
         return None
     return RESULT_FILES.get(name)
 

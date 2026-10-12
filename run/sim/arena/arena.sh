@@ -8,6 +8,7 @@
 #                                            fix, wall-matching localizer, BP-1 hazard detector, dig -> dump cycles;
 #                                            RViz shows hazards, the route and estimated vs true pose
 #                                            (--truth-pose: detector and planner use the sim's true pose)
+#                                            (--map-only: localize and map hazards, but do not drive the mission)
 #   run/sim/arena/arena.sh --eval --headless check SLAM against ground truth: survey lap, dig + dump,
 #                                            second lap, then pose / map / volume errors (sim/arena_eval.py)
 #   run/sim/arena/arena.sh --seed 4          another round: new boulders/craters and start pose
@@ -31,6 +32,7 @@ while [ $# -gt 0 ]; do
     --survey) mode=survey ;;
     --autonomy) mode=autonomy ;;
     --truth-pose) auto_args+=(pose_topic:=/ground_truth/base_pose) ;;
+    --map-only) auto_args+=(autostart:=false) ;;
     --eval) mode=eval ;;
     --teleop) mode=teleop ;;
     --seed) seed="$2"; sim_args+=(--seed "$2"); shift ;;

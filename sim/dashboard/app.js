@@ -693,6 +693,7 @@
     if (drift.length || isaacVo.length) body.append(odometrySection(drift, isaacVo));
     const recs = by("records");
     if (recs.length) body.append(recordsBlock(recs));
+    for (const it of by("autonomy_runs")) body.append(autonomyRunsBlock(it));
     if (errs.length) {
       body.append(el("div", { class: "card" }, el("h3", { text: "Files that could not be read" }),
         el("ul", null, errs.map((x) => el("li", null, code(x.path), ` — ${x.error}`)))));
@@ -1051,6 +1052,36 @@
         el("td", { class: "num", text: it.content.seed0 ?? DASH }),
         el("td", { class: "num", text: dur(it.content.seconds) })))))));
     card.append(el("p", { class: "source", text: "Source: the file in the first column (only its counts are read; the records themselves are skipped)." }));
+    return card;
+  }
+
+  function autonomyRunsBlock(it) {
+    const c = it.content || {};
+    const what = c.what || DASH;
+    const truth = c.truth || {};
+    const runs = c.runs || [];
+    const card = el("div", { class: "card" });
+    const truthStr = Object.entries(truth).map(([k, v]) => `${k}: ${v}`).join(", ") || "(none)";
+    card.append(el("div", { class: "section-head" }, el("h2", { text: "Autonomy runs in arena.sh" }),
+      el("span", { class: "sub", text: `${what} · Ground truth: ${truthStr}` })));
+    const rows = [];
+    for (const r of runs) {
+      rows.push(el("tr", null,
+        el("td", { text: r.run ?? DASH }),
+        el("td", { text: r.commit ?? DASH }),
+        el("td", { text: r.ended ?? DASH }),
+        el("td", { class: "num", text: `${r.goals_reached ?? DASH} / ${r.goals_skipped ?? DASH}` }),
+        el("td", { class: "num", text: `${fmt(r.loc_xy_median_cm, 1)} / ${fmt(r.loc_xy_max_cm, 1)}` }),
+        el("td", { class: "num", text: fmt(r.true_path_m, 2) }),
+        el("td", { class: "num", text: `${r.matched ?? DASH} / ${r.missed ?? DASH} / ${r.false ?? DASH}` }),
+        el("td", { class: "num", text: fmt(r.largest_radius_m, 2) }),
+        el("td", { class: "num", text: r.detector_ms ?? DASH }),
+        el("td", { text: r.note ?? DASH })));
+    }
+    card.append(el("div", { class: "table-wrap" }, el("table", null,
+      el("thead", null, el("tr", null, ["Run", "Commit", "Ended", "Goals reached/skipped", "Localizer xy median/max (cm)", "True path (m)", "Hazards matched/missed/false", "Largest radius (m)", "Detector ms", "Note"].map((h) => el("th", { class: h === "Run" || h === "Commit" || h === "Ended" || h === "Note" ? "" : "num", text: h })))),
+      el("tbody", null, rows))));
+    card.append(sourceLine(it.path, it.mtime));
     return card;
   }
 
