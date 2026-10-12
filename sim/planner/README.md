@@ -28,12 +28,16 @@ chosen number with no source). Every number the bench uses is in `arena2d.PARAMS
 | Name | What it is | Where |
 | --- | --- | --- |
 | `gcs` | The planned custom stack: convex free-space regions (Drake IRIS), a shortest route through them (Drake GCS, straight pieces, Clarabel), corners rounded, then a minimum-time speed profile (TOPP-RA) in wheel coordinates | `custom_gcs.py` |
-| `tangent` | A second custom candidate: the exact shortest route around the inflated obstacles (straight tangents and arcs, Dijkstra), with several ways of arriving at the goal heading | `tangent_route.py` |
+| `tangent` | A second custom candidate: the exact shortest route around the inflated obstacles (straight tangents and arcs, Dijkstra), with the body's footprint checked along every edge of the route and edges that touch dropped before searching again. Where that finds nothing, a fallback search over (x, y, heading) on a 5 cm, 5 deg grid with straight moves forwards or backwards and turns in place, shortened by straight cuts | `tangent_route.py`, `lattice_route.py` |
 | Nav2 | Smac State Lattice (5 cm diff-drive primitives) + MPPI, default BT with replanning and recoveries | `nav2/` |
 
 Both custom planners hand their route to the same executor (`execute.py`): stop and turn at corners sharper than
-45 deg, follow each piece on its TOPP-RA speed schedule with a Kanayama steering law, then correct to the goal pose.
-Each tries obstacle inflations of 0.45, 0.40 and 0.37 m and takes the first that gives a route.
+45 deg, follow each piece on its TOPP-RA speed schedule with a Kanayama steering law. A route that ends with a straight
+run along the goal heading (0.3 or 0.6 m) stops where the run begins, aims at the goal point and drives straight in, so
+an error left by the curve becomes a small heading error rather than a sideways miss; the dump spot is only 5 cm from
+the berm. At the goal the robot closes the last distance along its heading only, then turns in place. Every turn in
+place is checked for the footprint it sweeps. Each tries obstacle inflations of 0.45, 0.40 and 0.37 m and takes the
+first that gives a route.
 
 `world_cache/` holds the 100 test arenas (seeds 3000-3099) so every machine runs the identical layouts.
 

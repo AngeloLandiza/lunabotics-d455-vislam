@@ -106,6 +106,24 @@ def _bitangents(ci, cj):
     return out
 
 
+def edge_clear(w, geom, step=0.05):
+    """Smallest footprint clearance along one route edge, the robot heading along the edge."""
+    if geom[0] == "seg":
+        a, b = geom[1], geom[2]
+        n = max(int(np.ceil(np.hypot(*(b - a)) / step)), 1)
+        th = np.arctan2(b[1] - a[1], b[0] - a[0])
+        P = np.linspace(a, b, n + 1)
+        poses = np.column_stack([P, np.full(len(P), th)])
+    elif geom[0] == "arc":
+        _, c, R, a1, da = geom
+        n = max(int(np.ceil(abs(da) * R / step)), 1)
+        ang = a1 + da * np.linspace(0, 1, n + 1)
+        poses = np.column_stack([c[0] + R * np.cos(ang), c[1] + R * np.sin(ang), ang + np.sign(da) * np.pi / 2])
+    else:
+        return np.inf
+    return min(a2.clearance(w, q) for q in poses)
+
+
 def route(w, start, goal, inflate):
     """Shortest route for base_link from start (x, y, yaw) to goal (x, y, yaw). Returns (points (N, 2), info)."""
     from execute import CHECK_MARGIN
@@ -225,22 +243,43 @@ def route(w, start, goal, inflate):
                 P = c.c + c.R * np.stack([np.cos(ang), np.sin(ang)], 1)
                 if sc.clear(P, skip=(i,) if not c.virtual else ()).min() > -1e-6:
                     add(k1, k2, abs(da) * c.R, ("arc", c.c, c.R, a1, da))
-    # Dijkstra
+    # Dijkstra, then check the footprint along the route's edges (heading on the tangent, as the executor drives them);
+    # edges where the body would touch something are dropped and the search runs again (lazy collision checking).
+    # The grown circles only make sure the body's sides clear an obstacle the route wraps around; the front and rear
+    # corners swing wider on arcs and can reach a neighbouring obstacle.
     adj = {}
     for (u, v_), (cost, geom) in edges.items():
-        adj.setdefault(u, []).append((v_, cost, geom))
-    dist, prev, pq = {s_node: 0.0}, {}, [(0.0, s_node)]
-    while pq:
-        dcur, u = heapq.heappop(pq)
-        if dcur > dist.get(u, np.inf) + 1e-12:
-            continue
-        if u == t_node:
+        adj.setdefault(u, {})[v_] = (cost, geom)
+    checked, rounds = {}, 0
+    while True:
+        rounds += 1
+        dist, prev, pq = {s_node: 0.0}, {}, [(0.0, s_node)]
+        while pq:
+            dcur, u = heapq.heappop(pq)
+            if dcur > dist.get(u, np.inf) + 1e-12:
+                continue
+            if u == t_node:
+                break
+            for v_, (cost, geom) in adj.get(u, {}).items():
+                nd = dcur + cost
+                if nd < dist.get(v_, np.inf) - 1e-12:
+                    dist[v_], prev[v_] = nd, (u, geom)
+                    heapq.heappush(pq, (nd, v_))
+        if t_node not in dist:
             break
-        for v_, cost, geom in adj.get(u, []):
-            nd = dcur + cost
-            if nd < dist.get(v_, np.inf) - 1e-12:
-                dist[v_], prev[v_] = nd, (u, geom)
-                heapq.heappush(pq, (nd, v_))
+        bad, k = [], t_node
+        while k != s_node:
+            u, g = prev[k]
+            if (u, k) not in checked:
+                checked[(u, k)] = edge_clear(w, g) >= CHECK_MARGIN
+            if not checked[(u, k)]:
+                bad.append((u, k))
+            k = u
+        if not bad:
+            break
+        for u, k in bad:
+            del adj[u][k]
+    info["rounds"] = rounds
     if t_node not in dist:
         info.update(fail="no route", solve_s=time.time() - t0)
         return None, info
@@ -275,11 +314,11 @@ class TangentController:
 
     INFLATIONS = (0.45, 0.40, 0.37)     # half-width 0.353 + 0.1 m margin, then less where passages are narrow
 
-    def __init__(self, w, robot, goal, cache=None):
+    def __init__(self, w, robot, goal, cache=None, fallback=True):
         import execute as ex
         self.goal = np.asarray(goal, float)
         t0 = time.time()
-        self.info = {"inflate": None, "solve_s": 0.0, "fail": None, "pieces": 0, "length": None}
+        self.info = {"inflate": None, "solve_s": 0.0, "fail": None, "pieces": 0, "length": None, "route": None}
         backup, p = ex.backup_distance(w, robot.pose)
         actions, why = None, []
         for inf in self.INFLATIONS:
@@ -288,11 +327,21 @@ class TangentController:
             if P is None:
                 why.append(f"{inf}: {ri['fail']}")
                 continue
-            actions, reason = ex.build(w, robot, P, self.goal)
+            actions, reason = ex.build(w, robot, P, self.goal, start_heading=p[2])
             why.append(f"{inf}: {reason}")
             if actions is not None:
-                self.info.update(inflate=inf, pieces=sum(a[0] == "follow" for a in actions), length=ri["length"])
+                self.info.update(inflate=inf, length=ri["length"], route="tangent")
                 break
+        if actions is None and fallback:
+            # tight arena: stop-and-turn route on the (x, y, heading) grid
+            import lattice_route
+            actions, ri = lattice_route.plan(w, p, self.goal)
+            self.info["solve_s"] += ri["solve_s"] or 0.0
+            why.append(f"grid: {ri['fail']}")
+            if actions is not None:
+                self.info.update(length=ri["length"], route="grid", reverse=ri["reverse"])
+        if actions is not None:
+            self.info["pieces"] = sum(a[0] in ("follow", "line") for a in actions)
         self.info["fail"] = None if actions is not None else "; ".join(why)
         self.info["plan_s"] = time.time() - t0
         self.run = ex.Executor(robot, actions, backup) if actions is not None else None

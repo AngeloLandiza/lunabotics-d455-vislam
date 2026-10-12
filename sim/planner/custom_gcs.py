@@ -268,10 +268,10 @@ class GcsController:
             if poly is None:
                 why.append(f"{inf}: no route")
                 continue
-            actions, reason = ex.build(w, robot, poly, self.goal)
+            actions, reason = ex.build(w, robot, poly, self.goal, start_heading=p[2])
             why.append(f"{inf}: {reason}")
             if actions is not None:
-                self.info.update(inflate=inf, pieces=sum(a[0] == "follow" for a in actions),
+                self.info.update(inflate=inf, pieces=sum(a[0] in ("follow", "line") for a in actions),
                                  length=float(np.hypot(*np.diff(poly, axis=0).T).sum()))
                 break
         self.info["fail"] = None if actions is not None else "; ".join(why)

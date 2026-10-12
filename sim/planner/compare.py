@@ -45,7 +45,7 @@ def mission_run(args):
     ok = True
     for k, (kind, g) in enumerate(goals):
         c = make_controller(name, w, robot, g, cache)
-        info = {key: val for key, val in c.info.items() if key in ("inflate", "solve_s", "plan_s", "fail", "length", "pieces")}
+        info = {key: val for key, val in c.info.items() if key in ("inflate", "solve_s", "plan_s", "fail", "length", "pieces", "route", "reverse")}
         if info.get("fail"):
             legs.append({"k": k, "kind": kind, "planned": False, **info})
             ok = False
