@@ -67,6 +67,8 @@ PARAMS = {
     "wall_sigma": P(0.02, "m", "Assumed", "per-point wall residual used to turn the ICP fit into a covariance"),
     "wall_lam_min": P(0.15, "", "Assumed", "weakest-direction information per point below which a fix is skipped"),
     "wall_min_pts": P(200, "", "Assumed", "wall points needed for a fix"),
+    "relock_n": P(3, "", "Assumed", "gate-refused wall fits in a row that, when they agree, are taken anyway"),
+    "relock_tol": P((0.05, 1.5), "m, deg", "Assumed", "how closely those fits must agree"),
 }
 LEGS = 3                                 # start -> dig 1 -> dump 1 -> dig 2
 MOUNT = "front45"
@@ -236,6 +238,8 @@ def run_estimators(seed, level, log, frames, arena, rng):
         prev_i = 0
         x_w0, P_w0, K_w0, i_w0 = x.copy(), Pc.copy(), np.eye(3), 0
         n_gated = n_walls = n_win = 0
+        n_try = n_weak = n_wgate = n_relock = 0
+        rejected = []                                        # innovations of wall fixes the gate turned away
         buf = []                                             # wall points in the world, by the estimated track
         T = 1.0 / v(PARAMS, "lidar_hz")
         for f, (i_end, pts, ts) in enumerate(frames):
@@ -285,7 +289,9 @@ def run_estimators(seed, level, log, frames, arena, rng):
                     Pl = np.concatenate(buf) @ Xi[:2, :2].T + Xi[:2, 2] if buf else np.zeros((0, 2))
                     buf = []
                     if len(Pl) >= v(PARAMS, "wall_min_pts"):
+                        n_try += 1
                         pose, lam, n_used = lz.icp(Pl, x, arena.L, arena.W)
+                        n_weak += not (lam is not None and lam > v(PARAMS, "wall_lam_min") and n_used >= v(PARAMS, "wall_min_pts"))
                         if lam is not None and lam > v(PARAMS, "wall_lam_min") and n_used >= v(PARAMS, "wall_min_pts"):
                             rr, Jw = lz.wall_residuals(Pl, pose, arena.L, arena.W)
                             near = np.abs(rr) < 0.1
@@ -295,20 +301,38 @@ def run_estimators(seed, level, log, frames, arena, rng):
                             z = pose - x
                             z[2] = wrap(z[2])
                             S = Pc + Rw
-                            if z @ np.linalg.solve(S, z) < gate:
+                            relock = False
+                            if z @ np.linalg.solve(S, z) >= gate:
+                                # the filter may have drifted past its own covariance: RELOCK_N fits in a row that the
+                                # gate refuses but that agree with each other are taken, with the covariance inflated
+                                rejected.append(z)
+                                zs = np.array(rejected[-v(PARAMS, "relock_n"):])
+                                tol_xy, tol_a = v(PARAMS, "relock_tol")
+                                if (len(zs) == v(PARAMS, "relock_n") and np.ptp(zs[:, 0]) < tol_xy
+                                        and np.ptp(zs[:, 1]) < tol_xy and np.ptp(zs[:, 2]) < np.radians(tol_a)):
+                                    Pc = Pc + np.diag(z ** 2)
+                                    S = Pc + Rw
+                                    relock = True
+                                    n_relock += 1
+                            else:
+                                rejected = []
+                            if relock or z @ np.linalg.solve(S, z) < gate:
+                                rejected = []
                                 Kg = Pc @ np.linalg.inv(S)
                                 x = x + Kg @ z
                                 x[2] = wrap(x[2])
                                 Pc = (np.eye(3) - Kg) @ Pc
                                 n_walls += 1
                                 track[i_end] = x
+                            else:
+                                n_wgate += 1
             if (f + 1) % win_n == 0:
                 x_w0, P_w0, K_w0, i_w0 = x.copy(), Pc.copy(), kiss_poses[f], i_end
         # fill steps between frame ends (already filled during prediction) and after the last frame
         for i in range(prev_i + 1, len(log)):
             track[i] = track[i - 1]
         est[variant] = track
-        out[variant] = {"windows": n_win, "gated": n_gated, "wall_fixes": n_walls, "frames": len(frames)}
+        out[variant] = {"windows": n_win, "gated": n_gated, "wall_fixes": n_walls, "wall_tries": n_try, "wall_weak": n_weak, "wall_gated": n_wgate, "wall_relocks": n_relock, "frames": len(frames)}
     for name, poses in kiss_runs.items():
         tr = np.zeros((len(log), 3))
         tr[0] = start

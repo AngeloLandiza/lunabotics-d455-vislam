@@ -1,0 +1,565 @@
+{
+ "meta": {
+  "seeds": [
+   3000,
+   3029
+  ],
+  "slip_levels": {
+   "nominal": [
+    0.1,
+    0.05,
+    1.5,
+    0.15
+   ],
+   "heavy": [
+    0.25,
+    0.08,
+    2.0,
+    0.25
+   ]
+  },
+  "mount": "front45",
+  "params": {
+   "tag_sigma": [
+    [
+     0.013,
+     1.2
+    ],
+    "m per axis, deg",
+    "Inferred",
+    "start fix error; Isaac two-tag run: 1.5 cm median xy, 0.8 deg median yaw (sim/fiducial)"
+   ],
+   "gyro_noise": [
+    0.014,
+    "deg/s/sqrt(Hz)",
+    "Inferred",
+    "BMI055 (D435i IMU chip) noise density from a Bosch forum post; the D455 chip is unconfirmed (research/step2/22-imu-noise.md)"
+   ],
+   "gyro_bias": [
+    0.05,
+    "deg/s",
+    "Assumed",
+    "1-sigma bias left after averaging the gyro at standstill; BMI055 offset drifts +-0.015 deg/s/K (Bosch forum, 22-imu-noise.md), so a few kelvin of warm-up"
+   ],
+   "imu_hz": [
+    100.0,
+    "Hz",
+    "Assumed",
+    "gyro rate used here (the sim step)"
+   ],
+   "lidar_hz": [
+    10.0,
+    "Hz",
+    "Assumed",
+    "frames handed to KISS-ICP (sensors.l1 frame_s 0.1)"
+   ],
+   "sub": [
+    5,
+    "",
+    "Assumed",
+    "time slices per L1 frame for motion skew"
+   ],
+   "kiss_max_range": [
+    8.0,
+    "m",
+    "Assumed",
+    "KISS-ICP max range; voxel = max_range / 100 (KISS-ICP default rule)"
+   ],
+   "kiss_min_range": [
+    0.3,
+    "m",
+    "Assumed",
+    "drop returns closer than this (L1 minimum range is about 0.05 m)"
+   ],
+   "fuse_every": [
+    1.0,
+    "s",
+    "Assumed",
+    "window over which LiDAR and wheel+gyro increments are fused"
+   ],
+   "sig_win_lidar": [
+    [
+     0.012,
+     0.4
+    ],
+    "m, deg per window",
+    "Inferred",
+    "lidar_gyro increment error over one window, measured on tuning arenas 1000-1003 (tune.py)"
+   ],
+   "sig_v_wheel": [
+    0.05,
+    "fraction of distance",
+    "Assumed",
+    "slip variation within a window (SLIP_LEVELS sd)"
+   ],
+   "wheel_cal_err": [
+    0.03,
+    "fraction of distance",
+    "Inferred",
+    "error of the BP-1 slip calibration: the run's true mean slip differs from the calibrated one by this 1-sigma (research/step2/23: flat-ground slip sd 0.03, Inferred)"
+   ],
+   "gate_chi2": [
+    11.34,
+    "",
+    "Verified",
+    "chi-square 3 dof, 99%"
+   ],
+   "wall_every": [
+    1.0,
+    "s",
+    "Assumed",
+    "wall-map fix period"
+   ],
+   "wall_band": [
+    [
+     0.3,
+     1.1
+    ],
+    "m",
+    "Assumed",
+    "z band of wall points (localize.py)"
+   ],
+   "wall_sigma": [
+    0.02,
+    "m",
+    "Assumed",
+    "per-point wall residual used to turn the ICP fit into a covariance"
+   ],
+   "wall_lam_min": [
+    0.15,
+    "",
+    "Assumed",
+    "weakest-direction information per point below which a fix is skipped"
+   ],
+   "wall_min_pts": [
+    200,
+    "",
+    "Assumed",
+    "wall points needed for a fix"
+   ]
+  },
+  "seconds": 2061.8903641700745
+ },
+ "summary": [
+  {
+   "slip": "nominal",
+   "point": "first berm arrival",
+   "estimator": "wheel",
+   "n": 23,
+   "dist_median_m": 7.633128301613573,
+   "xy_median_cm": 75.36120335845348,
+   "xy_ci_cm": [
+    59.1924733478298,
+    91.63288380383675
+   ],
+   "xy_p95_cm": 123.49621778494708,
+   "yaw_median_deg": 5.5031938934770634,
+   "yaw_p95_deg": 18.92051134099892
+  },
+  {
+   "slip": "nominal",
+   "point": "first berm arrival",
+   "estimator": "wheel_cal",
+   "n": 23,
+   "dist_median_m": 7.633128301613573,
+   "xy_median_cm": 50.49317253572415,
+   "xy_ci_cm": [
+    35.44890819233733,
+    89.47850968025038
+   ],
+   "xy_p95_cm": 103.94238648837027,
+   "yaw_median_deg": 5.5031938934770634,
+   "yaw_p95_deg": 18.92051134099892
+  },
+  {
+   "slip": "nominal",
+   "point": "first berm arrival",
+   "estimator": "wheel_gyro",
+   "n": 23,
+   "dist_median_m": 7.633128301613573,
+   "xy_median_cm": 14.149379502624765,
+   "xy_ci_cm": [
+    12.0352702621677,
+    17.485995106847778
+   ],
+   "xy_p95_cm": 35.838002195834896,
+   "yaw_median_deg": 1.286907092108945,
+   "yaw_p95_deg": 5.575619389993173
+  },
+  {
+   "slip": "nominal",
+   "point": "first berm arrival",
+   "estimator": "lidar",
+   "n": 23,
+   "dist_median_m": 7.633128301613573,
+   "xy_median_cm": 16.354889215621768,
+   "xy_ci_cm": [
+    7.901098804666043,
+    24.554816650023568
+   ],
+   "xy_p95_cm": 75.85762710185907,
+   "yaw_median_deg": 2.77217704191176,
+   "yaw_p95_deg": 10.806189396165886
+  },
+  {
+   "slip": "nominal",
+   "point": "first berm arrival",
+   "estimator": "lidar_gyro",
+   "n": 23,
+   "dist_median_m": 7.633128301613573,
+   "xy_median_cm": 15.044378176925715,
+   "xy_ci_cm": [
+    10.093949429056243,
+    18.88005614688891
+   ],
+   "xy_p95_cm": 43.94123849448018,
+   "yaw_median_deg": 2.221954525518221,
+   "yaw_p95_deg": 5.504363861998452
+  },
+  {
+   "slip": "nominal",
+   "point": "first berm arrival",
+   "estimator": "fused",
+   "n": 23,
+   "dist_median_m": 7.633128301613573,
+   "xy_median_cm": 9.128214492614049,
+   "xy_ci_cm": [
+    6.78997137393539,
+    10.56702319719153
+   ],
+   "xy_p95_cm": 23.064939853974497,
+   "yaw_median_deg": 1.2872081625766727,
+   "yaw_p95_deg": 5.507154714516579
+  },
+  {
+   "slip": "nominal",
+   "point": "first berm arrival",
+   "estimator": "fused_walls",
+   "n": 23,
+   "dist_median_m": 7.633128301613573,
+   "xy_median_cm": 0.9097849507128812,
+   "xy_ci_cm": [
+    0.7661928247012346,
+    1.1544507983374985
+   ],
+   "xy_p95_cm": 12.511079991870082,
+   "yaw_median_deg": 0.052042445334045354,
+   "yaw_p95_deg": 3.1377266718947494
+  },
+  {
+   "slip": "nominal",
+   "point": "back at the dig area (round trip)",
+   "estimator": "wheel",
+   "n": 23,
+   "dist_median_m": 13.252888818710911,
+   "xy_median_cm": 85.82333607603192,
+   "xy_ci_cm": [
+    41.42242006016946,
+    105.79255355612918
+   ],
+   "xy_p95_cm": 150.68073446021586,
+   "yaw_median_deg": 13.12519366874251,
+   "yaw_p95_deg": 37.4107522559957
+  },
+  {
+   "slip": "nominal",
+   "point": "back at the dig area (round trip)",
+   "estimator": "wheel_cal",
+   "n": 23,
+   "dist_median_m": 13.252888818710911,
+   "xy_median_cm": 72.10344625960785,
+   "xy_ci_cm": [
+    38.174503570416235,
+    103.01308763812224
+   ],
+   "xy_p95_cm": 138.42575875492898,
+   "yaw_median_deg": 13.12519366874251,
+   "yaw_p95_deg": 37.4107522559957
+  },
+  {
+   "slip": "nominal",
+   "point": "back at the dig area (round trip)",
+   "estimator": "wheel_gyro",
+   "n": 23,
+   "dist_median_m": 13.252888818710911,
+   "xy_median_cm": 13.022363948178405,
+   "xy_ci_cm": [
+    9.052162174100777,
+    19.955353978896575
+   ],
+   "xy_p95_cm": 36.99314314101478,
+   "yaw_median_deg": 1.6183258219296974,
+   "yaw_p95_deg": 9.949172876441054
+  },
+  {
+   "slip": "nominal",
+   "point": "back at the dig area (round trip)",
+   "estimator": "lidar",
+   "n": 23,
+   "dist_median_m": 13.252888818710911,
+   "xy_median_cm": 10.269134179060762,
+   "xy_ci_cm": [
+    7.563679575674412,
+    21.604187354956345
+   ],
+   "xy_p95_cm": 37.602095216517604,
+   "yaw_median_deg": 2.3663073898054057,
+   "yaw_p95_deg": 11.58554105901245
+  },
+  {
+   "slip": "nominal",
+   "point": "back at the dig area (round trip)",
+   "estimator": "lidar_gyro",
+   "n": 23,
+   "dist_median_m": 13.252888818710911,
+   "xy_median_cm": 8.287726304852864,
+   "xy_ci_cm": [
+    5.404613785596005,
+    11.169013850155709
+   ],
+   "xy_p95_cm": 28.583857426920673,
+   "yaw_median_deg": 1.8689933867361863,
+   "yaw_p95_deg": 5.66908324038949
+  },
+  {
+   "slip": "nominal",
+   "point": "back at the dig area (round trip)",
+   "estimator": "fused",
+   "n": 23,
+   "dist_median_m": 13.252888818710911,
+   "xy_median_cm": 9.321150144341193,
+   "xy_ci_cm": [
+    7.70239286531832,
+    12.529921516176518
+   ],
+   "xy_p95_cm": 31.079609688323902,
+   "yaw_median_deg": 1.6069890324707448,
+   "yaw_p95_deg": 9.800812294826784
+  },
+  {
+   "slip": "nominal",
+   "point": "back at the dig area (round trip)",
+   "estimator": "fused_walls",
+   "n": 23,
+   "dist_median_m": 13.252888818710911,
+   "xy_median_cm": 0.7620051156869844,
+   "xy_ci_cm": [
+    0.7092097660106361,
+    1.7116955748651543
+   ],
+   "xy_p95_cm": 33.24174681915749,
+   "yaw_median_deg": 0.11301824204580194,
+   "yaw_p95_deg": 7.533414414913135
+  },
+  {
+   "slip": "heavy",
+   "point": "first berm arrival",
+   "estimator": "wheel",
+   "n": 23,
+   "dist_median_m": 7.619215657559272,
+   "xy_median_cm": 157.95508511958164,
+   "xy_ci_cm": [
+    141.14021969112434,
+    177.04489397615671
+   ],
+   "xy_p95_cm": 243.18155793966469,
+   "yaw_median_deg": 8.827000274545282,
+   "yaw_p95_deg": 19.43546749636866
+  },
+  {
+   "slip": "heavy",
+   "point": "first berm arrival",
+   "estimator": "wheel_cal",
+   "n": 23,
+   "dist_median_m": 7.619215657559272,
+   "xy_median_cm": 80.50282410117599,
+   "xy_ci_cm": [
+    64.48368818607901,
+    85.38596187414271
+   ],
+   "xy_p95_cm": 111.46702808422683,
+   "yaw_median_deg": 8.827000274545282,
+   "yaw_p95_deg": 19.43546749636866
+  },
+  {
+   "slip": "heavy",
+   "point": "first berm arrival",
+   "estimator": "wheel_gyro",
+   "n": 23,
+   "dist_median_m": 7.619215657559272,
+   "xy_median_cm": 15.514459109389714,
+   "xy_ci_cm": [
+    12.544201932226349,
+    20.54390236539706
+   ],
+   "xy_p95_cm": 38.07696239059164,
+   "yaw_median_deg": 0.9350660985912658,
+   "yaw_p95_deg": 4.820122373666902
+  },
+  {
+   "slip": "heavy",
+   "point": "first berm arrival",
+   "estimator": "lidar",
+   "n": 23,
+   "dist_median_m": 7.619215657559272,
+   "xy_median_cm": 17.306392597976423,
+   "xy_ci_cm": [
+    15.927397272276009,
+    25.982985107872775
+   ],
+   "xy_p95_cm": 77.89365333898556,
+   "yaw_median_deg": 2.9612488769843344,
+   "yaw_p95_deg": 14.851179995934261
+  },
+  {
+   "slip": "heavy",
+   "point": "first berm arrival",
+   "estimator": "lidar_gyro",
+   "n": 23,
+   "dist_median_m": 7.619215657559272,
+   "xy_median_cm": 12.661809797685592,
+   "xy_ci_cm": [
+    9.267005776944917,
+    19.616694179171613
+   ],
+   "xy_p95_cm": 35.187775716501456,
+   "yaw_median_deg": 2.073434044776347,
+   "yaw_p95_deg": 4.815959913082023
+  },
+  {
+   "slip": "heavy",
+   "point": "first berm arrival",
+   "estimator": "fused",
+   "n": 23,
+   "dist_median_m": 7.619215657559272,
+   "xy_median_cm": 10.683147164814033,
+   "xy_ci_cm": [
+    7.012023692463338,
+    15.8683739526751
+   ],
+   "xy_p95_cm": 24.118533266229285,
+   "yaw_median_deg": 0.9393974815364112,
+   "yaw_p95_deg": 4.783263850060245
+  },
+  {
+   "slip": "heavy",
+   "point": "first berm arrival",
+   "estimator": "fused_walls",
+   "n": 23,
+   "dist_median_m": 7.619215657559272,
+   "xy_median_cm": 0.899776219945134,
+   "xy_ci_cm": [
+    0.738343899772487,
+    2.2016450896443165
+   ],
+   "xy_p95_cm": 17.187699660433257,
+   "yaw_median_deg": 0.055644638410679396,
+   "yaw_p95_deg": 2.8949140929771513
+  },
+  {
+   "slip": "heavy",
+   "point": "back at the dig area (round trip)",
+   "estimator": "wheel",
+   "n": 22,
+   "dist_median_m": 13.202571877209692,
+   "xy_median_cm": 112.5734170718435,
+   "xy_ci_cm": [
+    73.33700911109577,
+    131.13627259142459
+   ],
+   "xy_p95_cm": 200.26327755591046,
+   "yaw_median_deg": 17.78078406870223,
+   "yaw_p95_deg": 36.73251093632397
+  },
+  {
+   "slip": "heavy",
+   "point": "back at the dig area (round trip)",
+   "estimator": "wheel_cal",
+   "n": 22,
+   "dist_median_m": 13.202571877209692,
+   "xy_median_cm": 66.28579199242327,
+   "xy_ci_cm": [
+    49.683411840748576,
+    93.03439836216845
+   ],
+   "xy_p95_cm": 144.58777618842015,
+   "yaw_median_deg": 17.78078406870223,
+   "yaw_p95_deg": 36.73251093632397
+  },
+  {
+   "slip": "heavy",
+   "point": "back at the dig area (round trip)",
+   "estimator": "wheel_gyro",
+   "n": 22,
+   "dist_median_m": 13.202571877209692,
+   "xy_median_cm": 25.722706001997693,
+   "xy_ci_cm": [
+    19.026365383432296,
+    29.545246881203724
+   ],
+   "xy_p95_cm": 41.23930141977898,
+   "yaw_median_deg": 1.0604038117730994,
+   "yaw_p95_deg": 7.138876326528541
+  },
+  {
+   "slip": "heavy",
+   "point": "back at the dig area (round trip)",
+   "estimator": "lidar",
+   "n": 22,
+   "dist_median_m": 13.202571877209692,
+   "xy_median_cm": 12.941470911925064,
+   "xy_ci_cm": [
+    8.218854570502842,
+    18.518190088313315
+   ],
+   "xy_p95_cm": 28.63761030678103,
+   "yaw_median_deg": 3.134079815057663,
+   "yaw_p95_deg": 15.740640858486682
+  },
+  {
+   "slip": "heavy",
+   "point": "back at the dig area (round trip)",
+   "estimator": "lidar_gyro",
+   "n": 22,
+   "dist_median_m": 13.202571877209692,
+   "xy_median_cm": 8.940459996846634,
+   "xy_ci_cm": [
+    4.144777933561759,
+    10.992499294293953
+   ],
+   "xy_p95_cm": 19.584363787413892,
+   "yaw_median_deg": 1.9101060648832977,
+   "yaw_p95_deg": 4.628691465866611
+  },
+  {
+   "slip": "heavy",
+   "point": "back at the dig area (round trip)",
+   "estimator": "fused",
+   "n": 22,
+   "dist_median_m": 13.202571877209692,
+   "xy_median_cm": 15.553889321842021,
+   "xy_ci_cm": [
+    10.64197119556319,
+    23.201775059985785
+   ],
+   "xy_p95_cm": 26.427369405291632,
+   "yaw_median_deg": 1.111390862273737,
+   "yaw_p95_deg": 7.058130603660072
+  },
+  {
+   "slip": "heavy",
+   "point": "back at the dig area (round trip)",
+   "estimator": "fused_walls",
+   "n": 22,
+   "dist_median_m": 13.202571877209692,
+   "xy_median_cm": 4.098208074712653,
+   "xy_ci_cm": [
+    1.2651286005138775,
+    13.178811517301462
+   ],
+   "xy_p95_cm": 30.751542851156437,
+   "yaw_median_deg": 0.2243773410809446,
+   "yaw_p95_deg": 5.59830099669184
+  }
+ ]
+}
