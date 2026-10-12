@@ -987,7 +987,7 @@
     card.append(el("div", { class: "section-head" }, el("h3", { text: "Benchmark summary by planner and slip level" })));
     const summ_rows = [];
     for (const key of sorted_keys) {
-      const items_for_key = by_key[key];
+      const items_for_key = by_key[key].sort((a, b) => b.mtime - a.mtime);
       const it = items_for_key[0];  // Use the newest item for this key
       summ_rows.push({
         planner: it.planner,
@@ -1001,6 +1001,40 @@
         items: items_for_key
       });
     }
+    // Per-file detail rows (per run for Nav2 files) sit right under their summary row, hidden until it is clicked
+    function detailRow(it) {
+      const detail_card = el("div", { class: "card" },
+        el("div", { class: "section-head" },
+          el("h4", { text: it.path }),
+          el("span", { class: "sub", text: `Modified ${when(it.mtime)}` })));
+      if (it.type === "nav2" && it.runs && it.runs.length) {
+        detail_card.append(el("p", { text: `Missions so far: ${it.runs.length}` }));
+        detail_card.append(el("div", { class: "table-wrap" }, el("table", null,
+          el("thead", null,
+            el("tr", null,
+              el("th", { text: "Seed" }),
+              el("th", { text: "Complete" }),
+              el("th", { class: "num", text: "Time (s)" }),
+              el("th", { text: "Legs (status, time s, e_xy m, e_yaw deg)" }))),
+          el("tbody", null, it.runs.map((run) =>
+            el("tr", null,
+              el("td", { text: run.seed }),
+              el("td", { text: run.complete ? "Yes" : "No", class: run.complete ? "" : "bad" }),
+              el("td", { class: "num", text: fmt(run.time, 1) }),
+              el("td", { text: (run.legs || []).map((l) =>
+                `${l.status ?? "no plan"} ${fmt(l.time, 0)}/${fmt(l.e_xy, 2)}/${fmt(l.e_yaw, 0)}`).join(" · ") })))))));
+      } else {
+        detail_card.append(el("dl", null,
+          it.plan_s_median != null ? [el("dt", { text: "Plan time median (s)" }), el("dd", { class: "num", text: fmt(it.plan_s_median, 2) })] : [],
+          it.plan_s_p95 != null ? [el("dt", { text: "Plan time 95th pct (s)" }), el("dd", { class: "num", text: fmt(it.plan_s_p95, 2) })] : [],
+          it.dump_on_target != null ? [el("dt", { text: "Dumps on target" }), el("dd", { class: "num", text: pct(it.dump_on_target) })] : []));
+      }
+      return el("tr", { class: "detail-row", hidden: true }, el("td", { colspan: "8" }, detail_card));
+    }
+    const toggle = (e) => {
+      for (let d = e.currentTarget.nextElementSibling; d && d.classList.contains("detail-row"); d = d.nextElementSibling)
+        d.hidden = !d.hidden;
+    };
     card.append(el("div", { class: "table-wrap" }, el("table", null,
       el("thead", null,
         el("tr", null,
@@ -1012,59 +1046,17 @@
           el("th", { class: "num", text: "Median time (s)" }),
           el("th", { class: "num", text: "95th pct time (s)" }),
           el("th", { class: "num", text: "Legs with contact" }))),
-      el("tbody", null, summ_rows.map((r) =>
-        el("tr", { class: "clickable", tabindex: "0", onclick: (e) => {
-          const row = e.currentTarget;
-          const detail = row.nextElementSibling;
-          if (detail && detail.classList.contains("detail-row")) {
-            detail.hidden = !detail.hidden;
-          }
-        }},
+      el("tbody", null, summ_rows.map((r) => [
+        el("tr", { class: "clickable", tabindex: "0", onclick: toggle },
           el("td", { text: r.planner }),
           el("td", { text: r.slip }),
           el("td", { class: "num", text: r.missions }),
           el("td", { class: "num", text: r.complete }),
-          el("td", { class: "num", text: r.complete && r.missions ? pct(r.complete / r.missions, 0) : DASH }),
+          el("td", { class: "num", text: r.missions ? pct(r.complete / r.missions, 0) : DASH }),
           el("td", { class: "num", text: fmt(r.time_med, 1) }),
           el("td", { class: "num", text: fmt(r.time_p95, 1) }),
-          el("td", { class: "num", text: r.contact ?? DASH }))
-      ))));
-    // Detail rows for each group (per file, per run)
-    for (const row_obj of summ_rows) {
-      for (const it of row_obj.items) {
-        const detail_row = el("tr", { class: "detail-row", hidden: true });
-        const detail_cell = el("td", { colspan: "8" });
-        detail_row.append(detail_cell);
-        const detail_card = el("div", { class: "card" });
-        detail_cell.append(detail_card);
-        detail_card.append(el("div", { class: "section-head" },
-          el("h4", { text: `${it.path}` }),
-          el("span", { class: "sub", text: `Modified ${when(it.mtime)}` })));
-        // Per-run table for nav2 (or show summary fields for summary.json)
-        if (it.type === "nav2" && it.runs && it.runs.length) {
-          detail_card.append(el("p", { text: `Live runs: ${it.runs.length}` }));
-          detail_card.append(el("div", { class: "table-wrap" }, el("table", null,
-            el("thead", null,
-              el("tr", null,
-                el("th", { text: "Seed" }),
-                el("th", { class: "num", text: "Complete" }),
-                el("th", { class: "num", text: "Time (s)" }),
-                el("th", { class: "num", text: "Legs" }))),
-            el("tbody", null, it.runs.map((run) =>
-              el("tr", null,
-                el("td", { text: run.seed }),
-                el("td", { text: run.complete ? "Yes" : "No", class: run.complete ? "" : "bad" }),
-                el("td", { class: "num", text: fmt(run.time, 1) }),
-                el("td", { class: "num", text: run.legs ? run.legs.length : 0 })))))))
-        } else {
-          detail_card.append(el("dl", null,
-            it.plan_s_median !== null ? [el("dt", { text: "Plan time median (s)" }), el("dd", { class: "num", text: fmt(it.plan_s_median, 2) })] : [],
-            it.plan_s_p95 !== null ? [el("dt", { text: "Plan time 95th pct (s)" }), el("dd", { class: "num", text: fmt(it.plan_s_p95, 2) })] : [],
-            it.dump_on_target !== null ? [el("dt", { text: "Dumps on target" }), el("dd", { class: "num", text: pct(it.dump_on_target) })] : []));
-        }
-        body.append(detail_row);
-      }
-    }
+          el("td", { class: "num", text: r.contact ?? DASH })),
+        r.items.map(detailRow)])))));
     if (errors.length) {
       body.append(el("div", { class: "card" }, el("h3", { text: "Files that could not be read" }),
         el("ul", null, errors.map((x) => el("li", null, code(x.path), ` — ${x.error}`)))));
