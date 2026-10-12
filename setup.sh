@@ -21,8 +21,8 @@ fi
 
 # Without these rules the D455 IMU (HID/IIO sysfs nodes) is root-only and
 # realsense2_camera fails with "Failed to open scan_element" / "Hid device is busy".
-install -m 0644 udev/99-realsense-libusb.rules /etc/udev/rules.d/
+install -m 0644 lunabotics_slam/udev/99-realsense-libusb.rules /etc/udev/rules.d/
 udevadm control --reload-rules
 udevadm trigger
 
-echo "Done. Unplug and replug the D455, then run ./run.sh"
+echo "Done. Unplug and replug the D455, then run: run/physical/lunabotics.sh"

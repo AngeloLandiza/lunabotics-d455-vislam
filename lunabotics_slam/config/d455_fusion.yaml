@@ -40,7 +40,8 @@ imu_filter_madgwick:
 
 stereo_odometry:                          # visual-inertial odometry on projector-off IR
   ros__parameters:
-    frame_id: camera_link
+    # frame_id comes from the launch file (base_frame arg, default camera_link): a node-specific
+    # entry here would override it.
     approx_sync: false                    # split IR pair keeps identical stamps
     wait_imu_to_init: true
     Odom/ResetCountdown: "5"
@@ -62,7 +63,8 @@ stereo_sync:                              # packs the split IR pair into /rgbd_i
 
 rtabmap:
   ros__parameters:
-    frame_id: camera_link
+    # frame_id comes from the launch file (base_frame arg, default camera_link): a node-specific
+    # entry here would override it.
     subscribe_rgbd: true                  # stereo pair (via stereo_sync): visual loop closures
     subscribe_scan_cloud: true            # dense cloud for ICP + the map
                                           # (rtabmap can't sync raw stereo topics with a cloud)

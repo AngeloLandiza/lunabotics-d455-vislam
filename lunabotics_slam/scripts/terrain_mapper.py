@@ -23,6 +23,7 @@ Topics: /terrain/cloud (PointCloud2: elevation, change, variance per cell),
         /terrain/elevation (Image 32FC1, NaN = unknown), /terrain/volume ([cut, fill] m^3)
 Services: /terrain/reset_baseline, /terrain/clear (std_srvs/Trigger)
 """
+import math
 import os
 import time
 
@@ -32,7 +33,8 @@ import numpy as np
 class TerrainGrid:
     def __init__(self, resolution, size_x, size_y, origin_x, origin_y,
                  change_threshold=3.0, time_variance=1e-5, max_variance=0.05,
-                 cleanup_margin=0.05, drift_window=0.15, change_confirmations=2):
+                 cleanup_margin=0.05, drift_window=0.15, change_confirmations=2, max_drift_step=0.05,
+                 baseline_sigma=0.012, max_tilt_deg=4.0):
         self.res = resolution
         self.nx, self.ny = int(round(size_x / resolution)), int(round(size_y / resolution))
         self.x0, self.y0 = origin_x - size_x / 2, origin_y - size_y / 2  # lower corner
@@ -42,6 +44,10 @@ class TerrainGrid:
         self.cleanup_margin = cleanup_margin
         self.drift_window = drift_window
         self.change_confirmations = change_confirmations
+        self.max_drift_step = max_drift_step
+        self.drift = np.zeros(3)             # scan-vs-map correction: offset, x slope, y slope
+        self.baseline_var = baseline_sigma ** 2
+        self.max_tilt = math.tan(math.radians(max_tilt_deg))
         self.clear()
         self.baseline = np.full((self.nx, self.ny), np.nan, np.float32)
         self.frozen = np.zeros((self.nx, self.ny), bool)  # baseline fixed after a change
@@ -68,6 +74,7 @@ class TerrainGrid:
         pts, sigma2, ix, iy = pts[ok], sigma2[ok], ix[ok], iy[ok]
         if len(pts) == 0:
             return 0
+        origin_cell = ((origin[0] - self.x0) / self.res - 0.5, (origin[1] - self.y0) / self.res - 0.5)
         self._visibility_cleanup(pts, origin, n_rays)
 
         # Per-cell mean height and mean measurement variance this frame.
@@ -80,11 +87,25 @@ class TerrainGrid:
         h, v = self.height.ravel(), self.variance.ravel()
 
         new = np.isnan(h[idx])
-        if (~new).sum() >= 30:  # remove this scan's vertical pose drift
+        cx = (idx // self.ny - origin_cell[0]) * self.res     # cell offsets from the sensor (m)
+        cy = (idx % self.ny - origin_cell[1]) * self.res
+        if (~new).sum() >= 30:  # remove this scan's height + tilt error against the map
             d = z[~new] - h[idx[~new]]
-            coarse = np.median(d)                      # robust: digs cover few cells
-            near = np.abs(d - coarse) < self.drift_window
-            z = z - np.median(d[near])
+            keep = np.abs(d - np.median(d)) < self.drift_window      # robust: digs cover few cells
+            A = np.c_[np.ones(len(d)), cx[~new], cy[~new]]
+            fit = None
+            for _ in range(2):                                         # fit, trim, refit
+                if keep.sum() < 30:
+                    break
+                fit = np.linalg.lstsq(A[keep], d[keep], rcond=None)[0]
+                keep &= np.abs(d - A @ fit) < 0.5 * self.drift_window
+            # SLAM drift (height, and ~1 deg of tilt) changes slowly; a sudden jump (bad
+            # pose / glitch) must not be "corrected" toward the stored map, or one bad burst
+            # would lock in forever. Change detection re-maps those cells instead.
+            if fit is not None and abs(fit[0] - self.drift[0]) <= self.max_drift_step \
+                    and np.all(np.abs(fit[1:]) <= self.max_tilt):
+                self.drift = fit
+                z = z - (fit[0] + fit[1] * cx + fit[2] * cy)
         d2 = (z - h[idx]) ** 2 / (v[idx] + s2)
         outlier = ~new & (d2 > self.change_threshold ** 2)
         count = self.disagree.ravel()
@@ -100,11 +121,13 @@ class TerrainGrid:
         h[f] = (sf * h[f] + vf * z[fuse]) / (vf + sf)
         v[f] = vf * sf / (vf + sf)
 
-        # Baseline tracks the estimate until the cell first changes.
+        # Baseline tracks the estimate until the cell is well observed (then it freezes,
+        # so later gradual digging still counts as volume) or first changes.
         b, frozen = self.baseline.ravel(), self.frozen.ravel()
         frozen[idx[changed & ~np.isnan(b[idx])]] = True
         track = idx[~frozen[idx]]
         b[track] = h[track]
+        frozen[track[v[track] < self.baseline_var]] = True
         return int(hit.sum())
 
     def _visibility_cleanup(self, pts, origin, n_rays):
@@ -187,7 +210,9 @@ def main():
                                     p('origin_x', 0.0), p('origin_y', 0.0),
                                     p('change_threshold', 3.0), p('time_variance', 1e-5),
                                     p('max_variance', 0.05), p('cleanup_margin', 0.05),
-                                    p('drift_window', 0.15), p('change_confirmations', 2))
+                                    p('drift_window', 0.15), p('change_confirmations', 2),
+                                    p('max_drift_step', 0.05), p('baseline_sigma', 0.012),
+                                    p('max_tilt_deg', 4.0))
             if p('load', False) and os.path.exists(self.save_path):
                 self.grid.load(self.save_path)
                 self.get_logger().info(f'loaded terrain baseline from {self.save_path}')

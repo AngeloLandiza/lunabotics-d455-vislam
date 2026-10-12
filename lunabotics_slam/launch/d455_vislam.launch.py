@@ -11,14 +11,14 @@
 # and wires topics.
 #
 # Usage:
-#   ros2 launch launch/d455_vislam.launch.py
-#   ros2 launch launch/d455_vislam.launch.py viz:=false                 # headless (robot)
-#   ros2 launch launch/d455_vislam.launch.py rtabmap_viz:=true          # stock RTAB-Map GUI too
-#   ros2 launch launch/d455_vislam.launch.py localization:=true         # reuse saved map
-#   ros2 launch launch/d455_vislam.launch.py database_path:=~/arena.db  # custom map file
-#   ros2 launch launch/d455_vislam.launch.py new_map:=false              # extend saved map
-#   ros2 launch launch/d455_vislam.launch.py dynamic_map:=true          # map forgets dug-out terrain
-#   ros2 launch launch/d455_vislam.launch.py config:=config/my_room.yaml
+#   ros2 launch lunabotics_slam d455_vislam.launch.py
+#   ros2 launch lunabotics_slam d455_vislam.launch.py viz:=false                 # headless (robot)
+#   ros2 launch lunabotics_slam d455_vislam.launch.py rtabmap_viz:=true          # stock RTAB-Map GUI too
+#   ros2 launch lunabotics_slam d455_vislam.launch.py localization:=true         # reuse saved map
+#   ros2 launch lunabotics_slam d455_vislam.launch.py database_path:=~/arena.db  # custom map file
+#   ros2 launch lunabotics_slam d455_vislam.launch.py new_map:=false              # extend saved map
+#   ros2 launch lunabotics_slam d455_vislam.launch.py dynamic_map:=true          # map forgets dug-out terrain
+#   ros2 launch lunabotics_slam d455_vislam.launch.py config:=/path/to/my_room.yaml
 
 import os
 
