@@ -34,6 +34,14 @@ declare -A V=(
   # let the lattice planner reverse (the custom planners and MPPI both can) and search longer: in the default run some
   # dump legs got no plan within 10 s
   [reverse]="planner_server.GridBased.allow_reverse_expansion=true planner_server.GridBased.max_planning_time=8.0"
+  # smaller safety margin: at 0.70 m most gaps are high cost and MPPI stops ~0.5 m short of dig spots near rocks
+  # (default run, RViz). Smac and MPPI both check the full footprint, so the margin need not cover the circumscribed radius
+  [inflate]="costmaps.inflation_layer.inflation_radius=0.45 costmaps.inflation_layer.cost_scaling_factor=6.0"
+  # slower turning: at the goal Nav2 stops while turning at up to 1.85 rad/s, and the wheels' 0.5 m/s^2 spin-down
+  # carries the body on by up to ~50 deg (11-17 deg seen in the default run with no slip)
+  [slowturn]="$C.wz_max=0.9 $C.GoalAngleCritic.cost_weight=8.0"
+  # all of the above together
+  [combo]="costmaps.inflation_layer.inflation_radius=0.45 costmaps.inflation_layer.cost_scaling_factor=6.0 $C.wz_max=0.9 $C.GoalAngleCritic.cost_weight=8.0 planner_server.GridBased.allow_reverse_expansion=true planner_server.GridBased.max_planning_time=8.0"
   # cheaper in-place turns for the lattice planner
   [turns]="planner_server.GridBased.rotation_penalty=2.0 planner_server.GridBased.non_straight_penalty=1.0"
 )
