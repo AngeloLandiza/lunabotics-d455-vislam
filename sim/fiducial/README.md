@@ -49,3 +49,34 @@ median [1.2, 1.4] and 4.1 cm at the 95th percentile, no heading errors over 5 de
 
 Caveats: the zone size and tag placement accuracy are Assumed and drive the numbers; lens distortion, motion blur,
 lighting on BP-1 and partial occlusion by the robot are not modelled; the table is in `results/sweep_v1/table.md`.
+
+## Isaac Sim check of the two-tag start zone (`isaac_tags.py`, 2026-10-12, sim)
+
+`./run_isaac_tags.sh results/isaac_tags_v1 --poses 50` renders `two_perpendicular` (tags at (1.0, 0) on wall y = 0 and
+(0, 1.0) on wall x = 0, centres 0.30 m high) as real tag36h11 tags, ids 0 and 1, with the team's 16.51 cm edge
+(`config_pkg/params/apriltag/tag_params.yaml` in EDT-Lunabotics-2026, Verified) and a one-cell white margin, on flat
+BP-1-coloured ground with the robot body in the scene. Two rear cameras at the URDF rear_cam pose, 1280 x 720: the wide
+lens (2.0 rad, 15 deg down) and the URDF camera as-is (1.2 rad, 15 deg up). Poses: tag_start's sampler, seed 0, first
+50. At each pose the robot turns in place in 5 deg steps until the detector finds a tag. Detector: OpenCV 4.13 aruco
+DICT_APRILTAG_36h11 with sub-pixel corners (Isaac's Python; the system OpenCV 4.5.4 did not decode the rendered tags).
+Pose: `tag_start.solve()`. `isaac_tags_eval.py` also runs tag_start's model on the same 50 poses.
+
+| Wide lens, 50 poses | Seen at start heading | xy error median / p95 | Heading median / p95 | Flips > 5 deg | Turn to a tag median / p95, never |
+|---|---|---|---|---|---|
+| Isaac, exact tag map | 30% (15) | 0.6 / 1.2 cm | 0.2 / 0.5 deg | 0 | 35 / 95 deg, 0% |
+| Isaac, 5 mm / 1 deg placement error | 30% | 1.5 / 3.8 cm | 0.8 / 1.9 deg | 0 | (same) |
+| tag_start model, same poses | 34% (17) | 1.9 / 4.8 cm | 0.8 / 2.0 deg | 0 | 35 / 95 deg, 0% |
+
+1. **The render agrees with the Python model.** Same median and p95 turn, no start pose that never sees a tag, no
+   heading flips, and errors within the model's. Detected corners sit 0.8 px (median) from the projected truth.
+2. **The error budget is the tag map, not the camera.** With the exact map, 0.6 cm median; the assumed 5 mm / 1 deg
+   placement error brings it to 1.5 cm. Measuring where the tags really are after setup is what matters.
+3. **Two detections the model expected were missed**, both with the tag at the image edge: the black square was in
+   frame but its white margin was cut off, which the detector needs. The model's visibility test should require the
+   margin (about 1.25 x the tag edge) in the image; it overstates "seen at start heading" by about 4 points here.
+4. **The URDF camera (1.2 rad, 15 deg up) sees no tag from any pose or heading**, as the model predicted.
+
+The 50-pose sample is small (the turn median of 35 deg against the model's 20 deg on 1500 poses is this sample's draw:
+the model gives 35 deg on the same 50). Not modelled: lens distortion of a real wide lens, motion blur, BP-1 lighting
+(one dome light here) and dust on the tags. Summary and sample frames: `results/isaac_tags_v1/`; raw renders stay in
+`isaac_out/` (ignored).

@@ -688,6 +688,7 @@
     for (const it of all96) body.append(all96Block(it));
     const metas = by("approaches_meta");
     if (metas.length) body.append(approachesBlock(metas, data.roots));
+    for (const it of by("isaac_tags")) body.append(isaacTagsBlock(it));
     const recs = by("records");
     if (recs.length) body.append(recordsBlock(recs));
     if (errs.length) {
@@ -919,6 +920,39 @@
       })))));
     card.append(el("p", { class: "source" }, "Source: the ", code("meta"), " part of each file listed in the first column (", code("approaches_meta.json"),
       " is the copy kept in the repo). A dash means the run predates that setting."));
+    return card;
+  }
+
+  function isaacTagsBlock(it) {
+    const c = it.content || {};
+    const m = c.meta || {};
+    const card = el("div", { class: "card" });
+    card.append(el("div", { class: "section-head" }, el("h2", { text: "Start-zone tags in Isaac Sim" }),
+      el("span", { class: "sub", text: `${m.layout ?? DASH} layout · ${c.n_poses ?? DASH} start poses · tags ${fmt((m.tag_size ?? NaN) * 100, 2)} cm, ${fmt((m.tag_height ?? NaN) * 100, 0)} cm high · modified ${when(it.mtime)}` })));
+    const cm = (x) => (isNum(x) ? fmt(x * 100, 1) : DASH);
+    const rows = [];
+    for (const [cam, v] of Object.entries(c.cameras || {})) {
+      for (const [key, label, turn] of [["isaac_placement_error", "Isaac (tag placement error)", "turn_isaac"],
+                                         ["isaac_exact_map", "Isaac (exact tag map)", null],
+                                         ["python_prediction_same_poses", "Python prediction", "turn_python"]]) {
+        const s = v[key] || {};
+        const t = turn ? v[turn] || {} : {};
+        rows.push(el("tr", null,
+          el("td", { text: `${cam} (${fmt(v.hfov_rad, 1)} rad, ${v.pitch_deg_up > 0 ? "+" : ""}${v.pitch_deg_up} deg)` }),
+          el("td", { text: label }),
+          el("td", { class: "num", text: isNum(s.seen_frac) ? pct(s.seen_frac, 0) : DASH }),
+          el("td", { class: "num", text: `${cm(s.e_xy_median)} / ${cm(s.e_xy_p95)}` }),
+          el("td", { class: "num", text: `${fmt(s.e_yaw_median, 1)} / ${fmt(s.e_yaw_p95, 1)}` }),
+          el("td", { class: "num", text: s.heading_flips ?? DASH }),
+          el("td", { class: "num", text: turn ? `${fmt(t.turn_median_deg, 0)} / ${isNum(t.never_frac) ? pct(t.never_frac, 0) : DASH}` : "" })));
+      }
+    }
+    card.append(el("div", { class: "table-wrap" }, el("table", null,
+      el("thead", null, el("tr", null, el("th", { text: "Camera" }), el("th", { text: "Source" }),
+        ["Seen at start heading", "xy error median / p95 (cm)", "Heading error median / p95 (deg)", "Heading flips (> 5 deg)",
+          "Turn to a tag median (deg) / never"].map((h) => el("th", { class: "num", text: h })))),
+      el("tbody", null, rows))));
+    card.append(el("p", { class: "source" }, "Source: ", pathNode(it.path), ` (sim/fiducial/isaac_tags_eval.py; detector ${c.detector ?? DASH})`));
     return card;
   }
 
