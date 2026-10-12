@@ -94,15 +94,13 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'min_radius': pr.P(0.14, 'm', 'Assumed', 'objects smaller than this are dropped: guidebook boulders are 30-40 cm, '
                        'and detected discs come out a few cm larger than the true ones; arena.sh seed 0 false boulders '
                        'had a median radius of 9 cm, and false craters from the ruts 13 cm; true ones came out 18-22 cm'),
-    'crater_depth': pr.P((0.04, 5), 'm, cells', 'Assumed',
-                         'a crater needs at least this many cells inside its disc whose mean return height lies this far '
-                         'below the ground ring around it (bag replay: true crater 10 cells at 4 cm, 3 at 5 cm; false '
-                         'ones away from boulders at most 7 at 4 cm). arena.sh seed 0 start zone (true pose): 4 false craters just behind '
-                         'boulders / the column were a 9-17 % tail of low returns (to -4..-9 cm, median -1 to -2 cm), the '
-                         'true crater (11 cm deep) had 26 % of returns below -3 cm, down to -12 cm; guidebook-scale '
-                         'craters in arena.sh are 7-12 cm deep'),
+    'crater_depth': pr.P(((0.03, 10), (0.05, 5)), '(m, cells) pairs', 'Assumed',
+                         'a crater needs, inside its disc, at least n cells whose mean return height lies d below the '
+                         'ground ring around it, for either (d, n) pair: wide and shallow-looking, or small and deep. '
+                         'arena.sh seed 0 start-zone bag (true pose): true 11 cm crater 16 / 7 / 3 cells at 3 / 4 / 5 cm; '
+                         'the false craters at most 5 / 2 / 2; sandbox seed 3005 true crater r 0.15 m: 9 / 7 / 7'),
     'crater_ring': pr.P(0.30, 'm', 'Assumed', 'width of the ground ring around a crater disc its depth is measured from'),
-    'boulder_clear': pr.P(0.15, 'm', 'Assumed', 'cells this close to boulder evidence are left out of the crater '
+    'boulder_clear': pr.P(0.20, 'm', 'Assumed', 'cells this close to boulder evidence are left out of the crater '
                           'depth test: arena.sh seed 0 had a false crater 0.13 m from a boulder edge with 7 cells 6 cm '
                           'below the ground fit'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
@@ -289,12 +287,11 @@ class HazardMap:
         return merge_discs(out)
 
     def depression(self, x, y, r):
-        """True when the returns inside the disc show a real hole: crater_depth[1] cells (2+ returns each) whose mean
-        height lies crater_depth[0] or more below the ground around the disc (median cell height in a ring
+        """True when the returns inside the disc show a real hole: for one of the crater_depth (d, n) pairs, n cells (2+ returns
+        each) whose mean height lies d or more below the ground around the disc (median cell height in a ring
         crater_ring wide outside it). Cells within boulder_clear of boulder evidence count neither in the disc nor in
         the ring: next to a boulder the ground fit is pulled up and grazing returns land low. Crater log-odds alone
         also fire on the scattered low returns just behind boulders and the column."""
-        depth, n_min = val('crater_depth')
         ring, clear = val('crater_ring'), val('boulder_clear')
         g, L, c = self.grid, self.L, self.grid.cell
         R = r + ring + clear
@@ -312,8 +309,8 @@ class HazardMap:
         ok = (n >= 2) & ~near_boulder
         ring_m = ok & (d2 > (r + c) ** 2) & (d2 <= (r + c + ring) ** 2)
         ref = np.median(mean[ring_m]) if ring_m.sum() >= 8 else self.g[i0:i1, j0:j1]
-        deep = ok & (d2 <= r * r) & (ref - mean >= depth)
-        return int(deep.sum()) >= n_min
+        drop = np.where(ok & (d2 <= r * r), ref - mean, -np.inf)
+        return any(int((drop >= d).sum()) >= n for d, n in val('crater_depth'))
 
     def occupancy(self):
         """int8 grid (nx, ny): 100 where either sensor's evidence is positive, 0 where seen, -1 unseen."""
