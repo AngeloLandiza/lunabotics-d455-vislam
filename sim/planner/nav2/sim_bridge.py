@@ -231,8 +231,8 @@ def main():
     ap.add_argument("--seed0", type=int, default=3000)
     ap.add_argument("--slip", default="nominal")
     ap.add_argument("--rtf", type=float, default=2.0)
-    ap.add_argument("--settle", type=float, default=4.0, help="sim seconds after a new map before the first goal "
-                    "(the global costmap takes the new map on its next update)")
+    ap.add_argument("--settle", type=float, default=2.5, help="wall seconds after a new map before the first goal "
+                    "(the global costmap takes a new map on its next update, 1 Hz on the wall clock)")
     a = ap.parse_args()
     rclpy.init()
     node = Bridge(a.rtf)
@@ -257,7 +257,7 @@ def main():
         node.advance(0.1)
     for level, seed in todo:
         w, goals = setup(level, seed)
-        node.advance(a.settle)
+        node.advance(a.settle * a.rtf)
         legs, ok = [], True
         for k, (kind, g) in enumerate(goals):
             m = node.run_leg(w, g, a2.v(a2.PARAMS, "leg_timeout"))

@@ -51,6 +51,10 @@ Nav2 (ROS 2 Humble with nav2_bringup, nav2_smac_planner, nav2_mppi_controller):
     nav2/run_nav2.sh results/nav2/nav2_default.json --slip nominal --seeds 2          # smoke test, check cmd ~20 Hz
     nav2/run_nav2.sh results/nav2/nav2_default.json --slip none,nominal,heavy --seeds 100
 
+Tuned Nav2: `nav2/tune.sh results/nav2_tune` runs a first set of variants (MPPI critic weights, sampling, costmap
+decay, lattice turn penalty; `--set` overrides on the params file) on tuning arenas 1000+, kept apart from the test
+arenas, then the best variant goes through `run_nav2.sh` on seeds 3000-3099 with the same `--set` flags.
+
 `run_nav2.sh` fills in the lattice file, starts Nav2 with sim time and runs `nav2/sim_bridge.py`, which steps the
 same robot model, publishes /clock, /odom, TF and /map, sends each leg as a NavigateToPose goal and scores it the same
 way. Sim time stands still until Nav2's first plan for a leg, as planning is left out of the custom planners' times too.
