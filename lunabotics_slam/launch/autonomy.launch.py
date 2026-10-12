@@ -13,7 +13,9 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, EmitEvent, ExecuteProcess, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 
@@ -30,6 +32,9 @@ def node(script, *params):
 
 def generate_launch_description():
     pose = ['pose_topic:=', LaunchConfiguration('pose_topic')]
+    mission = node('mission_runner.py', pose, ['seed:=', LaunchConfiguration('seed')],
+                   ['cycles:=', LaunchConfiguration('cycles')], ['autostart:=', LaunchConfiguration('autostart')],
+                   ['sim_dig:=', LaunchConfiguration('sim_dig')])
     return LaunchDescription([
         DeclareLaunchArgument('sim', default_value='false'),
         DeclareLaunchArgument('pose_topic', default_value='/autonomy/pose'),
@@ -45,9 +50,10 @@ def generate_launch_description():
         node('start_tags.py'),
         node('arena_localizer.py', ['wheel_scale:=', LaunchConfiguration('wheel_scale')]),
         node('hazard_detector.py', pose, ['use_depth:=', LaunchConfiguration('use_depth')]),
-        node('mission_runner.py', pose, ['seed:=', LaunchConfiguration('seed')],
-             ['cycles:=', LaunchConfiguration('cycles')], ['autostart:=', LaunchConfiguration('autostart')],
-             ['sim_dig:=', LaunchConfiguration('sim_dig')]),
+        mission,
+        # the mission ends (done, or stuck) -> the whole run ends
+        RegisterEventHandler(OnProcessExit(target_action=mission,
+                                           on_exit=[EmitEvent(event=Shutdown(reason='mission ended'))])),
         ExecuteProcess(cmd=['rviz2', '-d', os.path.join(PKG, 'rviz', 'autonomy.rviz'), '--ros-args',
                             '-p', ['use_sim_time:=', LaunchConfiguration('sim')]],
                        output='screen', condition=IfCondition(LaunchConfiguration('rviz'))),

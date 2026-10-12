@@ -93,9 +93,13 @@ class MissionNode(Node):
             v, w = self.model.command(0.0, w, 1.0 / HZ)
             self.send(0.0, w)
             return
-        if self.run.state == 'done':
+        if self.run.state in ('done', 'stuck'):
             self.send(0.0, 0.0)
-            return
+            for t, m in self.run.log[self.n_log:]:
+                self.get_logger().info(m)
+            self.get_logger().info(f'mission {self.run.state}: {self.run.k} of {len(self.goals)} goals handled; '
+                                   'shutting down the run')
+            raise SystemExit(0 if self.run.state == 'done' else 3)
         v, w, ev = self.run.step(self.pose, now, self.hazards, 1.0 / HZ)
         self.send(v, w)
         for t, m in self.run.log[self.n_log:]:
@@ -142,7 +146,12 @@ class MissionNode(Node):
 
 def main():
     rclpy.init()
-    rclpy.spin(MissionNode())
+    node = MissionNode()
+    try:
+        rclpy.spin(node)
+    except SystemExit as e:
+        node.send(0.0, 0.0)
+        raise SystemExit(e.code)
 
 
 if __name__ == '__main__':

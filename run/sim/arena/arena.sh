@@ -75,9 +75,9 @@ if [ "$mode" = teleop ]; then
 elif [ "$mode" = autonomy ]; then
   "${dig_tool[@]}" &
   pids+=($!)
-  ros2 launch "$REPO/lunabotics_slam/launch/autonomy.launch.py" sim:=true seed:="$seed" "${auto_args[@]}" &
-  pids+=($!)
-  wait "${pids[0]}"
+  # the run ends when the mission does (all goals, or stuck: two goals skipped / no progress for 30 s)
+  ros2 launch "$REPO/lunabotics_slam/launch/autonomy.launch.py" sim:=true seed:="$seed" "${auto_args[@]}"
+  echo "[arena] mission ended; stopping the run"
 else
   "${dig_tool[@]}" &
   pids+=($!)

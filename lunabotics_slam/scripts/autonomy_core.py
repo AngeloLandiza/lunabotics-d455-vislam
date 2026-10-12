@@ -79,9 +79,10 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'l1_sigma': pr.P(0.02, 'm', 'Inferred', 'L1 range accuracy 2.0 cm used as 1 sigma (params.LIDAR_GENERIC l1)'),
     'd455_k': pr.P(0.32 / ((848 / 2) / math.tan(math.radians(87 / 2)) * 0.095), '1/m', 'Inferred',
                    'D455 depth sigma = k z^2 (sim/realism.py: 0.32 px subpixel, 848 px, 87 deg, 95 mm baseline)'),
-    'wall_margin': pr.P(0.25, 'm', 'Inferred', 'detections centred this close to the interior edge are the ducts or '
+    'wall_margin': pr.P(0.40, 'm', 'Inferred', 'detections centred this close to the interior edge are the ducts or '
                         'the wall (DETECT.wall_band was 0.15 m in the sandbox, which had no ducts; arena.sh seed 0 '
-                        'had false boulders along the ducts)'),
+                        'had false boulders along the ducts up to 0.26 m out). The planner keeps base_link 0.37-0.45 m '
+                        'from the walls anyway'),
     'pole_margin': pr.P(0.15, 'm', 'Inferred', 'detections this close to a berm range pole are the pole (sim/arena.py '
                         'POLES; arena.sh seed 0 had false boulders at the poles)'),
     'max_range': pr.P(4.0, 'm', 'Assumed', 'returns farther than this from the sensor are not used for hazards: '
@@ -89,9 +90,9 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
                       'sigma = k z^2, about 12 cm at 4 m). The sandbox speed runs need hazards seen by about 2 m ahead'),
     'max_radius': pr.P(0.5, 'm', 'Assumed', 'a blob wider than this is not one guidebook obstacle (boulders 30-40 '
                        'cm, craters up to about 50 cm): arena.sh seed 0 grew a 1.9 m crater over the rutted dig area'),
-    'min_radius': pr.P(0.11, 'm', 'Assumed', 'objects smaller than this are dropped: guidebook boulders are 30-40 cm, '
+    'min_radius': pr.P(0.14, 'm', 'Assumed', 'objects smaller than this are dropped: guidebook boulders are 30-40 cm, '
                        'and detected discs come out a few cm larger than the true ones; arena.sh seed 0 false boulders '
-                       'had a median radius of 9 cm'),
+                       'had a median radius of 9 cm, and false craters from the ruts 13 cm; true ones came out 18-22 cm'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
     'tag_ids': pr.P((0, 1), '', 'Assumed', 'tag on the y = 0 wall, tag on the x = 0 wall'),
     'tag_xy': pr.P(((1.0, -A27.DUCT_D, 90.0), (-A27.DUCT_D, 1.0, 0.0)), 'm, m, deg facing', 'Assumed',
@@ -280,12 +281,14 @@ class HazardMap:
 
 
 def merge_discs(objs):
-    """The same object seen by both sensors: keep one disc covering both."""
+    """The same object seen by both sensors: one disc covering both. Only discs whose centres lie within the larger
+    radius merge, and a merged disc never grows past max_radius (chains of small blobs once merged into a 1.3 m disc
+    in arena.sh)."""
     out = []
     for o in sorted(objs, key=lambda o: -o['evidence']):
         for m in out:
-            if m['kind'] == o['kind'] and math.hypot(m['x'] - o['x'], m['y'] - o['y']) < m['r'] + o['r']:
-                d = math.hypot(m['x'] - o['x'], m['y'] - o['y'])
+            d = math.hypot(m['x'] - o['x'], m['y'] - o['y'])
+            if m['kind'] == o['kind'] and d < max(m['r'], o['r']) and d + o['r'] <= val('max_radius'):
                 m['r'] = max(m['r'], d + o['r'])
                 m['sensor'] = 'both' if m['sensor'] != o['sensor'] else m['sensor']
                 break
@@ -775,10 +778,12 @@ class MissionRunner:
              goal to the next dump spot (relocate_goal); then plan again
     work     at a dig or dump goal: hold still for dig_time / dump_time; the event is reported once on arrival
     done     all goals handled
+    stuck    two goals in a row skipped, or the robot has not moved stuck_m in stuck_s while it should be driving:
+             the mission ends there (Angelo, 2026-10-12: terminate a run when the rover gets stuck)
     step() returns (v, w, event) with event None or ('dig' | 'dump', goal) on arrival.
     """
 
-    def __init__(self, goals, robot, retry_s=1.0, plan_tries=5, retreat_m=0.4):
+    def __init__(self, goals, robot, retry_s=1.0, plan_tries=5, retreat_m=0.4, stuck_s=30.0, stuck_m=0.10):
         self.goals = list(goals)
         self.r = robot
         self.k = 0
@@ -789,6 +794,10 @@ class MissionRunner:
         self.retry_s, self.plan_tries, self.retreat_m = retry_s, plan_tries, retreat_m
         self.retreat_from = None
         self.escape = None
+        self.skips_in_row = 0
+        self.stuck_s, self.stuck_m = stuck_s, stuck_m
+        self.moved_at = None                # (t, xy) of the last time the robot had moved stuck_m
+        self.why_stuck = None
         self.log = []                       # (t, message) for the node to print
 
     def _go(self, state, t):
@@ -806,7 +815,14 @@ class MissionRunner:
         if self.k >= len(self.goals):
             self.state = 'done'
             return self._cmd(0.0, 0.0, dt) + (None,)
+        if self.state == 'stuck':
+            return self._cmd(0.0, 0.0, dt) + (None,)
         kind, g = self.goals[self.k]
+        xy = np.asarray(pose[:2], float)
+        if self.moved_at is None or np.hypot(*(xy - self.moved_at[1])) >= self.stuck_m or self.state == 'work':
+            self.moved_at = (t, xy.copy())
+        elif t - self.moved_at[0] > self.stuck_s:
+            return self._stuck(t, f'no progress for {self.stuck_s:.0f} s')
         if self.state == 'plan':
             if t - self.t_state < (self.retry_s if self.tries else 0.0):
                 return self._cmd(0.0, 0.0, dt) + (None,)
@@ -834,6 +850,9 @@ class MissionRunner:
                 if self.tries >= self.plan_tries:
                     self.log.append((t, f'goal {self.k + 1} {kind}: skipped'))
                     self.k, self.tries = self.k + 1, 0
+                    self.skips_in_row += 1
+                    if self.skips_in_row >= 2:
+                        return self._stuck(t, 'two goals in a row skipped')
                 self.t_state = t
                 return self._cmd(0.0, 0.0, dt) + (None,)
         if self.state == 'drive':
@@ -843,6 +862,7 @@ class MissionRunner:
             else:
                 cv, cw, done = self.leg(np.asarray(pose, float), t - self.t_state)
                 if done:
+                    self.skips_in_row = 0
                     self.log.append((t, f'goal {self.k + 1} {kind}: arrived'))
                     self._go('work', t)
                     return self._cmd(0.0, 0.0, dt) + ((kind, g),)
@@ -870,6 +890,11 @@ class MissionRunner:
                 self._go('plan', t)
             return self._cmd(0.0, 0.0, dt) + (None,)
         return self._cmd(0.0, 0.0, dt) + (None,)
+
+    def _stuck(self, t, why):
+        self.state, self.why_stuck = 'stuck', why
+        self.log.append((t, f'STUCK: {why}; mission stopped'))
+        return self._cmd(0.0, 0.0, 0.05) + (None,)
 
     def _cmd(self, cv, cw, dt):
         self.r.command(cv, cw, dt)
