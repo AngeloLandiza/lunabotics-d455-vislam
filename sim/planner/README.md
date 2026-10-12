@@ -29,7 +29,7 @@ chosen number with no source). Every number the bench uses is in `arena2d.PARAMS
 | --- | --- | --- |
 | `gcs` | The planned custom stack: convex free-space regions (Drake IRIS), a shortest route through them (Drake GCS, straight pieces, Clarabel), corners rounded, then a minimum-time speed profile (TOPP-RA) in wheel coordinates | `custom_gcs.py` |
 | `tangent` | A second custom candidate: the exact shortest route around the inflated obstacles (straight tangents and arcs, Dijkstra), with the body's footprint checked along every edge of the route and edges that touch dropped before searching again. Where that finds nothing, a fallback search over (x, y, heading) on a 5 cm, 5 deg grid with straight moves forwards or backwards and turns in place, shortened by straight cuts | `tangent_route.py`, `lattice_route.py` |
-| Nav2 | Smac State Lattice (5 cm diff-drive primitives) + MPPI, default BT with replanning and recoveries | `nav2/` |
+| Nav2 | Smac State Lattice (5 cm diff-drive primitives) + MPPI, default BT with replanning and recoveries; runs on ROS 2 Humble with an RViz window | `nav2/` |
 
 Both custom planners hand their route to the same executor (`execute.py`): stop and turn at corners sharper than
 45 deg, follow each piece on its TOPP-RA speed schedule with a Kanayama steering law. A route that ends with a straight
@@ -84,4 +84,31 @@ Custom planners on the 100 test arenas (2026-10-12; `results/compare_v3` for `ta
 Every incomplete mission stopped at its first dump leg, the crossing from the dig area to the berm. A configuration
 space check (5 cm, 5 deg) finds no way through for the body in about a third of the arenas where the first run
 failed, even at 2 cm clearance. The obstacle layout is Assumed, because Figure 9 is unreadable, so the arenas may be
-denser than the real pit. Nav2: pending, on the laptop.
+denser than the real pit.
+
+### Nav2 against the custom planner (decision, 2026-10-12)
+
+Nav2 Humble (Smac State Lattice + MPPI) ran on the same bench on Angelo's laptop (`results/nav2*`; Inferred, sim):
+
+| Run | Arenas | Missions complete | Legs with contact |
+| --- | --- | --- | --- |
+| Nav2, default settings | test 3000-3099, 3 slip levels | 3 of 300 (none 1, nominal 2, heavy 0) | 6 |
+| Nav2, 12 tuned settings (`nav2/tune.sh`, two rounds) | tuning 1000-1019, nominal slip | best 1 of 20 (`combo`, 17 contact legs; `finalturn`, 1 contact leg) | 0 to 17 |
+| `tangent` | tuning 1000-1019, nominal slip | 17 of 20 | 1 |
+| `tangent` | test 3000-3099, 3 slip levels | 242 of 300 (82, 82, 80) | 9 |
+
+**Decision: the custom stack (`tangent` routes + the shared executor) replaces Nav2 for driving between poses; Nav2
+stays the fallback** (Angelo, 2026-10-12). Why Nav2 failed here, from its logs:
+
+- At a goal MPPI turns in place at up to 1.85 rad/s and stops; the wheels' spin-down (0.5 m/s^2, Assumed) carries the
+  body 10-50 deg past the target heading, it turns back, overshoots again, and the progress checker's spin recovery
+  adds more turning until the 60 s leg timeout. Humble's MPPI has no acceleration limits in its motion model.
+- A 0.5 rad/s final turn (`finalturn`) stops the overshoot, but near rocks the 0.70 m safety margin keeps the robot
+  0.2-0.9 m short; with a 0.45 m margin (`finalcombo`) it gets within 0.27 m and still does not close the last
+  0.2 m to the 8 cm goal tolerance; with the small margin and fast turns (`inflate`, `combo`) it hits rocks.
+- Some dump poses (5 cm from the berm) get no Smac plan within 10 s.
+
+Caveats: the arenas' obstacle layout is Assumed (Figure 9 unreadable) and may be denser than the real pit; the wheel
+acceleration and slip are Assumed; Nav2 was tuned by parameters only, not by a custom behaviour tree or a rotation
+controller. The custom executor's stop-then-turn steps are what Nav2 lacks here, so the gap is about the final
+approach, not route finding.
