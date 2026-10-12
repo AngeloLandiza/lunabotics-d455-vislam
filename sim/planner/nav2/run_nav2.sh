@@ -58,11 +58,12 @@ alive() { ps -e -o pgid=,stat= | awk -v g="$1" '$1 == g && $2 !~ /^Z/ {f = 1} EN
 stop() {
   [ -n "$1" ] || return 0
   kill -INT -- "-$1" 2>/dev/null || return 0
-  for _ in $(seq 100); do alive "$1" || { wait "$1" 2>/dev/null; return 0; }; sleep 0.1; done
+  for _ in $(seq 100); do alive "$1" || { wait "$1" 2>/dev/null || true; return 0; }; sleep 0.1; done
   echo "process group $1 did not stop on SIGINT, killing it"
   kill -KILL -- "-$1" 2>/dev/null || true
 }
 cleanup() {
+  set +e
   stop "$VIZ"
   stop "$NAV"
   rm -rf "$RUN"

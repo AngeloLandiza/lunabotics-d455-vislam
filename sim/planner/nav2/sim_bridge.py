@@ -50,9 +50,10 @@ def yaw_quat(yaw):
 
 
 def stamp(t):
+    # whole nanoseconds first: rounding the fraction alone turned 1.9999999996 s into 1.0 s, a 1 s jump back in time
+    # (about one every 3 sim seconds with t accumulated in 0.01 s steps), which makes every Nav2 node reset its TF buffer
     m = TimeMsg()
-    m.sec = int(t)
-    m.nanosec = int(round((t - int(t)) * 1e9)) % 1_000_000_000
+    m.sec, m.nanosec = divmod(int(round(t * 1e9)), 1_000_000_000)
     return m
 
 
