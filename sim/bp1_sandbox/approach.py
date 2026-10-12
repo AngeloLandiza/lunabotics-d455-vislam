@@ -6,12 +6,13 @@ missed-hazard rates, phantom stops and speeds for any threshold and speed policy
 Usage: python3 approach.py [n_arenas] [out_dir] [first_seed] [--rms M] [--undulation M] [--pitch-err DEG] [--clear-only]
        [--ground plane|local] [--ground-sigma M] [--ground-spread M] [--seeds S1,S2,...] [--workers N]
        [--robot] [--lidar spin16|l1] [--body none|raw|box|table] [--inflate DEG] [--mask-err DEG]
-       [--ruts M] [--rut-trips N] [--sensors lidar,d455] [--label TEXT]
+       [--ruts M] [--rut-trips N] [--sensors lidar,d455] [--frame-s S] [--label TEXT]
 --robot takes the sensor mounts and the robot's size from the team's URDF (robot.py); --body none keeps the body
 transparent, raw lets it block and return rays with no mask, box and table add the self-mask (selfmask.py).
 --mask-err tilts the real LiDAR by that many degrees against its nominal mount. --ruts stamps ruts of that depth from
 --rut-trips earlier drives (ruts.py) into each arena, from their own random stream. --sensors runs only the listed
-sensors (the D455 never sees the body, so mask cases can skip it).
+sensors (the D455 never sees the body, so mask cases can skip it). --frame-s sets how long the L1 collects per frame:
+frames are DS apart, so DS / speed matches the rays a robot at that speed gets (0.15 s at 1 m/s, 0.6 s at 0.25 m/s).
 --rms sets the floor roughness (params.py default 0.01 m), --undulation adds long-wavelength floor waves of that RMS,
 --pitch-err makes the robot's attitude estimate wrong by that many degrees (sign alternates with the seed). The extra
 draws use their own random stream, so every case sees the same arenas, starts and sensor noise as the others. The
@@ -237,11 +238,15 @@ def main():
     ap.add_argument("--ruts", type=float, default=0.0, help="depth (m) of ruts from earlier drives; 0 = none")
     ap.add_argument("--rut-trips", type=int, default=v(pr.RUTS, "trips"))
     ap.add_argument("--sensors", default="lidar,d455", help="comma-separated subset of lidar,d455")
+    ap.add_argument("--frame-s", type=float, default=None, help="L1 collection time per frame in s (default 0.1)")
     ap.add_argument("--label", default="", help="case name shown on the dashboard")
     a = ap.parse_args()
     assert a.body == "none" or a.robot, "--body needs --robot"
     sensors = a.sensors.split(",")
     assert sensors and set(sensors) <= {"lidar", "d455"}, "--sensors takes lidar, d455 or both"
+    if a.frame_s is not None:  # set before the pool forks, like --rms
+        assert pr.LIDAR_PROFILES[a.lidar]["kind"] == "l1", "--frame-s is for the l1 profile"
+        pr.LIDAR_PROFILES[a.lidar] = dict(pr.LIDAR_PROFILES[a.lidar], frame_s=a.frame_s)
     if a.rms is not None:      # set before the pool forks, so every worker builds arenas with it
         old = pr.ARENA["surface_rms"]
         pr.ARENA["surface_rms"] = pr.P(a.rms, old.unit, "Assumed", "approach.py --rms (robustness case)")
@@ -283,6 +288,7 @@ def main():
             "DS": DS, "FRONT": FRONT, "HALF_W": HALF_W, "X_END": X_END, "PLUME_AHEAD": PLUME_AHEAD, "LOOK": LOOK,
             "surface_rms": v(pr.ARENA, "surface_rms"), "ground_fit": v(pr.DETECT, "ground_fit"), "ground_sigma": v(pr.DETECT, "ground_sigma"),
             "ground_spread": v(pr.DETECT, "ground_spread"), "BACK": BACK, "label": a.label, **CASE,
+            "frame_s": pr.LIDAR_PROFILES[a.lidar].get("frame_s"),
             "det_fields": ["kind", "x", "y", "evidence", "cells", "along", "lateral", "class", "match"]}
     with open(os.path.join(a.out, "approaches.json"), "w") as f:
         json.dump({"meta": meta, "trials": res}, f)

@@ -51,7 +51,7 @@ BP1 = {
     "particle_size_most_under": P(100e-6, "m", "Verified", GUIDEBOOK + " 11.1 g"),
     "density_compacted": P((1.5, 1.8), "g/cm^3", "Verified", GUIDEBOOK + " 11.1 f"),
     "density_top_raked": P(0.75, "g/cm^3", "Verified", GUIDEBOOK + " 11.1 h"),
-    "lidar_reflectivity": P(0.10, "", "Assumed", "NOT KNOWN. Guidebook Figure 7 lets teams measure it; needs the PDF figure"),
+    "lidar_reflectivity": P(0.10, "", "Assumed", "NOT KNOWN at 905 nm. Guidebook 2027 Figure 7 (refs/guidebook2027, measure_fig7.py): the red laser line on BP-1 is a little dimmer than on the target's mid-grey patch in all three photos, about 0.04-0.17 if the light-grey patch is 0.5-0.9 (Inferred, uncalibrated photo)"),
 }
 
 # Sensor mounts in the robot frame (x forward, y left, z up; origin on the ground under the robot center)

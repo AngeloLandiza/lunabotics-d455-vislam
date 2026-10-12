@@ -126,7 +126,7 @@ def gpu():
             return None
         if now - _gpu_cache["t"] < 1.5:
             return _gpu_cache["value"]
-    cmd = ["nvidia-smi", "--query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw",
+    cmd = ["nvidia-smi", "--query-gpu=name,utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw,power.limit",
            "--format=csv,noheader,nounits"]
     value, missing = None, False
     try:
@@ -137,8 +137,11 @@ def gpu():
                 f = [x.strip() for x in line.split(",")]
                 if len(f) < 6:
                     continue
+                power, limit = _num(f[5]), _num(f[6]) if len(f) > 6 else None
+                if power is not None and power > 1.5 * (limit or 400):   # nvidia-smi can misread on GPU wake (590 W seen)
+                    power = None
                 gpus.append({"name": f[0], "util_pct": _num(f[1]), "mem_used_mib": _num(f[2]),
-                             "mem_total_mib": _num(f[3]), "temp_c": _num(f[4]), "power_w": _num(f[5])})
+                             "mem_total_mib": _num(f[3]), "temp_c": _num(f[4]), "power_w": power})
             value = gpus or None
     except FileNotFoundError:
         missing = True
