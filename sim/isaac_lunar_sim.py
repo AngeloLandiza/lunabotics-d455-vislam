@@ -505,6 +505,11 @@ imu_ax, imu_pos = world_frame(IMU)
 frames['camera_imu_optical_frame'] = (imu_ax.T, imu_pos)
 if REAR:
     frames['rear_camera_optical_frame'] = camera_axes(REAR, True)
+if ROBOT == 'team':
+    # base_link as a CHILD of camera_link (static), so it does not clash with the SLAM launch's odom -> camera_link
+    # (base_frame camera_link); the autonomy nodes reach the other sensor frames through it
+    base_ax, base_pos = world_frame(BASE)
+    frames['base_link'] = (base_ax.T, base_pos)
 if LIDAR:
     l1_ax, l1_pos = world_frame(LIDAR)
     frames['lidar3d_link'] = (l1_ax.T, l1_pos)       # the L1's own axes (columns = sensor x, y, z in the world)
