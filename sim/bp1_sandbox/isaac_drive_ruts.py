@@ -59,18 +59,9 @@ from arena import Arena  # noqa: E402
 from isaac_approach import approach_poses  # noqa: E402
 from robot import Robot  # noqa: E402
 from ruts import Ruts, add_earlier_ruts, rut_depth, wheel_offsets  # noqa: E402
+from telemetry import Telemetry  # noqa: E402
 
 out_path = args.out or os.path.join(HERE, "isaac_out", f"drive_seed{args.seed}.npz")
-TELEMETRY = os.path.join(HERE, "isaac_out", "telemetry", f"drive_seed{args.seed}.jsonl")
-
-
-def telemetry(**kw):
-    """One JSON line per event (frames done, pose, GPU memory, ETA) for the run dashboard."""
-    os.makedirs(os.path.dirname(TELEMETRY), exist_ok=True)
-    with open(TELEMETRY, "a") as f:
-        f.write(json.dumps({"t": time.time(), "run": f"drive_seed{args.seed}", **kw}) + "\n")
-
-
 def gpu_mib():
     try:
         import subprocess
@@ -315,7 +306,9 @@ def show(pose, origin, R, r):
 # ---------------------------------------------------------------- drive
 out = {"poses": np.array(poses), "rut_depth": depth, "x0": arena.x0, "y0": arena.y0, "res": arena.res,
        "seed": args.seed}
-telemetry(event="start", frames=len(poses), rut_depth=depth, gpu_mib=gpu_mib())
+tel = Telemetry(kind="isaac", total=len(poses), args=vars(args),
+                label=f"Isaac drive with ruts, seed {args.seed}, {100 * depth:.1f} cm")
+BODY_LO, BODY_HI = robot.extents(exclude=("lidar3d_link", "d455_link"))
 app_utils.play()
 app_utils.update_app(steps=5)
 last_mesh_s, t0 = None, time.time()
@@ -347,9 +340,18 @@ for k, pose in enumerate(poses):
     eta = (time.time() - t0) / (k + 1) * (len(poses) - k - 1)
     print(f"[drive] frame {k + 1}/{len(poses)} s={s:.2f} m base z {tb[2]:.4f} pitch(nose up) {pitch:+.2f} roll(left up) {roll:+.2f} deg, "
           f"L1 {np.isfinite(r).sum()} returns, ETA {eta:.0f} s", flush=True)
-    telemetry(event="frame", frame=k + 1, frames=len(poses), s=s, pose=list(pose), base_z=float(tb[2]),
-              pitch_deg=float(pitch), roll_deg=float(roll), l1_returns=int(np.isfinite(r).sum()), gpu_mib=gpu_mib(),
-              eta_s=eta)
+    ok = np.isfinite(r)
+    hits_w = lo + r[ok, None] * (np.nan_to_num(D_S[ok]) @ lR.T)
+    hits_r = (hits_w - tb) @ Rb                               # in the robot frame
+    on_body = np.all((hits_r >= BODY_LO - 0.01) & (hits_r <= BODY_HI + 0.01), axis=1)
+    c_, s_ = np.cos(np.radians(pose[2])), np.sin(np.radians(pose[2]))
+    wxy = WHEELS[:, :2] @ np.array([[c_, -s_], [s_, c_]]).T + pose[:2]
+    wi = np.clip(np.round((wxy[:, 0] - arena.x0) / arena.res).astype(int), 0, arena.h.shape[0] - 1)
+    wj = np.clip(np.round((wxy[:, 1] - arena.y0) / arena.res).astype(int), 0, arena.h.shape[1] - 1)
+    tel.progress(k + 1, s_m=round(s, 3), l1_returns=int(ok.sum()), l1_body_hits=int(on_body.sum()),
+                 l1_ground_hits=int((~on_body).sum()), pitch_deg=round(float(pitch), 2), roll_deg=round(float(roll), 2),
+                 base_z_m=round(float(tb[2]), 4), rut_cm_under_wheels=round(100 * float(ruts.trench[wi, wj].mean()), 2),
+                 gpu_mib=gpu_mib())
     show(pose, lo, lR, r)
 
 out.update({"l1_d_s": D_S, "h_final": arena.h.astype(np.float32), "trench_final": ruts.trench.astype(np.float32),
@@ -359,6 +361,6 @@ out.update({"l1_d_s": D_S, "h_final": arena.h.astype(np.float32), "trench_final"
                                   "base_height": robot.base_height, "robot_digest": robot.digest()})})
 os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
 np.savez_compressed(out_path, **out)
-telemetry(event="done", frames=len(poses), seconds=time.time() - t0, out=out_path, gpu_mib=gpu_mib())
+tel.end(seconds=round(time.time() - t0, 1), out=os.path.relpath(out_path, HERE), gpu_mib=gpu_mib())
 print(f"[drive] wrote {out_path} ({time.time() - t0:.0f} s)", flush=True)
 app.close()

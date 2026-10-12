@@ -22,6 +22,7 @@ import speed_gate as sg
 from params import v
 from isaac_validate import isaac_d455_scan, isaac_lidar_scan
 from sensors import D455Depth, Lidar
+from telemetry import Telemetry
 
 
 def frame_of(poses, robot):
@@ -140,8 +141,13 @@ def main():
     seed = int(sys.argv[2]) if len(sys.argv) > 2 else 1
     cap = np.load(cap_path)
     base = os.path.join(os.path.dirname(cap_path), f"approach_seed{seed}")
+    n_noise = int(sys.argv[3]) if len(sys.argv) > 3 else 0
+    tel = Telemetry(kind="isaac", total=2 + 2 * n_noise, args={"capture": cap_path, "seed": seed, "noise": n_noise},
+                    label=f"Isaac vs sandbox approach, seed {seed}")
     t_sb = run_trial(seed, Lidar, D455Depth)
+    tel.progress(1, stage="sandbox run")
     t_is = run_trial(seed, *isaac_sensors(cap))
+    tel.progress(2, stage="isaac run")
     assert np.allclose(t_sb["start"], t_is["start"])
     save(t_sb, os.path.join(base, "sandbox"))
     save(t_is, os.path.join(base, "isaac"))
@@ -189,12 +195,13 @@ def main():
     open(os.path.join(base, "compare.md"), "w").write(md)
     print(md)
 
-    n_noise = int(sys.argv[3]) if len(sys.argv) > 3 else 0
     if n_noise:
-        noise_study(cap, seed, base, n_noise, keys)
+        noise_study(cap, seed, base, n_noise, keys, tel)
+    tel.end(lidar_dust_fa_sandbox=sum(res["sandbox"]["spin16_dust"]["fa_confirmed_per_frame"]),
+            lidar_dust_fa_isaac=sum(res["isaac"]["spin16_dust"]["fa_confirmed_per_frame"]))
 
 
-def noise_study(cap, seed, base, n_noise, keys):
+def noise_study(cap, seed, base, n_noise, keys, tel=None):
     """Both sources over n_noise noise streams: per case, how often each path hazard is confirmed in time at 1.0 m/s,
     phantom stops per 10 m at 1.0 m/s, and confirmed false alarms summed over frames."""
     rows = {src: {k: {"missed_1.0": [], "phantom_1.0": [], "fa_frames": [], "first": []} for k in keys}
@@ -212,6 +219,8 @@ def noise_study(cap, seed, base, n_noise, keys):
                 r["fa_frames"].append(sum(res[k]["fa_confirmed_per_frame"]))
                 r["first"].append([h["first"] for h in res[k]["hazards"]])
         print(f"noise stream {noise + 1}/{n_noise} done", flush=True)
+        if tel is not None:
+            tel.progress(2 + 2 * (noise + 1), stage=f"noise stream {noise + 1}/{n_noise}")
     with open(os.path.join(base, "noise.json"), "w") as f:
         json.dump({"seed": seed, "n_noise": n_noise, **rows}, f, indent=1)
     L = [f"# Isaac vs sandbox over {n_noise} sensor-noise streams (seed {seed})", "",
