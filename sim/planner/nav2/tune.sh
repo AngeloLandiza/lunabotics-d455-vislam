@@ -49,14 +49,17 @@ declare -A V=(
 mkdir -p "$OUT"
 domain=60
 running=0
+VIZ_PID=
 for name in "${!V[@]}"; do
   sets=()
   for kv in ${V[$name]}; do sets+=(--set "$kv"); done
   echo "variant $name: ${V[$name]:-(defaults)}"
-  # one RViz window, on the first variant; the others run alongside without one
-  [ "$domain" -eq 60 ] || sets+=(--no-rviz)
+  # one RViz window at any time: the next variant to start takes it over when the variant showing it ends, so the
+  # sweep is never all headless; the others run alongside without one
+  if [ -n "$VIZ_PID" ] && kill -0 "$VIZ_PID" 2>/dev/null; then sets+=(--no-rviz); viz=0; else viz=1; fi
   "$HERE/run_nav2.sh" "$OUT/$name.json" --label "nav2_$name" --domain $domain --rtf "$RTF" "${sets[@]}" \
     --seeds "$SEEDS" --seed0 1000 --slip "$SLIP" >"$OUT/$name.out" 2>&1 &
+  [ "$viz" = 1 ] && VIZ_PID=$!
   domain=$((domain + 1)); running=$((running + 1))
   if [ "$running" -ge "$JOBS" ]; then wait -n; running=$((running - 1)); fi
 done
