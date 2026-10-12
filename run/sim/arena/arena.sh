@@ -13,6 +13,8 @@
 #   run/sim/arena/arena.sh --realism off     ideal sensors and rigid ground (default nominal: BP-1 sensor noise,
 #                                            slip, ruts and dust from sim/realism.py; heavy: worse)
 #   run/sim/arena/arena.sh --earlier-trips 6 start on a used bed with the ruts of 6 earlier drives
+#   run/sim/arena/arena.sh --light low       low sun (15 deg) with the hall lights at 1/4: long shadows, glare
+#   run/sim/arena/arena.sh --no-tags         without the two start-zone AprilTags (36h11 ids 0, 1)
 #
 # Dig tool window: hold W A S D to drive (tank drive: W/S forward/back, A/D pivot, W+A/W+D
 # arc; 1 2 3 speed), left-drag digs, right-drag dumps, wheel = brush size, E cycles the SLAM
