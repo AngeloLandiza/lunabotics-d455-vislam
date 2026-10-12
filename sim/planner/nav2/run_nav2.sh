@@ -5,6 +5,9 @@
 #
 # Usage: ./run_nav2.sh OUT.json [--label nav2_default] [--params nav2_params.yaml] [--domain 42] [--rtf 2.0]
 #                      [--set NODE.KEY.SUBKEY=VALUE ...] [--seeds 100] [--seed0 3000] [--slip nominal] [--settle 2.5]
+#                      [--no-rviz]
+#   RViz opens by default (nav2_bringup's default view: map, costmaps, footprint, plan) so the run can be watched;
+#   --no-rviz skips it, e.g. for the extra parallel jobs in tune.sh.
 #   --set overrides one parameter of the params file, e.g. --set controller_server.FollowPath.vx_std=0.3;
 #   NODE "costmaps" sets both costmaps, e.g. --set costmaps.inflation_layer.inflation_radius=0.55
 #   e.g. ./run_nav2.sh ../results/nav2/nav2_default.json --slip nominal --seeds 2      (smoke test)
@@ -19,9 +22,9 @@
 # Several runs can go side by side with different --domain values (one ROS_DOMAIN_ID each).
 set -eo pipefail
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-[ $# -ge 1 ] || { sed -n '6,11p' "$0"; exit 2; }
+[ $# -ge 1 ] || { sed -n '6,14p' "$0"; exit 2; }
 OUT=$(realpath -m "$1"); shift
-LABEL=nav2_default PARAMS=$HERE/nav2_params.yaml DOMAIN=${ROS_DOMAIN_ID:-42} RTF=2.0 PASS=() SETS=()
+LABEL=nav2_default PARAMS=$HERE/nav2_params.yaml DOMAIN=${ROS_DOMAIN_ID:-42} RTF=2.0 RVIZ=1 PASS=() SETS=()
 while [ $# -gt 0 ]; do
   case $1 in
     --label) LABEL=$2; shift 2 ;;
@@ -29,6 +32,7 @@ while [ $# -gt 0 ]; do
     --domain) DOMAIN=$2; shift 2 ;;
     --rtf) RTF=$2; shift 2 ;;
     --set) SETS+=("$2"); shift 2 ;;
+    --no-rviz) RVIZ=0; shift ;;
     *) PASS+=("$1"); shift ;;
   esac
 done
@@ -47,8 +51,9 @@ LATTICE=$(echo "$LATTICES" | grep -m1 '0.5m' || true)
 echo "lattice: $LATTICE"
 
 RUN=$(mktemp -d)
-NAV=
+NAV= VIZ=
 cleanup() {
+  [ -n "$VIZ" ] && kill -INT "$VIZ" 2>/dev/null && wait "$VIZ" 2>/dev/null
   [ -n "$NAV" ] && kill -INT "$NAV" 2>/dev/null && wait "$NAV" 2>/dev/null
   rm -rf "$RUN"
 }
@@ -85,4 +90,9 @@ ros2 launch nav2_bringup navigation_launch.py params_file:="$RUN/params.yaml" us
   >"$LOG" 2>&1 &
 NAV=$!
 echo "Nav2 started (log $LOG), domain $DOMAIN, rtf $RTF"
+if [ "$RVIZ" = 1 ]; then
+  rviz2 -d "$(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz" \
+    --ros-args -p use_sim_time:=true >"${OUT%.json}.rviz.log" 2>&1 &
+  VIZ=$!
+fi
 python3 "$HERE/sim_bridge.py" "$OUT" --label "$LABEL" --rtf "$RTF" "${PASS[@]}"

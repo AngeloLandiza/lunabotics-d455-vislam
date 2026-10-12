@@ -42,6 +42,8 @@ for name in "${!V[@]}"; do
   sets=()
   for kv in ${V[$name]}; do sets+=(--set "$kv"); done
   echo "variant $name: ${V[$name]:-(defaults)}"
+  # one RViz window, on the first variant; the others run alongside without one
+  [ "$domain" -eq 60 ] || sets+=(--no-rviz)
   "$HERE/run_nav2.sh" "$OUT/$name.json" --label "nav2_$name" --domain $domain --rtf "$RTF" "${sets[@]}" \
     --seeds "$SEEDS" --seed0 1000 --slip "$SLIP" >"$OUT/$name.out" 2>&1 &
   domain=$((domain + 1)); running=$((running + 1))
