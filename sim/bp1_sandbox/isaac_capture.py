@@ -114,6 +114,9 @@ LIDAR_ATTRS = {
     "omni:sensor:Core:originErrorMean": Vt.FloatArray([0.0, 0.0, 0.0]),
     "omni:sensor:Core:originErrorStd": Vt.FloatArray([0.0, 0.0, 0.0]),
     "omni:sensor:Core:rangeResolutionM": 0.001,  # schema default 0.004 m; quantisation, not noise
+    # Schema default 0.4 m silently drops every return closer than 0.40 m, even with nearRangeM 0.01 (isaac_selfmask
+    # run, 2026-10-12: all robot-body hits under 0.40 m missing, all beyond kept); terrain is farther than that here
+    "omni:sensor:Core:minDistBetweenEchosM": 0.01,
     "omni:sensor:Core:emitterState:s001:azimuthDeg": Vt.FloatArray([0.0] * N_CH),
     "omni:sensor:Core:emitterState:s001:elevationDeg": Vt.FloatArray(EL.tolist()),
     "omni:sensor:Core:emitterState:s001:fireTimeNs": Vt.UIntArray([0] * N_CH),

@@ -1,0 +1,189 @@
+{
+ "usd": "usd/arena_seed1.usda",
+ "mounts": {
+  "lidar3d": {
+   "xyz": [
+    0.0,
+    0.102,
+    0.7351
+   ],
+   "pitch_down_deg": 30.0000701530499
+  },
+  "d455": {
+   "xyz": [
+    0.535,
+    0.0,
+    0.6351
+   ],
+   "pitch_down_deg": 39.998183678082775
+  },
+  "base_height": 0.2651,
+  "excluded_links": [
+   "lidar3d_link",
+   "d455_link"
+  ],
+  "robot_digest": "3efb20443a28",
+  "n_triangles": 456138
+ },
+ "scans_per_capture": 4,
+ "lidar_attrs": {
+  "omni:sensor:Core:scanType": "ROTARY",
+  "omni:sensor:Core:numberOfEmitters": 16,
+  "omni:sensor:Core:numberOfChannels": 16,
+  "omni:sensor:Core:scanRateBaseHz": 10,
+  "omni:sensor:Core:patternFiringRateHz": 9000,
+  "omni:sensor:Core:farRangeM": 8.0,
+  "omni:sensor:Core:nearRangeM": 0.01,
+  "omni:sensor:Core:maxReturns": 1,
+  "omni:sensor:Core:instantLidar": true,
+  "omni:sensor:Core:skipDroppingInvalidPoints": true,
+  "omni:sensor:Core:rayType": "IDEALIZED",
+  "omni:sensor:Core:rangeAccuracyM": 0.0,
+  "omni:sensor:Core:azimuthErrorMean": 0.0,
+  "omni:sensor:Core:azimuthErrorStd": 0.0,
+  "omni:sensor:Core:elevationErrorMean": 0.0,
+  "omni:sensor:Core:elevationErrorStd": 0.0,
+  "omni:sensor:Core:originErrorMean": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "omni:sensor:Core:originErrorStd": [
+   0.0,
+   0.0,
+   0.0
+  ],
+  "omni:sensor:Core:rangeResolutionM": 0.001,
+  "omni:sensor:Core:minDistBetweenEchosM": 0.01,
+  "omni:sensor:Core:emitterState:s001:azimuthDeg": [
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0,
+   0.0
+  ],
+  "omni:sensor:Core:emitterState:s001:elevationDeg": [
+   -15.0,
+   -13.0,
+   -11.0,
+   -9.0,
+   -7.0,
+   -5.0,
+   -3.0,
+   -1.0,
+   1.0,
+   3.0,
+   5.0,
+   7.0,
+   9.0,
+   11.0,
+   13.0,
+   15.0
+  ],
+  "omni:sensor:Core:emitterState:s001:fireTimeNs": [
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0,
+   0
+  ],
+  "omni:sensor:Core:emitterState:s001:channelId": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16
+  ]
+ },
+ "depth_render": [
+  1060,
+  622
+ ],
+ "captures": [
+  {
+   "pose": [
+    3.0,
+    2.5,
+    0.0
+   ],
+   "scene": "flat",
+   "case": "with",
+   "lidar_returns": 6275,
+   "lidar_returns_under_0.8m": 423,
+   "scan_range_spread_m": 0.0,
+   "depth_valid": 25440
+  },
+  {
+   "pose": [
+    3.0,
+    2.5,
+    0.0
+   ],
+   "scene": "flat",
+   "case": "without",
+   "lidar_returns": 6282,
+   "lidar_returns_under_0.8m": 0,
+   "scan_range_spread_m": 0.0,
+   "depth_valid": 25440
+  },
+  {
+   "pose": [
+    1.0,
+    2.5,
+    0.0
+   ],
+   "scene": "arena_seed1",
+   "case": "with",
+   "lidar_returns": 10326,
+   "lidar_returns_under_0.8m": 424,
+   "scan_range_spread_m": 0.0,
+   "depth_valid": 25440
+  },
+  {
+   "pose": [
+    1.0,
+    2.5,
+    0.0
+   ],
+   "scene": "arena_seed1",
+   "case": "without",
+   "lidar_returns": 10325,
+   "lidar_returns_under_0.8m": 0,
+   "scan_range_spread_m": 0.0,
+   "depth_valid": 25440
+  }
+ ]
+}
