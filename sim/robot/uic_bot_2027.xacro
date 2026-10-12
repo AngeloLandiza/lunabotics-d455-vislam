@@ -4,9 +4,12 @@
   src/description_pkg/urdf/uic_bot.xacro at commit a720e46 (2026 robot). Body, wheels, D456 and IMU are unchanged.
 
   Changes for the 2027 autonomy plan (each one Assumed until the team measures the real robot):
-  - lidar3d_link: a generic 3D LiDAR replaces the 2D RPLIDAR S3, at the S3's mount (0, 0.102, 0.470), pitched 30 deg
-    down. Housing is a generic 0.05 m radius x 0.07 m cylinder. Gazebo sensor: 16 beams over +-15 deg, 0.4 deg steps
-    (the sandbox "spin16" pattern), 0.3 to 8 m.
+  - lidar3d_link: the team's 3D LiDAR, a Unitree L1 (branches 5-27-2026 and comp-day-one: unitree_lidar_ros2 driver,
+    unilidar_sdk, Point-LIO config unilidar_l1.yaml), replacing the 2D RPLIDAR S3. Mount copied from comp-day-one
+    (3bd79d3) src/neptune_bringup/launch/test.launch.py, static transform base_link -> s3_lidar_link:
+    xyz (-0.353, 0, 0.721), roll 180 deg ("upside down"), so its 360 x 90 deg hemisphere looks down. Housing is the
+    L1's 75 x 75 x 65 mm (Unitree L1 user manual v1.1). Gazebo sensor: a 360 x 90 deg approximation of its field of
+    view; the sandbox models the L1's mirror-and-core scan itself (sensors.l1_dirs).
   - d455_link: moved from the rear (facing back) to the front centre, pitched 40 deg down (Angelo's 2027 layout;
     the 40 deg is Angelo's, the position is Assumed).
   - rear_cam_link: monocular camera for fiducials at the 2026 D455 pose (rear, facing back, 15 deg up).
@@ -101,14 +104,14 @@
   <link name="lidar3d_link">
     <visual>
       <geometry>
-        <cylinder radius="0.05" length="0.07" />
+        <box size="0.075 0.075 0.065" />
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0" />
       <material name="black" />
     </visual>
     <collision>
       <geometry>
-        <cylinder radius="0.05" length="0.07" />
+        <box size="0.075 0.075 0.065" />
       </geometry>
       <origin xyz="0 0 0" rpy="0 0 0" />
     </collision>
@@ -252,7 +255,7 @@
   <joint name="base_lidar3d_joint" type="fixed">
     <parent link="base_link" />
     <child link="lidar3d_link" />
-    <origin xyz="0.0 0.102 0.470" rpy="0 0.5236 0" />
+    <origin xyz="-0.353 0 0.721" rpy="3.14159 0 0" />
   </joint>
 
   <joint name="base_rear_cam_joint" type="fixed">
@@ -496,25 +499,25 @@
       <sensor type="ray" name="lidar3d">
         <pose>0 0 0 0 0 0</pose>
         <visualize>false</visualize>
-        <update_rate>10.0</update_rate>
+        <update_rate>11.0</update_rate>
         <ray>
           <scan>
             <horizontal>
-              <samples>900</samples>
+              <samples>360</samples>
               <resolution>1</resolution>
               <min_angle>-3.14159</min_angle>
-              <max_angle>3.13461</max_angle>
+              <max_angle>3.12414</max_angle>
             </horizontal>
             <vertical>
-              <samples>16</samples>
+              <samples>60</samples>
               <resolution>1</resolution>
-              <min_angle>-0.2618</min_angle>
-              <max_angle>0.2618</max_angle>
+              <min_angle>0.0</min_angle>
+              <max_angle>1.5708</max_angle>
             </vertical>
           </scan>
           <range>
-            <min>0.3</min>
-            <max>8.0</max>
+            <min>0.05</min>
+            <max>15.0</max>
           </range>
           <noise>
             <type>gaussian</type>

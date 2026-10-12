@@ -62,6 +62,31 @@ MOUNTS = {
     "lidar_pitch_down": P(30.0, "deg", "Assumed", "Angelo: 'angled downwards'; angle not given"),
 }
 
+# The team's robot (sim/robot/uic_bot_2027.xacro, read by robot.py)
+ROBOT = {
+    "urdf": P("sim/robot/uic_bot_2027.xacro", "", "Verified",
+              "educationmoment/EDT-Lunabotics-2026 uic_bot.xacro (a720e46), 2027 sensor layout added (see the file header)"),
+    "lidar_link": P("lidar3d_link", "", "Verified", "Unitree L1 at the comp-day-one mount: (-0.353, 0, 0.721) from base_link, upside down"),
+    "d455_link": P("d455_link", "", "Assumed", "D455 moved to the front centre (0.535, 0, 0.37), 40 deg down (Angelo's 2027 layout)"),
+    "body_reflectivity": P(0.5, "", "Assumed", "robot frame and panels at the LiDAR wavelength; only matters for returns under ~1 m, which pass at any value above ~0.01"),
+    "mask_margin": P(0.06, "m", "Assumed", "self-mask drops returns up to this far beyond the modelled body (3 sigma of the L1's 2 cm noise)"),
+    "mask_inflate": P(1.0, "deg", "Assumed", "self-mask table widened by this angle to cover extrinsic calibration error"),
+    "box_margin": P(0.05, "m", "Assumed", "box crop: the robot's bounding box grown by this much"),
+}
+
+CARRIER = "Carrier, 'Lunar soil simulation and trafficability parameters' (https://www.lpi.usra.edu/lunar/surface/carrier_lunar_trafficability_param.pdf), citing Lunar Sourcebook Table 9.14"
+RUTS = {
+    "kc": P(0.14, "N/cm^(n+1)", "Verified", CARRIER + "; recommended LUNAR SOIL value, not BP-1 (no BP-1 Bekker values found)"),
+    "kphi": P(0.82, "N/cm^(n+2)", "Verified", CARRIER + "; lunar soil, not BP-1"),
+    "n": P(1.0, "", "Verified", CARRIER + "; lunar soil, not BP-1"),
+    "robot_mass": P(74.1, "kg", "Verified", "2026 URDF masses: base_link 65 kg + 4 wheels x 2.27 kg (2027 mass Unknown)"),
+    "depth": P(0.032, "m", "Inferred", "ruts.rut_depth(): Wong 2012 Eq. (6) rigid-wheel sinkage with the values above, Earth gravity; "
+               "the raked BP-1 top layer (0.75 g/cm^3) is looser than the soil these values describe, so real ruts may be deeper"),
+    "berm_frac": P(0.3, "", "Assumed", "share of the trench volume pushed into side berms; the rest is compaction of fluffy BP-1"),
+    "berm_width": P(0.06, "m", "Assumed", "width of each side berm"),
+    "trips": P(6, "", "Assumed", "earlier drives across the obstacle zone whose ruts are in the arena (3 round trips)"),
+}
+
 D455 = {
     "hfov": P(87.0, "deg", "Verified", D455_PAGE),
     "vfov": P(58.0, "deg", "Verified", D455_PAGE),
@@ -86,6 +111,16 @@ LIDAR_PROFILES = {
     "spin16": {
         "kind": "spinning", "channels": 16, "vmin": -15.0, "vmax": 15.0, "hres": 0.4,
         "min_range": 0.3, "status": "Assumed generic 16-beam spinning pattern",
+    },
+    "l1": {
+        "kind": "l1", "f_h": 11.0, "f_v": 180.0, "samples_per_s": 43200, "frame_s": 0.1,
+        "min_range": 0.05, "range_sigma": 0.02, "max_range_ref": 10.0, "rmax": 9.0,
+        "status": "Unitree L1, the team's 2026 LiDAR (EDT-Lunabotics-2026 branch comp-day-one). Verified from the L1 user "
+                  "manual v1.1 (https://oss-global-cdn.unitree.com/static/52b72f707b304d229d4321eea223738f.pdf): 360 x 90 "
+                  "deg FOV, 11 Hz horizontal / 180 Hz vertical scanning, 43200 samples/s (21600 effective), 0.05 m "
+                  "blind zone, +-2.0 cm accuracy (used as 1 sigma, Inferred), 10 m at 10% reflectivity for the L1 PM "
+                  "(15 m for the RM; which one the team has is Unknown, PM taken). The scan geometry is Inferred "
+                  "(sensors.l1_dirs)",
     },
     "rosette70": {
         "kind": "rosette", "fov": 70.4, "points": 10000, "petals": 7.0,
@@ -132,5 +167,5 @@ def v(table, key):
 
 
 def all_tables():
-    return {"ARENA": ARENA, "OBSTACLES": OBSTACLES, "BP1": BP1, "MOUNTS": MOUNTS, "D455": D455,
+    return {"ARENA": ARENA, "OBSTACLES": OBSTACLES, "BP1": BP1, "MOUNTS": MOUNTS, "ROBOT": ROBOT, "RUTS": RUTS, "D455": D455,
             "LIDAR_GENERIC": LIDAR_GENERIC, "DUST": DUST, "DETECT": DETECT}

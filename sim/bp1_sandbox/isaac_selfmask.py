@@ -89,8 +89,8 @@ robot = Robot()
 # (with d455_link included every D455 pixel hit the housing at 0.6-28 mm in the first run, 2026-10-12)
 EXCLUDE = ("lidar3d_link", "d455_link")
 TRIS, _ = robot.triangles(exclude=EXCLUDE)
-lidar_mount, lidar_pitch = robot.mount("lidar3d_link")
-cam_mount, cam_pitch = robot.mount("d455_link")
+lidar_mount, lidar_pitch = robot.mount_pitch("lidar3d_link")   # spin16 check: forward mount only
+cam_mount, cam_pitch = robot.mount_pitch("d455_link")
 print(f"[selfmask] robot {len(TRIS)} triangles, lidar3d {lidar_mount} pitch {lidar_pitch:.1f}, "
       f"d455 {cam_mount} pitch {cam_pitch:.1f}", flush=True)
 ROBOT_PATH = "/World/bp1_robot"
