@@ -31,6 +31,9 @@ declare -A V=(
   [samples]="$C.batch_size=2000 $C.wz_std=0.6"
   # steeper cost decay so narrow gaps cost less to pass through
   [narrow]="costmaps.inflation_layer.cost_scaling_factor=6.0"
+  # let the lattice planner reverse (the custom planners and MPPI both can) and search longer: in the default run some
+  # dump legs got no plan within 10 s
+  [reverse]="planner_server.GridBased.allow_reverse_expansion=true planner_server.GridBased.max_planning_time=8.0"
   # cheaper in-place turns for the lattice planner
   [turns]="planner_server.GridBased.rotation_penalty=2.0 planner_server.GridBased.non_straight_penalty=1.0"
 )
