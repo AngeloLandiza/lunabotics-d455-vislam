@@ -38,11 +38,14 @@ parser.add_argument("--scans", type=int, default=4,
                     help="LiDAR scans merged per pose: RTX drops ~3%% of returns at random in each scan (see wait_for_scans)")
 parser.add_argument("--upsample", type=int, default=5,
                     help="odd factor: depth is rendered at upsample x 212 wide and resampled to the sandbox pixels")
+parser.add_argument("--gui", action="store_true",
+                    help="open the Isaac Sim window: chase camera on the robot, LiDAR hits and footprint drawn, lights on")
+parser.add_argument("--gui-hold", type=float, default=0.6, help="seconds each pose stays on screen with --gui")
 args, _ = parser.parse_known_args()
 
 from isaacsim import SimulationApp  # noqa: E402
 
-app = SimulationApp({"headless": True})
+app = SimulationApp({"headless": not args.gui, "width": 1600, "height": 900})
 
 import numpy as np  # noqa: E402
 import isaacsim.core.experimental.utils.app as app_utils  # noqa: E402
@@ -65,15 +68,22 @@ EL = np.linspace(PROF["vmin"], PROF["vmax"], N_CH)   # same elevations as sensor
 
 
 def quat_wxyz(R):
-    """Unit quaternion (w, x, y, z) of a rotation matrix."""
-    w = np.sqrt(max(0.0, 1 + R[0, 0] + R[1, 1] + R[2, 2])) / 2
-    x = np.sqrt(max(0.0, 1 + R[0, 0] - R[1, 1] - R[2, 2])) / 2
-    y = np.sqrt(max(0.0, 1 - R[0, 0] + R[1, 1] - R[2, 2])) / 2
-    z = np.sqrt(max(0.0, 1 - R[0, 0] - R[1, 1] + R[2, 2])) / 2
-    x = np.copysign(x, R[2, 1] - R[1, 2])
-    y = np.copysign(y, R[0, 2] - R[2, 0])
-    z = np.copysign(z, R[1, 0] - R[0, 1])
-    return np.array([w, x, y, z])
+    """Unit quaternion (w, x, y, z) of a rotation matrix (Shepperd's method: stable for any rotation)."""
+    t = np.trace(R)
+    if t > 0:
+        s = 2 * np.sqrt(1 + t)
+        q = [s / 4, (R[2, 1] - R[1, 2]) / s, (R[0, 2] - R[2, 0]) / s, (R[1, 0] - R[0, 1]) / s]
+    else:
+        i = int(np.argmax(np.diag(R)))
+        j, k = (i + 1) % 3, (i + 2) % 3
+        s = 2 * np.sqrt(1 + R[i, i] - R[j, j] - R[k, k])
+        q = [0.0] * 4
+        q[0] = (R[k, j] - R[j, k]) / s
+        q[1 + i] = s / 4
+        q[1 + j] = (R[j, i] + R[i, j]) / s
+        q[1 + k] = (R[k, i] + R[i, k]) / s
+    q = np.array(q)
+    return q if q[0] >= 0 else -q
 
 
 # ---------------------------------------------------------------- stage
@@ -150,6 +160,53 @@ def resample_depth(hi):
     near = np.where(a < 0.5, z0, z1)
     smooth = np.isfinite(z0) & np.isfinite(z1) & (np.abs(z1 - z0) < 0.05)
     return np.where(smooth, z0 * (1 - a) + z1 * a, near)
+
+
+# ---------------------------------------------------------------- GUI (watching only; nothing here reaches the sensors)
+if args.gui:
+    import time
+    from pxr import UsdLux
+    from omni.kit.viewport.utility import get_active_viewport
+    app_utils.enable_extension("isaacsim.util.debug_draw")
+    from isaacsim.util.debug_draw import _debug_draw
+    draw = _debug_draw.acquire_debug_draw_interface()
+    # Lights only change what the viewport shows: RTX LiDAR ranges and distance_to_image_plane ignore lighting
+    UsdLux.DomeLight.Define(stage, "/World/bp1_view_dome").CreateIntensityAttr(400.0)
+    sun = UsdLux.DistantLight.Define(stage, "/World/bp1_view_sun")
+    sun.CreateIntensityAttr(2500.0)
+    UsdGeom.Xformable(sun.GetPrim()).AddRotateXYZOp().Set(Gf.Vec3f(40.0, 0.0, 30.0))
+    chase = UsdGeom.Camera.Define(stage, "/World/bp1_chase_cam")
+    chase.CreateFocalLengthAttr(14.0)
+    chase.CreateClippingRangeAttr(Gf.Vec2f(0.05, 100.0))
+    chase_xf = UsdGeom.Xformable(chase.GetPrim())
+    chase_t = chase_xf.AddTranslateOp(UsdGeom.XformOp.PrecisionDouble)
+    chase_q = chase_xf.AddOrientOp(UsdGeom.XformOp.PrecisionDouble)
+    get_active_viewport().camera_path = chase.GetPath().pathString
+
+    def show(pose, lo, dirs, rng_m):
+        """Chase camera 2.2 m behind and 1.6 m above the robot, looking at a point 1.2 m ahead; hits and footprint."""
+        x, y, yaw = pose
+        hv = np.array([np.cos(np.radians(yaw)), np.sin(np.radians(yaw)), 0.0])
+        eye = np.array([x, y, 0.0]) - 2.2 * hv + np.array([0, 0, 1.6])
+        f = (np.array([x, y, 0.0]) + 1.2 * hv) - eye
+        f /= np.linalg.norm(f)
+        r = np.cross(f, [0, 0, 1.0])
+        r /= np.linalg.norm(r)
+        u = np.cross(r, f)
+        R = np.stack([r, u, -f], 1)               # USD camera: +X right, +Y up, looks along -Z
+        chase_t.Set(Gf.Vec3d(*eye.tolist()))
+        chase_q.Set(Gf.Quatd(*quat_wxyz(R).tolist()))
+        draw.clear_points()
+        draw.clear_lines()
+        ok = np.isfinite(rng_m)
+        pts = lo + rng_m[ok, None] * dirs[ok]
+        draw.draw_points([tuple(map(float, q)) for q in pts], [(0.2, 1.0, 0.4, 1.0)] * len(pts), [4.0] * len(pts))
+        c, s = np.cos(np.radians(yaw)), np.sin(np.radians(yaw))
+        corners = [(x + c * a - s * b, y + s * a + c * b, 0.02) for a, b in ((0.53, 0.35), (0.53, -0.35), (-0.41, -0.35), (-0.41, 0.35))]
+        draw.draw_lines(corners, corners[1:] + corners[:1], [(0.1, 0.85, 1.0, 1.0)] * 4, [3.0] * 4)
+        t_end = time.time() + args.gui_hold
+        while time.time() < t_end:
+            app.update()
 
 
 # ---------------------------------------------------------------- capture
@@ -231,6 +288,8 @@ for k, pose in enumerate(poses):
     valid = np.isfinite(r_full).any(0)
     r_merged = np.nanmax(np.where(np.isfinite(r_full), r_full, -np.inf), 0)
     r_merged = np.where(valid, r_merged, np.nan)
+    if args.gui:
+        show(pose, lo, np.nan_to_num(dirs_isaac), r_merged)
     out[f"p{k}_lidar_origin"], out[f"p{k}_lidar_R"] = lo, lR
     out[f"p{k}_lidar_range"], out[f"p{k}_lidar_dirs_isaac"] = r_merged, dirs_isaac
     out[f"p{k}_lidar_range_per_scan"] = r_full.astype(np.float32)

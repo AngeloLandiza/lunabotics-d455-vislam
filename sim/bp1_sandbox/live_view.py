@@ -102,7 +102,7 @@ def cloud(header, xyz, rgb=None):
 
 # ---------------------------------------------------------------- the run (approach.trial for one sensor and dust)
 class Run:
-    def __init__(self, seed, sensor, dust_on, l_dec):
+    def __init__(self, seed, sensor, dust_on, l_dec, capture=None):
         rng = np.random.default_rng(seed)          # same draws as approach.trial(seed): arena, then start pose
         self.arena = arena = Arena(rng)
         x0, y0 = rng.uniform(0.3, 0.8), rng.uniform(0.8, 4.2)
@@ -129,6 +129,7 @@ class Run:
         self.sensor = D455Depth() if sensor == "d455" else Lidar(sensor)
         self.dust = Plume(x0 + PLUME_AHEAD * h[0], y0 + PLUME_AHEAD * h[1]) if dust_on else None
         self.l_dec = l_dec
+        self.capture = capture          # isaac_capture.py output with this run's poses: scans come from Isaac hits
 
     def classify(self, d):
         """Same truth classes as approach.trial: obstacle / near / wall / fa."""
@@ -152,7 +153,14 @@ class Run:
                 return
             s = i * DS
             robot = (self.x0 + s * h[0], self.y0 + s * h[1], self.yaw)
-            scan = self.sensor.scan(self.arena, robot, self.rng, dust=self.dust)
+            if self.capture is None:
+                scan = self.sensor.scan(self.arena, robot, self.rng, dust=self.dust)
+            else:
+                from isaac_approach import frame_of
+                from isaac_validate import isaac_d455_scan, isaac_lidar_scan
+                k = frame_of(self.capture["poses"], robot)
+                scan = (isaac_d455_scan(self.capture, k, self.sensor, self.rng, self.dust) if self.sensor_name == "d455"
+                        else isaac_lidar_scan(self.capture, k, self.arena, self.sensor, self.rng, self.dust))
             add_scan(L, scan, grid)
             g = fit_ground(L, grid)
             dp, dn = logodds_delta(scan, grid, g, logodds_zref(L, g))
@@ -356,6 +364,7 @@ class Viewer:
         n_unres = sum(FAINT <= d["evidence"] < run.l_dec for d in fr["dets"])
         hud = self.marker("hud", 0, Marker.TEXT_VIEW_FACING, color=color(1, 1, 1, 1),
                           text=f"seed {self.node.args.seed}  {run.sensor_name}  {'DUST' if run.dust else 'clear'}  "
+                               f"{'ISAAC' if run.capture is not None else 'sandbox'}  "
                                f"frame {fr['i'] + 1}/{run.n_frames}  s = {fr['s']:.2f} m{'  [PAUSED]' if paused else ''}\n"
                                f"threshold {run.l_dec:g}   confirmed {n_conf}   unresolved {n_unres}   "
                                f"dust echoes {int(fr['dust'].sum())}")
@@ -407,6 +416,10 @@ def main():
     ap.add_argument("--l-dec-d455", type=float, default=v(pr.DETECT, "l_decide_d455"))
     ap.add_argument("--paused", action="store_true", help="start paused (space resumes, n steps)")
     ap.add_argument("--loop", action="store_true", help="restart the run when it ends")
+    ap.add_argument("--source", choices=["sandbox", "isaac"], default="sandbox",
+                    help="isaac: scans are Isaac Sim hits from --capture (see run_isaac_approach.sh) + the BP-1 layer")
+    ap.add_argument("--capture", default=None, help="isaac_capture.py output for this seed's approach poses "
+                                                     "(default isaac_out/approach_seed<seed>.npz)")
     ap.add_argument("--frames", type=int, default=0, help="stop after this many frames (0 = whole run); for tests")
     args, ros_args = ap.parse_known_args()
     rclpy.init(args=[sys.argv[0]] + ros_args)
@@ -414,13 +427,19 @@ def main():
     node.args = args
     keys = Keys()
     l_dec = args.l_dec_d455 if args.sensor == "d455" else args.l_dec_lidar
+    capture = None
+    if args.source == "isaac":
+        path = args.capture or os.path.join(HERE, "isaac_out", f"approach_seed{args.seed}.npz")
+        if not os.path.exists(path):
+            sys.exit(f"{path} not found: run ./run_isaac_approach.sh --seed {args.seed} first")
+        capture = np.load(path)
     cache, shown = None, 0
     try:
         while True:
-            run = Run(args.seed, args.sensor, args.dust, l_dec)
+            run = Run(args.seed, args.sensor, args.dust, l_dec, capture)
             viewer = Viewer(node, run)
             viewer.publish_static()
-            print(f"[live] seed {args.seed} {args.sensor} {'dust' if args.dust else 'clear'}: {run.n_frames} frames, "
+            print(f"[live] seed {args.seed} {args.sensor} {'dust' if args.dust else 'clear'} {args.source}: {run.n_frames} frames, "
                   f"start ({run.x0:.2f}, {run.y0:.2f}) yaw {run.yaw:.1f} deg, threshold {l_dec:g}"
                   + ("   keys: space pause, n step, r restart, q quit" if keys.ok else ""), flush=True)
             stop = threading.Event()
