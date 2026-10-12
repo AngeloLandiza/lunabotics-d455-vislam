@@ -69,4 +69,19 @@ Side by side:
 
 ## Results
 
-Pending: see the plan doc's Step 2 tab for the latest numbers.
+Custom planners on the 100 test arenas (2026-10-12; `results/compare_v3` for `tangent`, `results/compare_v2` for
+`gcs`; Inferred, sim):
+
+| Slip | Planner | Missions complete | Legs with contact | Mission time median / 95th pct | Dumps within 5 cm, 5 deg | Plan time median / 95th pct |
+| --- | --- | --- | --- | --- | --- | --- |
+| none | tangent | 82 of 100 | 6 | 100.7 / 153.4 s | 100% | 0.35 / 4.99 s |
+| nominal | tangent | 82 of 100 | 2 | 120.8 / 179.6 s | 100% | 0.34 / 4.81 s |
+| heavy | tangent | 80 of 100 | 1 | 146.9 / 202.1 s | 100% | 0.33 / 4.75 s |
+| none | gcs | 18 of 100 | 0 | - | 100% | 2.29 / 7.47 s |
+| nominal | gcs | 19 of 100 | 0 | - | 100% | 2.17 / 6.98 s |
+| heavy | gcs | 19 of 100 | 1 | - | 100% | 2.17 / 7.19 s |
+
+Every incomplete mission stopped at its first dump leg, the crossing from the dig area to the berm. A configuration
+space check (5 cm, 5 deg) finds no way through for the body in about a third of the arenas where the first run
+failed, even at 2 cm clearance. The obstacle layout is Assumed, because Figure 9 is unreadable, so the arenas may be
+denser than the real pit. Nav2: pending, on the laptop.
