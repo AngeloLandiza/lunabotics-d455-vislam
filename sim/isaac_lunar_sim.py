@@ -1,5 +1,8 @@
 """Isaac Sim 6.0: tank-drive rover with a down-pitched RealSense D455.
 
+Robots (--robot): team = the EDT Lunabotics rover from the team URDF (sim/team_robot.py, D455 at its 2027 front
+mount; default in the arena), jackal = Clearpath Jackal with the D455 on a front mast (default on lunar terrain).
+
 Worlds (--world):
   arena   the Lunabotics Artemis Arena (2027 guidebook; sim/arena.py, sim/arena_scene.py),
           Earth gravity, indoor lighting, random obstacles and start pose per round
@@ -27,6 +30,9 @@ parser.add_argument('--headless', action='store_true')
 parser.add_argument('--world', choices=['arena', 'lunar'], default='lunar')
 parser.add_argument('--seed', type=int, default=0, help='terrain / obstacle layout / start pose')
 parser.add_argument('--start-heading', default='random', help='arena: N, E, S, W or random')
+parser.add_argument('--robot', choices=['team', 'jackal'], default=None,
+                    help='team: the EDT Lunabotics rover (sim/team_robot.py; default in the arena); '
+                         'jackal: Clearpath Jackal (default on lunar terrain)')
 parser.add_argument('--view', default='', help='viewport camera prim (arena default: overview)')
 parser.add_argument('--dig-at', type=float, default=-1.0, help='sim time (s) of the dig event; <0 = never')
 parser.add_argument('--dig-xy', type=float, nargs=2, default=[1.5, 0.8])  # lunar: beside the survey loop's first side
@@ -79,12 +85,23 @@ from terrain_tiles import TerrainTiles  # noqa: E402
 SIZE, RES = 20.0, 0.05            # lunar terrain extent / mesh spacing (m)
 CAM_RES = (640, 400)              # IR render resolution (D455 IR is 16:10)
 DEPTH_RES = (640, 400)            # same 16:10 aperture as the IR cameras
-ROVER_USD = '/Isaac/Robots/Clearpath/Jackal/jackal.usd'
+ROBOT = args.robot or ('team' if args.world == 'arena' else 'jackal')
 D455_USD = '/Isaac/Sensors/RealSense/D455/rsd455.usd'
-CAM_MOUNT = (0.30, 0.0, 0.42)     # D455 on a front mast: 5 cm ahead of the bumper, ~0.49 m up
-CAM_PITCH_DEG = 40.0              # pitched down so the rover stays out of view
-WHEEL_RADIUS, TRACK = 0.098, 0.37559
-SKID_TRACK = 1.8 * TRACK          # skid steer turns about a wider effective track (wheels scrub sideways)
+if ROBOT == 'team':
+    import team_robot  # noqa: E402
+    ROVER_USD = None                  # imported from the team URDF below (needs the URDF importer extension)
+    CAM_MOUNT = team_robot.D455_MOUNT  # 2027 front mount (sim/robot/uic_bot_2027.xacro)
+    CAM_PITCH_DEG = team_robot.D455_PITCH_DEG
+    WHEEL_RADIUS, TRACK = team_robot.WHEEL_RADIUS, team_robot.TRACK
+    SPAWN_DZ = team_robot.BASE_HEIGHT + 0.02   # base_link above the wheel bottoms, plus a 2 cm drop
+    SKID_TRACK = 1.5 * TRACK          # effective turning track: ICR factor 1.5 (sim/planner/arena2d.py, Assumed)
+else:
+    ROVER_USD = '/Isaac/Robots/Clearpath/Jackal/jackal.usd'
+    CAM_MOUNT = (0.30, 0.0, 0.42)     # D455 on a front mast: 5 cm ahead of the bumper, ~0.49 m up
+    CAM_PITCH_DEG = 40.0              # pitched down so the rover stays out of view
+    WHEEL_RADIUS, TRACK = 0.098, 0.37559
+    SPAWN_DZ = 0.08                   # base ~6.5 cm above wheel bottoms
+    SKID_TRACK = 1.8 * TRACK          # skid steer turns about a wider effective track (wheels scrub sideways)
 CACHE = os.path.expanduser('~/.cache/lunabotics_sim')
 os.makedirs(CACHE, exist_ok=True)
 
@@ -183,9 +200,12 @@ if args.world == 'lunar':
 
 # ---------------------------------------------------------------- rover + D455
 ROVER = '/World/rover'
-add_reference_to_stage(assets + ROVER_USD, ROVER)
-place(ROVER, (start_x, start_y, terrain.height_at(start_x, start_y) + 0.08),  # base ~6.5 cm above wheel bottoms
-      (0.0, 0.0, float(np.degrees(start_yaw))))
+add_reference_to_stage(team_robot.usd_path() if ROBOT == 'team' else assets + ROVER_USD, ROVER)
+ground_z = terrain.height_at(start_x, start_y) if terrain is not None else 0.0
+place(ROVER, (start_x, start_y, ground_z + SPAWN_DZ), (0.0, 0.0, float(np.degrees(start_yaw))))
+if ROBOT == 'team':
+    team_robot.fix_physics(stage, ROVER)
+print(f'[sim] robot={ROBOT} d455 mount={CAM_MOUNT} pitch={CAM_PITCH_DEG} deg', flush=True)
 app.update()
 
 
@@ -234,13 +254,13 @@ imu_xf = UsdGeom.Xformable(stage.GetPrimAtPath(IMU))
 imu_xf.ClearXformOpOrder()
 imu_xf.AddTransformOp().Set(imu_in_base)
 stage.GetPrimAtPath(asset_imu).SetActive(False)
-WHEELS = sorted(str(p.GetPath()).split('/')[-1] for p in stage.Traverse()
-                if str(p.GetPath()).startswith(ROVER) and p.IsA(UsdPhysics.RevoluteJoint)
-                and 'wheel' in p.GetName())
+WHEEL_PATHS = {str(p.GetPath()).split('/')[-1]: str(p.GetPath()) for p in stage.Traverse()
+               if str(p.GetPath()).startswith(ROVER) and p.IsA(UsdPhysics.RevoluteJoint) and 'wheel' in p.GetName()}
+WHEELS = sorted(WHEEL_PATHS)
 LEFT_WHEELS = [w for w in WHEELS if 'left' in w]
 RIGHT_WHEELS = [w for w in WHEELS if 'right' in w]
 for w in WHEELS:
-    drive = UsdPhysics.DriveAPI.Get(stage.GetPrimAtPath(f'{ROVER}/{w}'), 'angular')
+    drive = UsdPhysics.DriveAPI.Get(stage.GetPrimAtPath(WHEEL_PATHS[w]), 'angular')
     print(f'[sim] drive {w}: stiffness={drive.GetStiffnessAttr().Get()} damping={drive.GetDampingAttr().Get()} '
           f'maxForce={drive.GetMaxForceAttr().Get()}', flush=True)
 print(f'[sim] base={BASE}\n[sim] left={LEFT}\n[sim] right={RIGHT}\n[sim] depth={DEPTH}\n'
