@@ -79,7 +79,17 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'l1_sigma': pr.P(0.02, 'm', 'Inferred', 'L1 range accuracy 2.0 cm used as 1 sigma (params.LIDAR_GENERIC l1)'),
     'd455_k': pr.P(0.32 / ((848 / 2) / math.tan(math.radians(87 / 2)) * 0.095), '1/m', 'Inferred',
                    'D455 depth sigma = k z^2 (sim/realism.py: 0.32 px subpixel, 848 px, 87 deg, 95 mm baseline)'),
-    'wall_margin': pr.P(0.15, 'm', 'Assumed', 'detections centred this close to a wall are the wall (DETECT.wall_band)'),
+    'wall_margin': pr.P(0.25, 'm', 'Inferred', 'detections centred this close to the interior edge are the ducts or '
+                        'the wall (DETECT.wall_band was 0.15 m in the sandbox, which had no ducts; arena.sh seed 0 '
+                        'had false boulders along the ducts)'),
+    'pole_margin': pr.P(0.15, 'm', 'Inferred', 'detections this close to a berm range pole are the pole (sim/arena.py '
+                        'POLES; arena.sh seed 0 had false boulders at the poles)'),
+    'max_range': pr.P(4.0, 'm', 'Assumed', 'returns farther than this from the sensor are not used for hazards: '
+                      'arena.sh seed 0 had many false small boulders at 3-6.6 m (grazing L1 returns, far D455 depth with '
+                      'sigma = k z^2, about 12 cm at 4 m). The sandbox speed runs need hazards seen by about 2 m ahead'),
+    'min_radius': pr.P(0.11, 'm', 'Assumed', 'objects smaller than this are dropped: guidebook boulders are 30-40 cm, '
+                       'and detected discs come out a few cm larger than the true ones; arena.sh seed 0 false boulders '
+                       'had a median radius of 9 cm'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
     'tag_ids': pr.P((0, 1), '', 'Assumed', 'tag on the y = 0 wall, tag on the x = 0 wall'),
     'tag_xy': pr.P(((1.0, -A27.DUCT_D, 90.0), (-A27.DUCT_D, 1.0, 0.0)), 'm, m, deg facing', 'Assumed',
@@ -155,7 +165,7 @@ def make_scan(origin, P, sigma_r, sensor):
     origin = np.asarray(origin, float)
     d = P - origin
     r = np.linalg.norm(d, axis=1)
-    keep = r > 0.05
+    keep = (r > 0.05) & (r <= val('max_range'))
     P, d, r = P[keep], d[keep], r[keep]
     sigma_r = np.broadcast_to(np.asarray(sigma_r, float), keep.shape)[keep] if np.ndim(sigma_r) else \
         np.full(len(r), float(sigma_r))
@@ -231,7 +241,11 @@ class HazardMap:
                     continue
                 if math.hypot(d['x'] - cx, d['y'] - cy) < cr + val('column_margin'):
                     continue
+                if any(math.hypot(d['x'] - px, d['y'] - py) < val('pole_margin') for px, py in A27.POLES):
+                    continue
                 r = math.sqrt(d['cells'] * cell * cell / math.pi) + cell / 2
+                if r < val('min_radius'):
+                    continue
                 out.append({'kind': 'boulder' if d['kind'] == 'pos' else 'crater', 'x': d['x'], 'y': d['y'], 'r': r,
                             'evidence': d['evidence'], 'sensor': sensor})
         return merge_discs(out)
@@ -803,7 +817,10 @@ class MissionRunner:
             back = np.asarray(pose, float) - 0.05 * np.array([math.cos(pose[2]), math.sin(pose[2]), 0.0])
             gone = math.hypot(*(np.asarray(pose[:2]) - self.retreat_from))
             world = make_world(hazards)
-            if gone >= self.retreat_m or a2.clearance(world, back) < ex.CHECK_MARGIN or t - self.t_state > 6.0:
+            # back out while that does not bring the body closer to anything (it may start inside a grown hazard)
+            here = a2.clearance(world, np.asarray(pose, float))
+            if gone >= self.retreat_m or a2.clearance(world, back) < min(ex.CHECK_MARGIN, here - 0.005) \
+                    or t - self.t_state > 6.0:
                 if self._still():
                     self._go('plan', t - self.retry_s)
                 return self._cmd(0.0, 0.0, dt) + (None,)
