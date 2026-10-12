@@ -9,19 +9,24 @@
 #   run/sim/arena/arena.sh --seed 4          another round: new boulders/craters and start pose
 #   run/sim/arena/arena.sh --start-heading N start facing N/E/S/W (default: random, like the direction wheel)
 #   run/sim/arena/arena.sh --headless        no Isaac window
+#   run/sim/arena/arena.sh --robot jackal    the Clearpath Jackal instead of the EDT Lunabotics rover (team URDF)
+#   run/sim/arena/arena.sh --realism off     ideal sensors and rigid ground (default nominal: BP-1 sensor noise,
+#                                            slip, ruts and dust from sim/realism.py; heavy: worse)
+#   run/sim/arena/arena.sh --earlier-trips 6 start on a used bed with the ruts of 6 earlier drives
 #
 # Dig tool window: hold W A S D to drive (tank drive: W/S forward/back, A/D pivot, W+A/W+D
 # arc; 1 2 3 speed), left-drag digs, right-drag dumps, wheel = brush size, E cycles the SLAM
 # view (elevation / change / error vs. truth), R re-aligns, Q quits.
 set -eo pipefail
 REPO="$(dirname "$(readlink -f "$0")")/../../.."
-sim_args=(--world arena); mode=teleop; seed=0
+sim_args=(--world arena); mode=teleop; seed=0; realism=nominal
 while [ $# -gt 0 ]; do
   case "$1" in
     --survey) mode=survey ;;
     --eval) mode=eval ;;
     --teleop) mode=teleop ;;
     --seed) seed="$2"; sim_args+=(--seed "$2"); shift ;;
+    --realism) realism="$2"; sim_args+=(--realism "$2"); shift ;;
     *) sim_args+=("$1") ;;
   esac
   shift
@@ -44,6 +49,10 @@ until timeout 5 ros2 topic echo --once --no-daemon /clock rosgraph_msgs/msg/Cloc
   sleep 2
 done
 
+if [ "$realism" != off ]; then        # IMU noise: the sim publishes the ideal IMU on /sim/imu_ideal
+  python3 "$REPO/sim/imu_realism_relay.py" --ros-args -p level:="$realism" -p seed:="$seed" &
+  pids+=($!)
+fi
 ros2 launch "$REPO/lunabotics_slam/launch/lunabotics.launch.py" sim:=true \
     database_path:="$HOME/.ros/lunabotics_arena.db" terrain_file:="$HOME/.ros/lunabotics_terrain_arena.npz" &
 pids+=($!)

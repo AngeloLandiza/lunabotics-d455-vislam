@@ -15,6 +15,11 @@ Publishes what the real D455 driver does, so the SLAM stack runs unchanged (sim:
   /ground_truth/camera_pose (camera_link in the world frame, for checking SLAM)
   /arena/heightmap (true terrain, 32FC1 rows = x)   /arena/volume ([cut, fill, berm] m^3)
   /l1/points (team robot: Unitree L1 PointCloud2, frame lidar3d_link, ~10 Hz; body returns left in)
+  /wheel/odom (encoder odometry, frame wheel_odom: over-reads by 1/(1 - slip) like real encoders on loose BP-1)
+--realism nominal|heavy (default nominal; off = ideal sensors, rigid ground) adds the BP-1 layers of sim/realism.py:
+D455 depth noise / dropouts / dust and IR noise, wheel slip, ruts, dust plumes after digs, the L1 BP-1 layer, and
+IMU noise (the sim then publishes the ideal IMU on /sim/imu_ideal; sim/imu_realism_relay.py adds the noise and
+republishes /camera/imu, started by run/sim/arena/arena.sh).
 drives from /cmd_vel, and digs/dumps where told on /arena/dig ([x, y, radius, depth]).
 
 Run via run/sim/procedural/lunar_terrain.sh or run/sim/arena/arena.sh (Isaac Sim's own Python + internal ROS 2 libraries):  python sim/isaac_lunar_sim.py [--headless]
@@ -347,7 +352,8 @@ og.Controller.edit(
     ],
      keys.SET_VALUES: [
         ('read_imu.inputs:imuPrim', [Sdf.Path(IMU)]), ('read_imu.inputs:readGravity', True),
-        ('imu.inputs:topicName', '/camera/imu'), ('imu.inputs:frameId', 'camera_imu_optical_frame'),
+        ('imu.inputs:topicName', '/camera/imu' if args.realism == 'off' else '/sim/imu_ideal'),
+        ('imu.inputs:frameId', 'camera_imu_optical_frame'),
         ('imu.inputs:publishOrientation', False),
         ('twist.inputs:topicName', '/cmd_vel'),
         ('odom.inputs:chassisPrim', [Sdf.Path(BASE)]),
@@ -455,6 +461,7 @@ from geometry_msgs.msg import TransformStamped  # noqa: E402
 from rclpy.qos import DurabilityPolicy, QoSProfile  # noqa: E402
 from geometry_msgs.msg import PoseStamped  # noqa: E402
 from sensor_msgs.msg import CameraInfo, Image, PointCloud2, PointField  # noqa: E402
+from nav_msgs.msg import Odometry  # noqa: E402
 from std_msgs.msg import Float32MultiArray  # noqa: E402
 from tf2_msgs.msg import TFMessage  # noqa: E402
 
@@ -475,14 +482,23 @@ pubs = {n: (ros.create_publisher(Image, f'/camera/{n}/image_rect_raw', 5),
 frame_ids = {'infra1': 'camera_infra1_optical_frame', 'infra2': 'camera_infra2_optical_frame',
              'depth': 'camera_depth_optical_frame'}
 baseline = float(np.linalg.norm(world_frame(RIGHT)[1] - world_frame(LEFT)[1]))
-dust = None                         # realism.DustPlumes, added with the dust layer
+import realism  # noqa: E402
+dust = realism.DustPlumes(args.realism) if args.realism != 'off' else None   # plumes after each dig / dump
+d455r = realism.D455Realism(args.realism, np.random.default_rng(args.seed + 303))
+slip = realism.Slip(args.realism, np.random.default_rng(args.seed + 404))
+wheel_odom_pub = ros.create_publisher(Odometry, '/wheel/odom', 20)
+wheel_odom = np.array([start_x, start_y, start_yaw], float)   # encoder dead reckoning, starts at the true pose
+# depth-camera pixel rays in its optical frame (for the dust optical depth per pixel)
+_u, _v = np.meshgrid(np.arange(DEPTH_RES[0]) + 0.5, np.arange(DEPTH_RES[1]) + 0.5)
+_fd = UsdGeom.Camera(stage.GetPrimAtPath(DEPTH)).GetFocalLengthAttr().Get() / \
+    UsdGeom.Camera(stage.GetPrimAtPath(DEPTH)).GetHorizontalApertureAttr().Get() * DEPTH_RES[0]
+DEPTH_RAYS = np.stack([(_u - DEPTH_RES[0] / 2) / _fd, (_v - DEPTH_RES[1] / 2) / _fd, np.ones_like(_u)], -1).reshape(-1, 3)
 
 # Wheel ruts (arena, team robot): realism.Ruts presses each wheel's 0.1 m patch into the bed to the Bekker static
 # sinkage of the 74.1 kg rover on 4 wheels of 0.3302 m (about 3.2 cm, lunar-soil values), with side berms, whenever a
 # wheel has moved 2 cm; touched tiles are re-meshed (render and collision), so the rover sits in its own tracks.
 ruts = None
 if args.world == 'arena' and ROBOT == 'team':
-    import realism  # noqa: E402
     WHEEL_XY = [(0.275, 0.27), (0.275, -0.27), (-0.18, 0.27), (-0.18, -0.27)]     # xacro wheel joints
     RUT_DEPTH = realism.rut_depth(65.0 + 4 * 2.27, 4, 0.1, 2 * WHEEL_RADIUS)
     ruts = realism.Ruts(args.realism, xs, ys, H0, RUT_DEPTH, 0.1, WHEEL_XY)
@@ -545,6 +561,27 @@ def ground_normals(P):
     gy = (H[i, j + 1] - H[i, j - 1]) / (ys[2] - ys[0])
     n = np.stack([-gx, -gy, np.ones_like(gx)], -1)
     return n / np.linalg.norm(n, axis=1, keepdims=True), np.abs(P[:, 2] - H[i, j]) < 0.03
+
+
+def publish_wheel_odom(stamp):
+    """Encoder odometry: mean measured wheel speed per side / (1 - slip), integrated with the calibrated effective
+    track (SKID_TRACK) over this camera frame."""
+    qd = np.asarray(rover.get_joint_velocities(), float)
+    s_ = slip.ratio(world.current_time)
+    vl = float(np.mean(qd[left_idx])) * WHEEL_RADIUS / (1 - s_)
+    vr = float(np.mean(qd[right_idx])) * WHEEL_RADIUS / (1 - s_)
+    v_, w_ = (vl + vr) / 2, (vr - vl) / SKID_TRACK
+    dt = SUBSTEPS / 200.0
+    wheel_odom[2] += w_ * dt / 2
+    wheel_odom[0] += v_ * dt * np.cos(wheel_odom[2])
+    wheel_odom[1] += v_ * dt * np.sin(wheel_odom[2])
+    wheel_odom[2] += w_ * dt / 2
+    msg = Odometry()
+    msg.header.stamp, msg.header.frame_id, msg.child_frame_id = stamp, 'wheel_odom', 'base_link'
+    msg.pose.pose.position.x, msg.pose.pose.position.y = float(wheel_odom[0]), float(wheel_odom[1])
+    msg.pose.pose.orientation.z, msg.pose.pose.orientation.w = float(np.sin(wheel_odom[2] / 2)), float(np.cos(wheel_odom[2] / 2))
+    msg.twist.twist.linear.x, msg.twist.twist.angular.z = v_, w_
+    wheel_odom_pub.publish(msg)
 
 
 def publish_lidar(stamp):
@@ -648,6 +685,8 @@ def apply_digs(requests):
     """Edit the terrain: [x, y, radius, depth] (+depth digs, -depth dumps); re-mesh touched tiles."""
     lo, hi = [10 ** 9, 10 ** 9], [-1, -1]
     for x, y, r, d in requests:
+        if dust is not None:
+            dust.add(x, y, world.current_time)        # a plume over every dig and dump
         (i0, i1, j0, j1), moved = A.dig(H, xs, ys, x, y, max(r, 0.03), d)
         lo, hi = [min(lo[0], i0), min(lo[1], j0)], [max(hi[0], i1), max(hi[1], j1)]
     tiles = terrain.update(lo[0], hi[0], lo[1], hi[1])
@@ -685,12 +724,20 @@ def publish_cameras(t):
         if name == 'depth':
             depth = np.nan_to_num(np.asarray(data, np.float32), nan=0.0, posinf=0.0)
             depth[depth > 20.0] = 0.0
+            if args.realism != 'off':
+                tau = None
+                if dust is not None and dust.active(t):
+                    R_d, p_d = camera_axes(DEPTH, optical=True)
+                    norm = np.linalg.norm(DEPTH_RAYS, axis=1)
+                    tau = dust.optical_depth(p_d, (DEPTH_RAYS / norm[:, None]) @ R_d.T,
+                                             depth.reshape(-1) * norm, t).reshape(depth.shape)
+                depth = d455r.depth(depth, tau)
             msg.height, msg.width = depth.shape
             msg.encoding, msg.step = '32FC1', depth.shape[1] * 4
             msg.data = array.array('B', depth.tobytes())  # array: rclpy's fast path (bytes are checked per element)
         else:  # D455 IR cameras are monochrome (Y8)
             rgb = np.asarray(data)[..., :3].astype(np.float32)
-            mono = (rgb @ np.array([0.299, 0.587, 0.114], np.float32)).astype(np.uint8)
+            mono = d455r.ir((rgb @ np.array([0.299, 0.587, 0.114], np.float32)).astype(np.uint8))
             msg.height, msg.width = mono.shape
             msg.encoding, msg.step = 'mono8', mono.shape[1]
             msg.data = array.array('B', mono.tobytes())
@@ -714,8 +761,12 @@ while app.is_running():
     yaw_i = float(np.clip(yaw_i + (w - w_meas) * SUBSTEPS * 0.005, -1.5, 1.5)) if abs(w) > 1e-3 else 0.0
     w_cmd = w + 0.4 * (w - w_meas) + 1.0 * yaw_i if abs(w) > 1e-3 else 0.0
     wl, wr = (v - w_cmd * SKID_TRACK / 2) / WHEEL_RADIUS, (v + w_cmd * SKID_TRACK / 2) / WHEEL_RADIUS
-    rover.apply_action(ArticulationAction(joint_velocities=np.array([wl] * len(left_idx) + [wr] * len(right_idx)),
-                                          joint_indices=np.array(left_idx + right_idx)))
+    # Slip (realism.Slip): on loose BP-1 the body moves (1 - s) of the wheel surface speed. The rigid physics wheels
+    # are driven at (1 - s) of the command, and the encoders report the command-level speed, so odometry over-reads.
+    s_slip = slip.ratio(world.current_time)
+    rover.apply_action(ArticulationAction(
+        joint_velocities=np.array([wl * (1 - s_slip)] * len(left_idx) + [wr * (1 - s_slip)] * len(right_idx)),
+        joint_indices=np.array(left_idx + right_idx)))
     t0 = time.perf_counter()
     for _ in range(SUBSTEPS - 1):
         world.step(render=False)  # 200 Hz physics + IMU between camera frames
@@ -728,6 +779,7 @@ while app.is_running():
     now = world.current_time
     stamp = Time(sec=int(now), nanosec=int((now % 1) * 1e9))
     publish_gt_camera(stamp)
+    publish_wheel_odom(stamp)
     if ruts is not None and ruts.on:
         pos, q = rover.get_world_pose()
         Rb = quat_wxyz_to_R(np.asarray(q, float))
