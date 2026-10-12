@@ -4,6 +4,10 @@
 #
 #   run/sim/arena/arena.sh                   arena + SLAM + dig tool; drive with W A S D in the dig tool window
 #   run/sim/arena/arena.sh --survey          the rover drives survey loops on its own instead
+#   run/sim/arena/arena.sh --autonomy        autonomous run (lunabotics_slam/launch/autonomy.launch.py): start-tag
+#                                            fix, wall-matching localizer, BP-1 hazard detector, dig -> dump cycles;
+#                                            RViz shows hazards, the route and estimated vs true pose
+#                                            (--truth-pose: detector and planner use the sim's true pose)
 #   run/sim/arena/arena.sh --eval --headless check SLAM against ground truth: survey lap, dig + dump,
 #                                            second lap, then pose / map / volume errors (sim/arena_eval.py)
 #   run/sim/arena/arena.sh --seed 4          another round: new boulders/craters and start pose
@@ -21,10 +25,12 @@
 # view (elevation / change / error vs. truth), R re-aligns, Q quits.
 set -eo pipefail
 REPO="$(dirname "$(readlink -f "$0")")/../../.."
-sim_args=(--world arena); mode=teleop; seed=0; realism=nominal
+sim_args=(--world arena); mode=teleop; seed=0; realism=nominal; auto_args=()
 while [ $# -gt 0 ]; do
   case "$1" in
     --survey) mode=survey ;;
+    --autonomy) mode=autonomy ;;
+    --truth-pose) auto_args+=(pose_topic:=/ground_truth/base_pose) ;;
     --eval) mode=eval ;;
     --teleop) mode=teleop ;;
     --seed) seed="$2"; sim_args+=(--seed "$2"); shift ;;
@@ -66,6 +72,12 @@ dig_tool=(python3 "$REPO/sim/dig_tool.py" --ros-args -p use_sim_time:=true -p se
 if [ "$mode" = teleop ]; then
   echo "[arena] 'Arena Dig Tool' window: click it, hold W A S D to drive, mouse to dig, Q to quit"
   "${dig_tool[@]}" -p drive:=true                  # closing the window ends the run
+elif [ "$mode" = autonomy ]; then
+  "${dig_tool[@]}" &
+  pids+=($!)
+  ros2 launch "$REPO/lunabotics_slam/launch/autonomy.launch.py" sim:=true seed:="$seed" "${auto_args[@]}" &
+  pids+=($!)
+  wait "${pids[0]}"
 else
   "${dig_tool[@]}" &
   pids+=($!)

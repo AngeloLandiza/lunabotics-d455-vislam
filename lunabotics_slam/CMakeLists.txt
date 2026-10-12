@@ -12,6 +12,10 @@ install(PROGRAMS
   scripts/obstacle_segmenter.py
   scripts/terrain_mapper.py
   scripts/vislam_viewer.py
+  scripts/arena_localizer.py
+  scripts/hazard_detector.py
+  scripts/mission_runner.py
+  scripts/start_tags.py
   DESTINATION share/${PROJECT_NAME}/scripts)
 # Also as `ros2 run lunabotics_slam <script>.py`
 install(PROGRAMS
@@ -19,6 +23,14 @@ install(PROGRAMS
   scripts/obstacle_segmenter.py
   scripts/terrain_mapper.py
   scripts/vislam_viewer.py
+  scripts/arena_localizer.py
+  scripts/hazard_detector.py
+  scripts/mission_runner.py
+  scripts/start_tags.py
   DESTINATION lib/${PROJECT_NAME})
+
+# Modules the autonomy nodes import (they also need the repo's sim/ folder: set LUNABOTICS_REPO when installed)
+install(FILES scripts/autonomy_core.py scripts/autonomy_ros.py DESTINATION share/${PROJECT_NAME}/scripts)
+install(FILES scripts/autonomy_core.py scripts/autonomy_ros.py DESTINATION lib/${PROJECT_NAME})
 
 ament_package()
