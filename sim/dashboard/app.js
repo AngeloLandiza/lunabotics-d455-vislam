@@ -350,6 +350,7 @@
     live: { load: loadLive, render: renderLive, every: 2000 },
     runs: { load: loadRuns, render: renderRuns, every: 5000 },
     results: { load: loadResults, render: renderResults, every: 30000 },
+    planner: { load: loadPlanner, render: renderPlanner, every: 30000 },
     params: { load: loadParams, render: renderParams, every: 60000 },
     research: { load: loadResearch, render: renderResearch, every: 60000 },
   };
@@ -933,6 +934,141 @@
         el("td", { class: "num", text: dur(it.content.seconds) })))))));
     card.append(el("p", { class: "source", text: "Source: the file in the first column (only its counts are read; the records themselves are skipped)." }));
     return card;
+  }
+
+  // ------------------------------------------------------------------------------------------------------------
+  // Planner benchmarks
+  // ------------------------------------------------------------------------------------------------------------
+  async function loadPlanner() {
+    let r;
+    try {
+      r = await getJSON("/api/planner");
+    } catch (e) {
+      if (e instanceof ApiError) $("#planner-body").replaceChildren(errorBox(e));
+      throw e;
+    }
+    $("#planner-sub").textContent = `${r.data.items.length} results · checked ${clock(r.data.time)}`;
+    if (r.text === state.texts.planner) return;
+    state.texts.planner = r.text;
+    state.planner = r.data;
+    renderPlanner();
+  }
+
+  function renderPlanner() {
+    const data = state.planner;
+    if (!data) return;
+    const body = $("#planner-body");
+    body.replaceChildren();
+    if (!data.items.length) {
+      body.append(el("div", { class: "empty" }, "No planner results found. Run compare.py or nav2 benchmarks."));
+      return;
+    }
+    // Group items by (planner, slip) for summary table
+    const by_key = {};
+    const errors = [];
+    for (const it of data.items) {
+      if (it.error) {
+        errors.push(it);
+        continue;
+      }
+      const key = `${it.planner}|${it.slip}`;
+      if (!by_key[key]) by_key[key] = [];
+      by_key[key].push(it);
+    }
+    // Sort by mtime descending (newest first)
+    const sorted_keys = Object.keys(by_key).sort((a, b) => {
+      const mt_a = Math.max(...by_key[a].map((x) => x.mtime));
+      const mt_b = Math.max(...by_key[b].map((x) => x.mtime));
+      return mt_b - mt_a;
+    });
+    // Summary table
+    const card = el("div", { class: "card" });
+    body.append(card);
+    card.append(el("div", { class: "section-head" }, el("h3", { text: "Benchmark summary by planner and slip level" })));
+    const summ_rows = [];
+    for (const key of sorted_keys) {
+      const items_for_key = by_key[key];
+      const it = items_for_key[0];  // Use the newest item for this key
+      summ_rows.push({
+        planner: it.planner,
+        slip: it.slip,
+        missions: it.missions,
+        complete: it.complete,
+        time_med: it.mission_time_median,
+        time_p95: it.mission_time_p95,
+        contact: it.legs_with_contact,
+        type: it.type,
+        items: items_for_key
+      });
+    }
+    card.append(el("div", { class: "table-wrap" }, el("table", null,
+      el("thead", null,
+        el("tr", null,
+          el("th", { text: "Planner" }),
+          el("th", { text: "Slip" }),
+          el("th", { class: "num", text: "Missions" }),
+          el("th", { class: "num", text: "Complete" }),
+          el("th", { class: "num", text: "Success %" }),
+          el("th", { class: "num", text: "Median time (s)" }),
+          el("th", { class: "num", text: "95th pct time (s)" }),
+          el("th", { class: "num", text: "Legs with contact" }))),
+      el("tbody", null, summ_rows.map((r) =>
+        el("tr", { class: "clickable", tabindex: "0", onclick: (e) => {
+          const row = e.currentTarget;
+          const detail = row.nextElementSibling;
+          if (detail && detail.classList.contains("detail-row")) {
+            detail.hidden = !detail.hidden;
+          }
+        }},
+          el("td", { text: r.planner }),
+          el("td", { text: r.slip }),
+          el("td", { class: "num", text: r.missions }),
+          el("td", { class: "num", text: r.complete }),
+          el("td", { class: "num", text: r.complete && r.missions ? pct(r.complete / r.missions, 0) : DASH }),
+          el("td", { class: "num", text: fmt(r.time_med, 1) }),
+          el("td", { class: "num", text: fmt(r.time_p95, 1) }),
+          el("td", { class: "num", text: r.contact ?? DASH }))
+      ))));
+    // Detail rows for each group (per file, per run)
+    for (const row_obj of summ_rows) {
+      for (const it of row_obj.items) {
+        const detail_row = el("tr", { class: "detail-row", hidden: true });
+        const detail_cell = el("td", { colspan: "8" });
+        detail_row.append(detail_cell);
+        const detail_card = el("div", { class: "card" });
+        detail_cell.append(detail_card);
+        detail_card.append(el("div", { class: "section-head" },
+          el("h4", { text: `${it.path}` }),
+          el("span", { class: "sub", text: `Modified ${when(it.mtime)}` })));
+        // Per-run table for nav2 (or show summary fields for summary.json)
+        if (it.type === "nav2" && it.runs && it.runs.length) {
+          detail_card.append(el("p", { text: `Live runs: ${it.runs.length}` }));
+          detail_card.append(el("div", { class: "table-wrap" }, el("table", null,
+            el("thead", null,
+              el("tr", null,
+                el("th", { text: "Seed" }),
+                el("th", { class: "num", text: "Complete" }),
+                el("th", { class: "num", text: "Time (s)" }),
+                el("th", { class: "num", text: "Legs" }))),
+            el("tbody", null, it.runs.map((run) =>
+              el("tr", null,
+                el("td", { text: run.seed }),
+                el("td", { text: run.complete ? "Yes" : "No", class: run.complete ? "" : "bad" }),
+                el("td", { class: "num", text: fmt(run.time, 1) }),
+                el("td", { class: "num", text: run.legs ? run.legs.length : 0 })))))))
+        } else {
+          detail_card.append(el("dl", null,
+            it.plan_s_median !== null ? [el("dt", { text: "Plan time median (s)" }), el("dd", { class: "num", text: fmt(it.plan_s_median, 2) })] : [],
+            it.plan_s_p95 !== null ? [el("dt", { text: "Plan time 95th pct (s)" }), el("dd", { class: "num", text: fmt(it.plan_s_p95, 2) })] : [],
+            it.dump_on_target !== null ? [el("dt", { text: "Dumps on target" }), el("dd", { class: "num", text: pct(it.dump_on_target) })] : []));
+        }
+        body.append(detail_row);
+      }
+    }
+    if (errors.length) {
+      body.append(el("div", { class: "card" }, el("h3", { text: "Files that could not be read" }),
+        el("ul", null, errors.map((x) => el("li", null, code(x.path), ` — ${x.error}`)))));
+    }
   }
 
   // ------------------------------------------------------------------------------------------------------------

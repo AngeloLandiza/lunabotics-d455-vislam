@@ -77,6 +77,7 @@ All endpoints return JSON. Any failure returns `{"error": "..."}` with HTTP 500 
 | `/api/results` | `items`: `path` (relative to the repo), `type`, `mtime`, `size`, `content`. Roots: folders named `results*` in `sim/bp1_sandbox` and `sim/bp1_sandbox/summaries`, searched 3 levels deep. `records.json` keeps only `n_trials`, `seed0`, `seconds`; `approaches.json` only its `meta` (read from the start of the file); results are cached by path and modification time |
 | `/api/params` | `tables` (each entry: `name`, `value`, `unit`, `status`, `source`), `counts` per status, `total`. `params.py` is re-imported when it changes. Plain-dict tables (such as `LIDAR_PROFILES`) are handled if `all_tables()` ever includes them |
 | `/api/research` | the contents of `research_index.json`, or an empty structure if it is missing |
+| `/api/planner` | `items`: planner benchmark results, one item per (file, planner, slip) combination. Read fresh on every request from `sim/planner/results/compare_v*/summary.json` (summary statistics) and `sim/planner/results/nav2/*.json` (live nav2 runs); skips files with JSON decode errors. Each item: `path`, `mtime`, `type` (summary or nav2), `planner`, `slip`, `missions`, `complete`, `legs_with_contact`, `mission_time_median`, `mission_time_p95`, `plan_s_median`, `plan_s_p95`, `dump_on_target` (null for nav2 on some fields), `runs` (array with seed/slip/complete/time and legs detail for nav2 files) |
 
 ## Refreshing the copies in the repo
 

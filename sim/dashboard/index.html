@@ -20,6 +20,7 @@
       <a href="#live" data-tab="live">Live</a>
       <a href="#runs" data-tab="runs">Runs</a>
       <a href="#results" data-tab="results">Results</a>
+      <a href="#planner" data-tab="planner">Planner</a>
       <a href="#params" data-tab="params">Parameters</a>
       <a href="#research" data-tab="research">Research</a>
     </nav>
@@ -67,6 +68,14 @@
       <p class="lead">Result files found in <code>sim/bp1_sandbox/results*</code> and <code>sim/bp1_sandbox/summaries</code>. The file each table and chart comes from is shown under it. Refreshes every 30 s.</p>
     </div>
     <div id="results-body"></div>
+  </section>
+
+  <section id="tab-planner" class="tab" hidden aria-labelledby="h-planner">
+    <div>
+      <div class="section-head"><h2 id="h-planner">Planner benchmarks</h2><span class="sub" id="planner-sub"></span></div>
+      <p class="lead">Head-to-head benchmark results from <code>sim/planner/results/compare_v*/summary.json</code> (custom planners) and <code>sim/planner/results/nav2/*.json</code> (Nav2 live runs). Grouped by planner and slip level, newest first. Refreshes every 30 s.</p>
+    </div>
+    <div id="planner-body"></div>
   </section>
 
   <section id="tab-params" class="tab" hidden aria-labelledby="h-params">

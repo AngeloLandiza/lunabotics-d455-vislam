@@ -528,10 +528,133 @@ def api_research():
 
 
 # ---------------------------------------------------------------------------------------------------------------
+# /api/planner
+# ---------------------------------------------------------------------------------------------------------------
+def api_planner():
+    """Planner head-to-head benchmark results. Reads summary.json and nav2/*.json files fresh."""
+    import numpy as np
+    planner_root = os.path.join(REPO, "sim", "planner", "results")
+    items = []
+
+    if not os.path.isdir(planner_root):
+        return {"root": rel(planner_root), "time": time.time(), "items": items}
+
+    # Find all summary.json files (from compare.py) and nav2/*.json files (Nav2 live runs)
+    summary_files = []
+    nav2_files = []
+
+    for dirpath, dirnames, filenames in os.walk(planner_root):
+        dirnames[:] = sorted(d for d in dirnames if not d.startswith(".") and d != "__pycache__")
+        for name in sorted(filenames):
+            if name == "summary.json":
+                summary_files.append(os.path.join(dirpath, name))
+            elif name.endswith(".json") and "nav2" in dirpath:
+                nav2_files.append(os.path.join(dirpath, name))
+
+    # Process summary.json files (these have computed summaries for custom planners)
+    for path in summary_files:
+        try:
+            st = os.stat(path)
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, IOError, OSError) as e:
+            items.append({"path": rel(path), "error": f"Could not read: {type(e).__name__}"})
+            continue
+
+        summary = data.get("summary", [])
+        meta = data.get("meta", {})
+
+        # Each summary item is a row: {slip, planner, missions, complete, legs_with_contact, mission_time_median, mission_time_p95, ...}
+        for row in summary:
+            items.append({
+                "path": rel(path),
+                "mtime": st.st_mtime,
+                "type": "summary",
+                "planner": row.get("planner", "unknown"),
+                "slip": row.get("slip"),
+                "missions": row.get("missions"),
+                "complete": row.get("complete"),
+                "legs_with_contact": row.get("legs_with_contact"),
+                "mission_time_median": row.get("mission_time_median"),
+                "mission_time_p95": row.get("mission_time_p95"),
+                "plan_s_median": row.get("plan_s_median"),
+                "plan_s_p95": row.get("plan_s_p95"),
+                "dump_on_target": row.get("dump_on_target"),
+            })
+
+    # Process nav2 files (live runs that grow over time)
+    for path in nav2_files:
+        try:
+            st = os.stat(path)
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+        except (json.JSONDecodeError, IOError, OSError) as e:
+            items.append({"path": rel(path), "error": f"Could not read: {type(e).__name__}"})
+            continue
+
+        runs = data.get("runs", [])
+        meta = data.get("meta", {})
+        planner_label = meta.get("label", "nav2_unknown")
+
+        # Group runs by slip level and compute stats
+        by_slip = {}
+        for r in runs:
+            slip = r.get("slip")
+            if slip not in by_slip:
+                by_slip[slip] = []
+            by_slip[slip].append(r)
+
+        # Compute statistics for each slip level
+        for slip, slip_runs in by_slip.items():
+            missions = len(slip_runs)
+            complete_runs = [r for r in slip_runs if r.get("complete", False)]
+            n_complete = len(complete_runs)
+
+            # Compute legs with contact
+            legs_with_contact = 0
+            for r in slip_runs:
+                for leg in r.get("legs", []):
+                    if leg.get("contact_s", 0) > 0:
+                        legs_with_contact += 1
+
+            # Compute mission time stats for complete runs using numpy percentile
+            complete_times = [r.get("time", 0) for r in complete_runs if isinstance(r.get("time"), (int, float))]
+            mission_time_median = None
+            mission_time_p95 = None
+            if complete_times:
+                mission_time_median = float(np.median(complete_times))
+                mission_time_p95 = float(np.percentile(complete_times, 95))
+
+            items.append({
+                "path": rel(path),
+                "mtime": st.st_mtime,
+                "type": "nav2",
+                "planner": planner_label,
+                "slip": slip,
+                "missions": missions,
+                "complete": n_complete,
+                "legs_with_contact": legs_with_contact,
+                "mission_time_median": mission_time_median,
+                "mission_time_p95": mission_time_p95,
+                "plan_s_median": None,
+                "plan_s_p95": None,
+                "dump_on_target": None,
+                "runs": [{"seed": r.get("seed"), "slip": r.get("slip"), "complete": r.get("complete"),
+                          "time": r.get("time"), "legs": [{"k": l.get("k"), "status": l.get("status"),
+                                                           "time": l.get("time"), "e_xy": l.get("e_xy"),
+                                                           "e_yaw": l.get("e_yaw"), "cmd_hz": l.get("cmd_hz")}
+                                                         for l in r.get("legs", [])]}
+                         for r in slip_runs]
+            })
+
+    return {"root": rel(planner_root), "time": time.time(), "items": items}
+
+
+# ---------------------------------------------------------------------------------------------------------------
 # HTTP
 # ---------------------------------------------------------------------------------------------------------------
 ROUTES = {"/api/system": api_system, "/api/runs": api_runs, "/api/results": api_results,
-          "/api/params": api_params, "/api/research": api_research}
+          "/api/params": api_params, "/api/research": api_research, "/api/planner": api_planner}
 
 
 class Handler(BaseHTTPRequestHandler):
