@@ -39,6 +39,7 @@ python3 isaac_bridge.py 1          # usd/arena_seed1.usda + truth.json for Isaac
 - `isaac_approach.py`, `run_isaac_approach.sh`: approach runs on Isaac Sim hits next to the sandbox (section "Approach runs on Isaac Sim hits"). `isaac_selfmask.py`, `run_isaac_selfmask.sh`: the robot's self-occlusion in Isaac Sim. Small results go to `results_isaac/`.
 - `live_view.py`, `live_view.rviz`, `run_live.sh`: live RViz2 view of one approach run (section "Live view").
 - `robustness.py`: floor roughness, floor waves, attitude error and the local ground fit, scored at the speeds that passed (section "Floor and tilt cases"). Output goes to `results_rob/`, which is not committed.
+- `localize.py`: L1 localization against the arena walls for each mount (same section).
 - `robot.py`, `selfmask.py`, `ruts.py`, `selfmask_eval.py`, `run_selfmask.sh`: the team robot from its URDF, the L1 self-mask, wheel ruts and their 48-arena cases (section "Team robot, Unitree L1, self-mask and ruts"). Output goes to `results_selfmask/`, which is not committed; `summaries/` keeps the small result files.
 - `refs/guidebook2027/`: guidebook 2027 Figure 7 (BP-1 laser reflectivity photos) and `measure_fig7.py`, which reads BP-1's laser-line brightness against the target patches.
 - `telemetry.py`: progress lines for the dashboard in `sim/dashboard/` (`python3 sim/dashboard/server.py`, then http://127.0.0.1:8765/).
@@ -204,6 +205,15 @@ The L1 at its real mount confirms hazards late: few of its points land on the co
 Each rear cell uses records with that speed's points per frame (`l1_table_f0.6`, `_f0.3`, `_f0.15`) and a threshold tuned at that speed on seeds 3000-3023 (`speed_gate.py --tune-speed`). The front row uses the 1.0 m/s records (`l1_front45_f0.15`) at every speed, so its slower cells are conservative.
 
 The D455 at its front mount misses 0 of 45 up to 0.75 m/s and 1 of 45 at 1.0 m/s (clear air, `both_noruts`). At the real mount the L1 cannot be the forward hazard sensor above walking pace; the D455 has to carry that, or the L1 moves forward and tilts down, at the cost of its rear view for localization (Inferred).
+
+That rear view is tested in `localize.py` (`python3 localize.py results_selfmask/localize`, about 4 min on 4 cores): the robot stands at 240 random free poses in 12 arenas (seeds 3000-3011), the L1 scans with the table mask, and returns 0.30-1.10 m above the floor are matched to the four walls only (column and obstacles left out of the map) by robust point-to-line ICP in x, y and yaw, from a start guess off by odometry-like errors (15 cm, 5 deg sigma) or a bad guess (40 cm, 15 deg). Localized means within 5 cm and 2 deg.
+
+| L1 mount | Localized, normal guess | Localized, bad guess (1 s scan) | Wall points per 1 s scan | Points holding the weakest direction, 1 s (median / 5th pct) |
+| --- | --- | --- | --- | --- |
+| Rear top (the team's) | 240 of 240 | 88% | 4,247 | 1,588 / 986 |
+| Front top, 45 deg down | 239 of 240 | 79% | 3,348 | 672 / 262 |
+
+Both mounts fit the walls to under 1 cm when the guess is normal (the 0.7 cm median is the sandbox's wall edge on its 1 cm grid, the same for both). The front mount sees about a fifth fewer wall points and, facing a nearby wall, little of the side walls, so its weakest direction is held by about 2.4 times fewer points and its fit fails more often from a bad guess. The bad-guess failures start about 0.8-0.9 m off and lock onto the wrong wall; that needs a global fix (fiducials, the start zone, or a correlative matcher) with either mount (Inferred).
 
 ## Parameter status
 

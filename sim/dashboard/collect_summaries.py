@@ -3,7 +3,7 @@
 
     python3 sim/dashboard/collect_summaries.py [--src /mnt/project-files/step2/bp1_sandbox] [--dry-run]
 
-Copies robustness.json/.md, speed_gate.json/.md, selfmask_eval.json/.md, all96_summary.json, tables.md and *.png under 400 KB from the
+Copies robustness.json/.md, speed_gate.json/.md, selfmask_eval.json/.md, localize.json/.md, all96_summary.json, tables.md and *.png under 400 KB from the
 results root into <repo>/sim/bp1_sandbox/summaries/<same relative path>/. For each approaches.json (several MB)
 it writes only its "meta" object, as approaches_meta.json ({"meta": {...}}). Anything over 1 MB is skipped.
 The source folder is only read. Files whose size and modification time already match are left alone.
@@ -21,7 +21,7 @@ REPO = os.path.dirname(os.path.dirname(DASH))
 DEFAULT_SRC = "/mnt/project-files/step2/bp1_sandbox"
 DEFAULT_DEST = os.path.join(REPO, "sim", "bp1_sandbox", "summaries")
 NAMES = {"robustness.json", "robustness.md", "speed_gate.json", "speed_gate.md", "all96_summary.json", "tables.md",
-         "selfmask_eval.json", "selfmask_eval.md"}
+         "selfmask_eval.json", "selfmask_eval.md", "localize.json", "localize.md"}
 PNG_MAX = 400 * 1024
 FILE_MAX = 1024 * 1024
 SKIP_DIRS = {"__pycache__", "usd", "tests", ".git"}
