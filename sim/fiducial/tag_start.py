@@ -42,6 +42,10 @@ PARAMS = {
     "corner_noise": P(0.5, "px", "Assumed", "1-sigma corner error after sub-pixel refinement; not measured on BP-1 light"),
     "min_side_px": P(20.0, "px", "Assumed", "smallest tag edge in pixels a tag36h11 detector decodes reliably"),
     "max_view_angle": P(70.0, "deg", "Assumed", "largest angle between the tag normal and the line of sight that decodes"),
+    "margin": P(1.125, "x tag edge", "Inferred",
+                "at least half of the one-cell white border must be in the image too: in the Isaac renders "
+                "(isaac_tags_v1, 50 poses) the detector missed 2 tags whose black square was in frame but whose border "
+                "was cut; 1.0625-1.125 matches the detector on every tag, 1.25 is too strict by one"),
     "placement_err": P((0.005, 1.0), "m, deg", "Assumed", "how well a taped or clamped tag's pose is known after setup"),
     "body_radius": P(0.66, "m", "Verified", "circumscribed radius of the 1.0 x 0.7 m body about base_link"),
 }
@@ -135,7 +139,11 @@ def visible(corners, normal, R_wc, t_wc, rng):
     if view > v("max_view_angle"):
         return None
     uv = (pc @ K.T)[:, :2] / pc[:, 2:3]
-    if np.any(uv < 0) or np.any(uv[:, 0] >= W_PX) or np.any(uv[:, 1] >= H_PX):
+    pm = (centre + (corners - centre) * v("margin") - t_wc) @ R_wc       # corners of the white border
+    if np.any(pm[:, 2] < 0.1):
+        return None
+    um = (pm @ K.T)[:, :2] / pm[:, 2:3]
+    if np.any(um < 0) or np.any(um[:, 0] >= W_PX) or np.any(um[:, 1] >= H_PX):
         return None
     side = min(np.linalg.norm(uv[i] - uv[(i + 1) % 4]) for i in range(4))
     if side < v("min_side_px"):

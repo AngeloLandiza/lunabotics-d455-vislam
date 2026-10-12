@@ -72,8 +72,13 @@ Pose: `tag_start.solve()`. `isaac_tags_eval.py` also runs tag_start's model on t
 2. **The error budget is the tag map, not the camera.** With the exact map, 0.6 cm median; the assumed 5 mm / 1 deg
    placement error brings it to 1.5 cm. Measuring where the tags really are after setup is what matters.
 3. **Two detections the model expected were missed**, both with the tag at the image edge: the black square was in
-   frame but its white margin was cut off, which the detector needs. The model's visibility test should require the
-   margin (about 1.25 x the tag edge) in the image; it overstates "seen at start heading" by about 4 points here.
+   frame but its white margin was cut off, which the detector needs. `tag_start.visible()` now also requires the
+   border out to `margin` = 1.125 x the tag edge (half the white cell) in the image; with it the model and the Isaac
+   detector agree on every tag in all 50 poses (1.0 misses 2, 1.25 rejects one the detector decodes). Rerun with the
+   margin: `results/sweep_v2/table.md`. The chosen setup barely moves (two_perpendicular, 2.0 rad, 15 deg down,
+   0.3 m: seen at start heading 34% (was 35%), never seen 0%, turn median 20 deg, xy 1.7 cm median [1.5, 1.8] and
+   5.8 cm p95 (was 1.6 / 5.2), no heading flips); setups with tags near the image edge (narrow lens, tags 0.6-0.9 m
+   high) lose more coverage. The Results section above still quotes sweep_v1.
 4. **The URDF camera (1.2 rad, 15 deg up) sees no tag from any pose or heading**, as the model predicted.
 
 The 50-pose sample is small (the turn median of 35 deg against the model's 20 deg on 1500 poses is this sample's draw:

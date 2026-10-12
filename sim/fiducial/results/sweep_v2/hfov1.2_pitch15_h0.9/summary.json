@@ -1,0 +1,233 @@
+{
+ "params": {
+  "start_zone": {
+   "value": [
+    0.0,
+    2.0,
+    0.0,
+    2.0
+   ],
+   "unit": "m (x0,x1,y0,y1)",
+   "status": "Assumed",
+   "source": "zone size is in the unreadable Figure 9; same as the BP-1 sandbox (bp1_sandbox/params.py)"
+  },
+  "walls": {
+   "value": "x = 0 and y = 0",
+   "unit": "",
+   "status": "Inferred",
+   "source": "the zone is in the arena corner (11.2), so its two bin-frame sides are the walls meeting there"
+  },
+  "tag_size": {
+   "value": 0.16,
+   "unit": "m",
+   "status": "Assumed",
+   "source": "black-square edge of a tag36h11 tag; team's tag family and size are open"
+  },
+  "tag_height": {
+   "value": 0.9,
+   "unit": "m",
+   "status": "Assumed",
+   "source": "tag centre above the regolith on the bin frame"
+  },
+  "cam_mount": {
+   "value": [
+    -0.42,
+    0.0,
+    0.37,
+    15.0
+   ],
+   "unit": "m, m, m, deg up",
+   "status": "Assumed",
+   "source": "what-if pitch 15.0 deg (xacro: 15)"
+  },
+  "base_height": {
+   "value": 0.2651,
+   "unit": "m",
+   "status": "Verified",
+   "source": "base_link height above ground (team URDF)"
+  },
+  "image": {
+   "value": [
+    1280,
+    720
+   ],
+   "unit": "px",
+   "status": "Verified",
+   "source": "rear_cam sensor in the xacro"
+  },
+  "hfov": {
+   "value": 1.2,
+   "unit": "rad",
+   "status": "Assumed",
+   "source": "what-if field of view (xacro: 1.2); pinhole, lens distortion ignored"
+  },
+  "corner_noise": {
+   "value": 0.5,
+   "unit": "px",
+   "status": "Assumed",
+   "source": "1-sigma corner error after sub-pixel refinement; not measured on BP-1 light"
+  },
+  "min_side_px": {
+   "value": 20.0,
+   "unit": "px",
+   "status": "Assumed",
+   "source": "smallest tag edge in pixels a tag36h11 detector decodes reliably"
+  },
+  "max_view_angle": {
+   "value": 70.0,
+   "unit": "deg",
+   "status": "Assumed",
+   "source": "largest angle between the tag normal and the line of sight that decodes"
+  },
+  "margin": {
+   "value": 1.125,
+   "unit": "x tag edge",
+   "status": "Inferred",
+   "source": "at least half of the one-cell white border must be in the image too: in the Isaac renders (isaac_tags_v1, 50 poses) the detector missed 2 tags whose black square was in frame but whose border was cut; 1.0625-1.125 matches the detector on every tag, 1.25 is too strict by one"
+  },
+  "placement_err": {
+   "value": [
+    0.005,
+    1.0
+   ],
+   "unit": "m, deg",
+   "status": "Assumed",
+   "source": "how well a taped or clamped tag's pose is known after setup"
+  },
+  "body_radius": {
+   "value": 0.66,
+   "unit": "m",
+   "status": "Verified",
+   "source": "circumscribed radius of the 1.0 x 0.7 m body about base_link"
+  }
+ },
+ "trials": 1500,
+ "seed": 0,
+ "layouts": {
+  "one": {
+   "seen_frac": 0.05733333333333333,
+   "e_xy_median": 0.02147898904149906,
+   "e_xy_median_ci": [
+    0.01724825495194283,
+    0.02400366460004289
+   ],
+   "e_xy_p95": 0.05080429370359866,
+   "e_xy_p95_ci": [
+    0.03835059898129059,
+    0.05690149190086535
+   ],
+   "e_yaw_median": 0.715138529127425,
+   "e_yaw_p95": 2.0098367761235485,
+   "bad_yaw_frac": 0.0,
+   "bad_yaw_frac_ci": [
+    0.0,
+    0.0
+   ],
+   "two_planes_frac": 0.0,
+   "turn_median_deg": 75.0,
+   "turn_p95_deg": 158.75,
+   "never_frac": 0.356
+  },
+  "two_coplanar": {
+   "seen_frac": 0.144,
+   "e_xy_median": 0.019796318105222525,
+   "e_xy_median_ci": [
+    0.018430657823573074,
+    0.022651257846879085
+   ],
+   "e_xy_p95": 0.048148184815960435,
+   "e_xy_p95_ci": [
+    0.04575106169188956,
+    0.05313080745011926
+   ],
+   "e_yaw_median": 0.6439152286676153,
+   "e_yaw_p95": 2.0013134569544424,
+   "bad_yaw_frac": 0.0,
+   "bad_yaw_frac_ci": [
+    0.0,
+    0.0
+   ],
+   "two_planes_frac": 0.0,
+   "turn_median_deg": 60.0,
+   "turn_p95_deg": 140.0,
+   "never_frac": 0.148
+  },
+  "two_perpendicular": {
+   "seen_frac": 0.12066666666666667,
+   "e_xy_median": 0.02445388015043832,
+   "e_xy_median_ci": [
+    0.0214911526818568,
+    0.02656856508553253
+   ],
+   "e_xy_p95": 0.05784185542936931,
+   "e_xy_p95_ci": [
+    0.0494166996560986,
+    0.06616756297674707
+   ],
+   "e_yaw_median": 0.7161015763393407,
+   "e_yaw_p95": 2.375652647187269,
+   "bad_yaw_frac": 0.0,
+   "bad_yaw_frac_ci": [
+    0.0,
+    0.0
+   ],
+   "two_planes_frac": 0.0,
+   "turn_median_deg": 60.0,
+   "turn_p95_deg": 150.0,
+   "never_frac": 0.12
+  },
+  "four": {
+   "seen_frac": 0.292,
+   "e_xy_median": 0.01942941367511995,
+   "e_xy_median_ci": [
+    0.01824048675587565,
+    0.021012995684821564
+   ],
+   "e_xy_p95": 0.051515235517197555,
+   "e_xy_p95_ci": [
+    0.04629213232914163,
+    0.05767207954213252
+   ],
+   "e_yaw_median": 0.6521077120184954,
+   "e_yaw_p95": 2.078964556742306,
+   "bad_yaw_frac": 0.0,
+   "bad_yaw_frac_ci": [
+    0.0,
+    0.0
+   ],
+   "two_planes_frac": 0.00228310502283105,
+   "turn_median_deg": 35.0,
+   "turn_p95_deg": 125.0,
+   "never_frac": 0.0
+  }
+ },
+ "paired": {
+  "two_perpendicular_minus_one": {
+   "n": 86,
+   "e_xy_diff_median": 0.0008993833615811644,
+   "e_xy_diff_median_ci": [
+    -0.003250049882273053,
+    0.006591045497199997
+   ],
+   "B_better_frac": 0.47674418604651164
+  },
+  "two_perpendicular_minus_two_coplanar": {
+   "n": 81,
+   "e_xy_diff_median": 0.003385381391815441,
+   "e_xy_diff_median_ci": [
+    -0.0008786534547876833,
+    0.008421397990190873
+   ],
+   "B_better_frac": 0.3950617283950617
+  },
+  "four_minus_two_perpendicular": {
+   "n": 168,
+   "e_xy_diff_median": -0.002386445698759331,
+   "e_xy_diff_median_ci": [
+    -0.006739537471753649,
+    0.0014181075756359426
+   ],
+   "B_better_frac": 0.5416666666666666
+  }
+ }
+}
