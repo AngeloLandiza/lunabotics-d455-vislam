@@ -19,21 +19,21 @@ Visualization Manager:
         Y: 0
         Z: 0
     - Class: rviz_default_plugins/PointCloud2
-      Name: SLAM cloud
-      Enabled: false
+      Name: Map
+      Enabled: true
       Topic:
-        Value: /cloud_map
+        Value: /vislam/map_cloud
         Depth: 1
         Durability Policy: Transient Local
         History Policy: Keep Last
         Reliability Policy: Reliable
       Style: Squares
-      Size (m): 0.045
+      Size (m): 0.015
       Size (Pixels): 3
       Alpha: 1
       Decay Time: 0
       Position Transformer: XYZ
-      Color Transformer: AxisColor
+      Color Transformer: RGB8
       Axis: Z
       Use Fixed Frame: true
       Use rainbow: true
@@ -42,65 +42,21 @@ Visualization Manager:
       Queue Size: 2
       Selectable: false
     - Class: rviz_default_plugins/PointCloud2
-      Name: Terrain height
-      Enabled: true
-      Topic:
-        Value: /terrain/cloud
-        Depth: 1
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
-      Style: Squares
-      Size (m): 0.05
-      Alpha: 1
-      Decay Time: 0
-      Position Transformer: XYZ
-      Color Transformer: Intensity
-      Channel Name: elevation
-      Use rainbow: true
-      Invert Rainbow: false
-      Autocompute Intensity Bounds: true
-      Queue Size: 2
-      Selectable: false
-    - Class: rviz_default_plugins/PointCloud2
-      Name: Dig (blue) / dump (red)
+      Name: Live landmarks
       Enabled: false
       Topic:
-        Value: /terrain/cloud
+        Value: /odom_local_map
         Depth: 1
         Durability Policy: Volatile
         History Policy: Keep Last
-        Reliability Policy: Reliable
-      Style: Squares
-      Size (m): 0.05
-      Alpha: 1
-      Decay Time: 0
-      Position Transformer: XYZ
-      Color Transformer: Intensity
-      Channel Name: change
-      Use rainbow: true
-      Invert Rainbow: true
-      Autocompute Intensity Bounds: false
-      Min Intensity: -0.3
-      Max Intensity: 0.3
-      Queue Size: 2
-      Selectable: false
-    - Class: rviz_default_plugins/PointCloud2
-      Name: Live scan
-      Enabled: false
-      Topic:
-        Value: /lidar/points
-        Depth: 1
-        Durability Policy: Volatile
-        History Policy: Keep Last
-        Reliability Policy: Reliable
+        Reliability Policy: Best Effort
       Style: Points
-      Size (Pixels): 2
+      Size (Pixels): 3
       Alpha: 0.9
       Decay Time: 0
       Position Transformer: XYZ
       Color Transformer: FlatColor
-      Color: 235; 240; 255
+      Color: 255; 180; 40
       Queue Size: 2
       Selectable: false
     - Class: rviz_default_plugins/Path

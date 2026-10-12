@@ -2,7 +2,7 @@
 #
 # Every tunable lives here; the launch file only handles modes and topic wiring.
 # To keep variants (e.g. a dim room), copy this file and run:
-#   ./run.sh config:=config/my_room.yaml
+#   run/physical/vislam.sh config:=lunabotics_slam/config/my_room.yaml
 #
 # RTAB-Map's own parameters ("Group/Name") must be quoted strings.
 

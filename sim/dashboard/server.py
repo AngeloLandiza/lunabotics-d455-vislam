@@ -406,6 +406,10 @@ def parse_result(path, kind):
         return {"meta": meta}
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
+    if kind == "odometry_drift":
+        if not isinstance(data, dict):
+            raise ValueError("expected a JSON object with meta and summary")
+        return {"meta": data.get("meta"), "summary": data.get("summary")}
     if kind == "speed_gate":
         keep = ("meta", "chosen", "constant", "gate", "sweep", "assumed", "tune_seeds", "test_seeds", "dirs")
         return {k: data.get(k) for k in keep if k in data}
@@ -425,18 +429,25 @@ def result_roots():
         pass
     if os.path.isdir(SUMMARIES):
         roots.append(SUMMARIES)
-    for extra in (FIDUCIAL_RESULTS, ODOMETRY_RESULTS):
-        if os.path.isdir(extra):
-            roots.append(extra)
+    if os.path.isdir(FIDUCIAL_RESULTS):
+        roots.append(FIDUCIAL_RESULTS)
+    if os.path.isdir(ODOMETRY_RESULTS):
+        roots.append(ODOMETRY_RESULTS)
     return roots
 
 
 def result_kind(dirpath, name):
-    """Kind of a result file by its name; summary.json is generic, so it counts only in an isaac_tags* or isaac_vo*
-    folder."""
-    for prefix in ("isaac_tags", "isaac_vo"):
-        if name == "summary.json" and os.path.basename(dirpath).startswith(prefix):
-            return prefix
+    """Kind of a result file by its name; summary.json is generic, so it counts only in a folder whose name says what it is:
+    isaac_tags* (fiducial tag table), drift_* (odometry drift, sim/odometry) or isaac_vo* (Isaac visual odometry, format not fixed yet)."""
+    if name == "summary.json":
+        folder = os.path.basename(dirpath)
+        if folder.startswith("isaac_tags"):
+            return "isaac_tags"
+        if folder.startswith("drift_"):
+            return "odometry_drift"
+        if folder.startswith("isaac_vo"):
+            return "isaac_vo"
+        return None
     return RESULT_FILES.get(name)
 
 

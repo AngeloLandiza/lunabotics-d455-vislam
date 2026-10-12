@@ -120,7 +120,12 @@ class VislamViewer(Node):
     # ------------------------------------------------------------- drawing
     def render(self, img_msg, info):
         h, w = img_msg.height, img_msg.width
-        gray = np.frombuffer(img_msg.data, np.uint8).reshape(h, img_msg.step)[:, :w]
+        rows = np.frombuffer(img_msg.data, np.uint8).reshape(h, img_msg.step)
+        if img_msg.encoding in ('rgb8', 'bgr8'):  # colour camera (reconstruction mode)
+            code = cv2.COLOR_RGB2GRAY if img_msg.encoding == 'rgb8' else cv2.COLOR_BGR2GRAY
+            gray = cv2.cvtColor(rows[:, :w * 3].reshape(h, w, 3), code)
+        else:
+            gray = rows[:, :w]
         base = (self.clahe.apply(gray) * 0.7).astype(np.uint8)
         canvas = cv2.cvtColor(base, cv2.COLOR_GRAY2BGR)
 

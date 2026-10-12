@@ -1,0 +1,60 @@
+# Semi-dynamic terrain map for Lunabotics (scripts/terrain_mapper.py).
+# Grid is fixed in the SLAM map frame (origin = where the camera started; z up,
+# gravity-aligned). Size it to cover the arena from the start pose.
+
+terrain_mapper:
+  ros__parameters:
+    cloud_topic: /lidar/points            # projector-on dense depth from the fusion pipeline
+    map_frame: map
+    update_rate: 5.0                      # Hz; ~4 ms per update for a 25k-point cloud
+
+    resolution: 0.05                      # m per cell
+    size_x: 16.0                          # m: the 6.88 x 5 m arena from any start pose and heading
+    size_y: 16.0                          # m
+    origin_x: 0.0                         # grid centre in the map frame
+    origin_y: 0.0
+
+    min_range: 0.3                        # m
+    max_range: 3.5                        # m; D455 depth noise grows with range^2
+    sigma_a: 0.005                        # height noise sigma = a + b * range^2 (m)
+    sigma_b: 0.005                        #   ~1 cm at 1 m, ~6 cm at 3 m
+
+    change_threshold: 3.0                 # sigmas: beyond this a cell is "dug/dumped" and reset
+    cleanup_margin: 0.05                  # m: clear cells the camera sees >5 cm *through*
+    time_variance: 0.00001                # m^2/s added to unobserved cells (map keeps adapting)
+    max_variance: 0.05                    # m^2
+    min_change: 0.03                      # m: smaller height changes don't count as volume
+
+    # Scan-to-map correction: each scan's height offset and tilt vs. the map are removed
+    # (SLAM drifts ~1 deg in tilt while driving, which would otherwise smear heights by
+    # range x tilt). Only slow drift is followed; jumps are left to change detection.
+    drift_window: 0.15                    # m: cells further off than this are ignored in the fit
+    max_drift_step: 0.05                  # m: max change of the height correction per scan
+    max_tilt_deg: 4.0                     # deg: larger fitted tilts are treated as glitches
+    change_confirmations: 2               # consecutive scans before a cell counts as changed
+    baseline_sigma: 0.012                 # m: baseline freezes once a cell is this certain
+
+    save_path: ~/.ros/lunabotics_terrain.npz   # written on shutdown (launch arg terrain_file overrides)
+    load: false                           # true: start from the saved terrain + baseline
+
+# Boulder / crater segmentation on the terrain map (scripts/obstacle_segmenter.py).
+# Heights are relative to the local ground (median over ground_window), so slopes cancel.
+obstacle_segmenter:
+  ros__parameters:
+    resolution: 0.05                      # m; match terrain_mapper
+    rate: 2.0                             # Hz; ~110 ms per update for the full arena
+    ground_window: 1.0                    # m: local ground estimate window (> largest crater)
+    boulder_height: 0.08                  # m above local ground: bump -> boulder candidate
+    crater_depth: 0.06                    # m below local ground: pit -> crater candidate
+    boulder_edge: 0.03                    # m: a candidate's outline is grown out to here...
+    crater_edge: 0.015                    # m: ...so a bowl-shaped crater is sized rim to rim
+    max_grow: 0.15                        # m: max outline growth beyond the candidate
+    rim_search: 0.25                      # m: craters are widened to their rim crest, searched this far out
+    rim_default: 0.08                     # m: widening when the rim isn't seen
+    changed: 0.04                         # m of change since the baseline: dug pit / dumped pile
+    # Walls and the pillar, from RTAB-Map's 3D map (vertical faces the terrain map can't hold)
+    map_cloud_topic: /cloud_map
+    wall_height: 0.12                     # m: a cell is tall with >= 2 map points this far above ground
+    wall_length: 1.0                      # m: tall blobs longer than this are walls (+ their ducts)
+    pillar_height: 0.35                   # m: compact tall blobs higher than this are the pillar
+                                          #    (boulders are < 0.3 m; seen this high within ~1.3 m)

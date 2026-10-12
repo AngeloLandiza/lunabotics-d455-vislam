@@ -13,16 +13,34 @@
 #   rviz2 + vislam_viewer -> map/scan/trajectory window + camera/landmarks window
 #
 # All node settings live in config/d455_fusion.yaml.
+#
+# On a robot: base_frame:=base_link camera_mount:="x y z roll pitch yaw" (camera_link in base_link,
+# m / rad) makes odometry and SLAM report the robot's pose, and odom_guess_frame:=odom_wheel uses
+# wheel odometry (e.g. robot_localization) as the motion guess.
 
 import os
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction
 from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration, PythonExpression
 from launch_ros.actions import Node, SetParameter
 
-REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # package root (source or install)
+
+
+def camera_mount_tf(context):
+    """Static base_frame -> camera_link from camera_mount "x y z roll pitch yaw" (none if empty)."""
+    mount = LaunchConfiguration('camera_mount').perform(context).split()
+    if not mount:
+        return []
+    if len(mount) != 6:
+        raise RuntimeError(f'camera_mount needs "x y z roll pitch yaw", got {mount}')
+    names = ['--x', '--y', '--z', '--roll', '--pitch', '--yaw']
+    args = [v for pair in zip(names, mount) for v in pair]
+    return [Node(package='tf2_ros', executable='static_transform_publisher', name='camera_mount_tf',
+                 arguments=args + ['--frame-id', LaunchConfiguration('base_frame').perform(context),
+                                   '--child-frame-id', 'camera_link'])]
 
 
 def generate_launch_description():
@@ -31,6 +49,7 @@ def generate_launch_description():
     config = LaunchConfiguration('config')
     rtabmap_args = LaunchConfiguration('rtabmap_args')
     database = {'database_path': LaunchConfiguration('database_path')}
+    frame = {'frame_id': LaunchConfiguration('base_frame')}   # overrides the yaml's camera_link
     sim = LaunchConfiguration('sim')
     # Real camera: images come through the projector splitter. Isaac Sim: straight from
     # /camera (rendered IR has no projector dots).
@@ -65,7 +84,7 @@ def generate_launch_description():
 
     odometry = Node(
         package='rtabmap_odom', executable='stereo_odometry', output='screen',
-        parameters=[config],
+        parameters=[config, frame, {'guess_frame_id': LaunchConfiguration('odom_guess_frame')}],
         arguments=[rtabmap_args],
         remappings=stereo,
     )
@@ -92,7 +111,7 @@ def generate_launch_description():
     slam_mapping = Node(
         package='rtabmap_slam', executable='rtabmap', output='screen',
         condition=UnlessCondition(localization),
-        parameters=[config, database],
+        parameters=[config, database, frame],
         arguments=[PythonExpression(["'--delete_db_on_start' if '",
                                      LaunchConfiguration('new_map'),
                                      "'.lower() == 'true' else ''"]),
@@ -103,7 +122,7 @@ def generate_launch_description():
     slam_localization = Node(
         package='rtabmap_slam', executable='rtabmap', output='screen',
         condition=IfCondition(localization),
-        parameters=[config, database, {
+        parameters=[config, database, frame, {
             'Mem/IncrementalMemory': 'False',
             'Mem/InitWMWithAllNodes': 'True',
         }],
@@ -146,6 +165,14 @@ def generate_launch_description():
                               description='Extra args for odometry and rtabmap.'),
         DeclareLaunchArgument('sim', default_value='false',
                               description='Isaac Sim: no camera driver/splitter, simulated clock.'),
+        DeclareLaunchArgument('base_frame', default_value='camera_link',
+                              description='Robot frame for odometry and SLAM (e.g. base_link).'),
+        DeclareLaunchArgument('camera_mount', default_value='',
+                              description='camera_link pose in base_frame, "x y z roll pitch yaw" (m, rad); '
+                                          'publishes the static TF. Empty = none.'),
+        DeclareLaunchArgument('odom_guess_frame', default_value='',
+                              description='Frame of wheel odometry to use as the motion guess (empty = IMU only).'),
+        OpaqueFunction(function=camera_mount_tf),
         SetParameter(name='use_sim_time', value=sim),
 
         camera,
