@@ -24,6 +24,7 @@ import os
 import sys
 
 import numpy as np
+from scipy import ndimage
 
 
 def _repo_root():
@@ -93,12 +94,17 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'min_radius': pr.P(0.14, 'm', 'Assumed', 'objects smaller than this are dropped: guidebook boulders are 30-40 cm, '
                        'and detected discs come out a few cm larger than the true ones; arena.sh seed 0 false boulders '
                        'had a median radius of 9 cm, and false craters from the ruts 13 cm; true ones came out 18-22 cm'),
-    'crater_depth': pr.P((0.05, 3), 'm, cells', 'Assumed',
+    'crater_depth': pr.P((0.04, 5), 'm, cells', 'Assumed',
                          'a crater needs at least this many cells inside its disc whose mean return height lies this far '
-                         'below the fitted ground. arena.sh seed 0 start zone (true pose): 4 false craters just behind '
+                         'below the ground ring around it (bag replay: true crater 10 cells at 4 cm, 3 at 5 cm; false '
+                         'ones away from boulders at most 7 at 4 cm). arena.sh seed 0 start zone (true pose): 4 false craters just behind '
                          'boulders / the column were a 9-17 % tail of low returns (to -4..-9 cm, median -1 to -2 cm), the '
                          'true crater (11 cm deep) had 26 % of returns below -3 cm, down to -12 cm; guidebook-scale '
                          'craters in arena.sh are 7-12 cm deep'),
+    'crater_ring': pr.P(0.30, 'm', 'Assumed', 'width of the ground ring around a crater disc its depth is measured from'),
+    'boulder_clear': pr.P(0.15, 'm', 'Assumed', 'cells this close to boulder evidence are left out of the crater '
+                          'depth test: arena.sh seed 0 had a false crater 0.13 m from a boulder edge with 7 cells 6 cm '
+                          'below the ground fit'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
     'tag_ids': pr.P((0, 1), '', 'Assumed', 'tag on the y = 0 wall, tag on the x = 0 wall'),
     'tag_xy': pr.P(((1.0, -A27.DUCT_D, 90.0), (-A27.DUCT_D, 1.0, 0.0)), 'm, m, deg facing', 'Assumed',
@@ -284,17 +290,29 @@ class HazardMap:
 
     def depression(self, x, y, r):
         """True when the returns inside the disc show a real hole: crater_depth[1] cells (2+ returns each) whose mean
-        height is crater_depth[0] or more below the fitted ground. Crater log-odds alone also fire on the scattered
-        low returns just behind boulders and the column, where only grazing rays land."""
+        height lies crater_depth[0] or more below the ground around the disc (median cell height in a ring
+        crater_ring wide outside it). Cells within boulder_clear of boulder evidence count neither in the disc nor in
+        the ring: next to a boulder the ground fit is pulled up and grazing returns land low. Crater log-odds alone
+        also fire on the scattered low returns just behind boulders and the column."""
         depth, n_min = val('crater_depth')
+        ring, clear = val('crater_ring'), val('boulder_clear')
         g, L, c = self.grid, self.L, self.grid.cell
-        i0, i1 = max(int((x - r) / c), 0), min(int((x + r) / c) + 1, g.nx)
-        j0, j1 = max(int((y - r) / c), 0), min(int((y + r) / c) + 1, g.ny)
+        R = r + ring + clear
+        i0, i1 = max(int((x - R) / c), 0), min(int((x + R) / c) + 1, g.nx)
+        j0, j1 = max(int((y - R) / c), 0), min(int((y + R) / c) + 1, g.ny)
         X, Y = np.meshgrid((np.arange(i0, i1) + 0.5) * c, (np.arange(j0, j1) + 0.5) * c, indexing='ij')
-        inside = (X - x) ** 2 + (Y - y) ** 2 <= r * r
+        d2 = (X - x) ** 2 + (Y - y) ** 2
         n = L['count'][i0:i1, j0:j1]
         mean = L['zsum'][i0:i1, j0:j1] / np.maximum(n, 1)
-        deep = inside & (n >= 2) & (self.g[i0:i1, j0:j1] - mean >= depth)
+        pos = np.zeros(n.shape, bool)
+        for s in ('lidar', 'd455'):
+            pos |= self.lp[s][i0:i1, j0:j1] > 0
+        k = int(math.ceil(clear / c))
+        near_boulder = ndimage.binary_dilation(pos, structure=np.ones((2 * k + 1, 2 * k + 1))) if pos.any() else pos
+        ok = (n >= 2) & ~near_boulder
+        ring_m = ok & (d2 > (r + c) ** 2) & (d2 <= (r + c + ring) ** 2)
+        ref = np.median(mean[ring_m]) if ring_m.sum() >= 8 else self.g[i0:i1, j0:j1]
+        deep = ok & (d2 <= r * r) & (ref - mean >= depth)
         return int(deep.sum()) >= n_min
 
     def occupancy(self):
