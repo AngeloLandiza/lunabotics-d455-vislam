@@ -23,6 +23,7 @@ import arena2d as a2
 APPROACHES = (0.30, 0.60)  # m, straight final approaches along the goal heading (Assumed)
 VIRTUAL_R = 0.40          # m, radius of the virtual arrival circles (Assumed)
 TURN_COST = 0.35          # m per rad of turn in place (Assumed: ~0.5 m/s driving vs ~1.4 rad/s turning)
+TIGHT_MARGIN = 0.02       # m, clearance the grid fallback accepts when nothing fits at execute.CHECK_MARGIN (Assumed)
 ARC_STEP = 0.01           # m, sampling of arcs in the output
 
 
@@ -333,13 +334,16 @@ class TangentController:
                 self.info.update(inflate=inf, length=ri["length"], route="tangent")
                 break
         if actions is None and fallback:
-            # tight arena: stop-and-turn route on the (x, y, heading) grid
+            # tight arena: stop-and-turn route on the (x, y, heading) grid, at the usual margin, then at half of it
             import lattice_route
-            actions, ri = lattice_route.plan(w, p, self.goal)
-            self.info["solve_s"] += ri["solve_s"] or 0.0
-            why.append(f"grid: {ri['fail']}")
-            if actions is not None:
-                self.info.update(length=ri["length"], route="grid", reverse=ri["reverse"])
+            for margin in (ex.CHECK_MARGIN, TIGHT_MARGIN):
+                actions, ri = lattice_route.plan(w, p, self.goal, margin=margin)
+                self.info["solve_s"] += ri["solve_s"] or 0.0
+                why.append(f"grid {margin}: {ri['fail']}")
+                if actions is not None:
+                    self.info.update(length=ri["length"], route="grid" if margin == ex.CHECK_MARGIN else "grid tight",
+                                     reverse=ri["reverse"])
+                    break
         if actions is not None:
             self.info["pieces"] = sum(a[0] in ("follow", "line") for a in actions)
         self.info["fail"] = None if actions is not None else "; ".join(why)

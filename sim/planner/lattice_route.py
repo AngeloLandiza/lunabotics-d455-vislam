@@ -146,7 +146,8 @@ def get(w, margin=None):
     margin = CHECK_MARGIN if margin is None else margin
     key = (w.seed, margin)
     if key not in _CACHE:
-        _CACHE.clear()                                   # one arena at a time per process
+        for k in [k for k in _CACHE if k[0] != w.seed]:  # one arena at a time per process
+            del _CACHE[k]
         _CACHE[key] = Lattice(w, margin)
     return _CACHE[key]
 
