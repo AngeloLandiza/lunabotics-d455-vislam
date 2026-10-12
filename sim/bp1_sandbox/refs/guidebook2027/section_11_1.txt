@@ -1,0 +1,40 @@
+11.1 Arena Composition
+1. The arena contains Black Point-1 (BP-1), a crushed basalt lunar regolith simulant to a depth of
+   approximately 45 cm. Coefficient of friction and cohesion are highly dependent on the humidity, bulk
+   density and porosity. For more information, refer to https://ares.jsc.nasa.gov/projects/simulants/bp-
+   1.html). Note the following:
+       a. It does not behave like sand.
+       b. The coefficient of friction has not been measured.
+       c. There are naturally occurring rocks in the aggregate.
+       d. BP-1 is made from crushed basalt fines and not commercially available.
+       e. Reference Soil Test Apparatus for Lunar Surfaces.
+       f.   The density of the compacted BP-1 aggregate will be between 1.5 g/cm3 and 1.8 g/cm3.
+       g. BP-1 behaves like a silty powder soil with most particles under 100 microns in diameter.
+       h. Will be compacted and the top layer will be raked to a fluffy condition of approximately 0.75
+          g/cm3, similar to the Lunar surface.
+       i.   Teams are encouraged to develop or procure simulants based on basaltic minerals and
+            lunar surface regolith particle size, shape, and distribution.
+2. There is naturally occurring additional material randomly distributed that may be mixed with the BP-
+   1. This gravel material may be approximately 2 cm diameter.
+3. BP-1 Reflectivity: NASA performed tests to answer questions about BP-1 reflectivity for LIDAR (or
+   other LASER-based) navigation systems. The laser is not a beam – it is spread out as a sheet that
+   is oriented in the vertical direction, so it is draped across the BP-1 and across a white/gray/black
+   target that is standing up behind the BP-1 in the images. The BP-1 is the mound at the bottom of
+   each image. Teams can get the reflectivity of the BP-1 by comparing the brightness of the laser
+   sheet seen reflected from the BP-1 with the brightness of the same sheet reflected from the white
+   and black portions of the target.
+       a. Note the BP-1 is mounded. Teams need to account for the fact that it is not a flat surface for
+          analyzing the brightness in the images. The three pictures below were shot with the camera
+          at 10, 16, and 21 degrees relative to the surface.
+
+                                                                                                      26
+     NASA Lunabotics Challenge Guidebook 2026-2027
+
+
+       b. The laser was at a phase angle of 15 degrees. The camera speed and aperture were set to
+          (manual mode): 1/8 s, f/4.5.
+
+
+
+
+     Figure 7 LIDAR/Laser Reflectivity
