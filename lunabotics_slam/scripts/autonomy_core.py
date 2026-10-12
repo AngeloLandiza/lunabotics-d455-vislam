@@ -93,6 +93,12 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'min_radius': pr.P(0.14, 'm', 'Assumed', 'objects smaller than this are dropped: guidebook boulders are 30-40 cm, '
                        'and detected discs come out a few cm larger than the true ones; arena.sh seed 0 false boulders '
                        'had a median radius of 9 cm, and false craters from the ruts 13 cm; true ones came out 18-22 cm'),
+    'crater_depth': pr.P((0.05, 3), 'm, cells', 'Assumed',
+                         'a crater needs at least this many cells inside its disc whose mean return height lies this far '
+                         'below the fitted ground. arena.sh seed 0 start zone (true pose): 4 false craters just behind '
+                         'boulders / the column were a 9-17 % tail of low returns (to -4..-9 cm, median -1 to -2 cm), the '
+                         'true crater (11 cm deep) had 26 % of returns below -3 cm, down to -12 cm; guidebook-scale '
+                         'craters in arena.sh are 7-12 cm deep'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
     'tag_ids': pr.P((0, 1), '', 'Assumed', 'tag on the y = 0 wall, tag on the x = 0 wall'),
     'tag_xy': pr.P(((1.0, -A27.DUCT_D, 90.0), (-A27.DUCT_D, 1.0, 0.0)), 'm, m, deg facing', 'Assumed',
@@ -215,6 +221,7 @@ class HazardMap:
         self.g = np.zeros(shape)
         self.frames = 0
         self.dropped = []                   # oversized blobs objects() split or dropped (for logs)
+        self.shallow = []                   # crater blobs with no real depression under them (for logs)
 
     def refit(self):
         if (self.L['count'] > 0).sum() > 50:
@@ -236,6 +243,7 @@ class HazardMap:
         """Hazards as dicts: kind ('boulder' / 'crater'), x, y, r (disc of the cluster's area), evidence, sensor.
         Wall returns and the known column are dropped (the planner already has both)."""
         out, big = [], []
+        self.shallow = []
         cell = self.grid.cell
         cx, cy, cr = COLUMN_DISC
         for sensor in ('lidar', 'd455'):
@@ -253,6 +261,9 @@ class HazardMap:
                 if r > val('max_radius'):
                     big.append((sensor, d))
                     continue
+                if d['kind'] == 'neg' and not self.depression(d['x'], d['y'], r):
+                    self.shallow.append((sensor, round(d['x'], 2), round(d['y'], 2), round(r, 2)))
+                    continue
                 out.append({'kind': 'boulder' if d['kind'] == 'pos' else 'crater', 'x': d['x'], 'y': d['y'], 'r': r,
                             'evidence': d['evidence'], 'sensor': sensor})
         # a blob wider than any guidebook obstacle (shallow ruts or dug ground joined to a crater): keep only its
@@ -263,11 +274,28 @@ class HazardMap:
             pos, neg = (lp >= strong, ln * 0 > 1) if d['kind'] == 'pos' else (lp * 0 > 1, ln >= strong)
             for e in detect.clusters(pos, neg, self.grid, lp, ln, detect.l_decide(sensor)):
                 r = math.sqrt(e['cells'] * cell * cell / math.pi) + cell / 2
+                if e['kind'] == 'neg' and not self.depression(e['x'], e['y'], r):
+                    continue
                 if val('min_radius') <= r <= val('max_radius') and math.hypot(e['x'] - d['x'], e['y'] - d['y']) < 3:
                     out.append({'kind': 'boulder' if e['kind'] == 'pos' else 'crater', 'x': e['x'], 'y': e['y'],
                                 'r': r, 'evidence': e['evidence'], 'sensor': sensor})
             self.dropped.append((d['kind'], round(d['x'], 2), round(d['y'], 2), d['cells']))
         return merge_discs(out)
+
+    def depression(self, x, y, r):
+        """True when the returns inside the disc show a real hole: crater_depth[1] cells (2+ returns each) whose mean
+        height is crater_depth[0] or more below the fitted ground. Crater log-odds alone also fire on the scattered
+        low returns just behind boulders and the column, where only grazing rays land."""
+        depth, n_min = val('crater_depth')
+        g, L, c = self.grid, self.L, self.grid.cell
+        i0, i1 = max(int((x - r) / c), 0), min(int((x + r) / c) + 1, g.nx)
+        j0, j1 = max(int((y - r) / c), 0), min(int((y + r) / c) + 1, g.ny)
+        X, Y = np.meshgrid((np.arange(i0, i1) + 0.5) * c, (np.arange(j0, j1) + 0.5) * c, indexing='ij')
+        inside = (X - x) ** 2 + (Y - y) ** 2 <= r * r
+        n = L['count'][i0:i1, j0:j1]
+        mean = L['zsum'][i0:i1, j0:j1] / np.maximum(n, 1)
+        deep = inside & (n >= 2) & (self.g[i0:i1, j0:j1] - mean >= depth)
+        return int(deep.sum()) >= n_min
 
     def occupancy(self):
         """int8 grid (nx, ny): 100 where either sensor's evidence is positive, 0 where seen, -1 unseen."""
