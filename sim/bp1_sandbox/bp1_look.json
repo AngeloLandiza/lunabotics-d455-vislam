@@ -1,0 +1,58 @@
+{
+ "description": "BP-1-like look of the Isaac Sim terrain for camera tests (isaac_landmarks.py). Status per value: Verified (in a source), Inferred (derived; derivation given), Assumed (placeholder).",
+ "values": {
+  "shading": {
+   "value": "UsdPreviewSurface, roughness 1.0, metallic 0, specular workflow with specularColor 0 (no highlight)",
+   "status": "Assumed",
+   "source": "BP-1 is a fine basalt powder; treated as a matte Lambertian surface"
+  },
+  "albedo_luminance": {
+   "value": 0.11,
+   "status": "Assumed",
+   "source": "middle of 0.10-0.12; no visible-light BP-1 albedo found in a source"
+  },
+  "tint_rgb_linear": {
+   "value": [
+    1.0,
+    0.66,
+    0.31
+   ],
+   "status": "Inferred",
+   "source": "measured by the coordinator on the BP-1 mound flanks in guidebook 2027 Figure 7 under that photo's lighting (refs/guidebook2027)"
+  },
+  "diffuse_rgb_linear": {
+   "value": [
+    0.1556,
+    0.1027,
+    0.0482
+   ],
+   "status": "Inferred",
+   "source": "tint scaled so Rec.709 luminance 0.2126 R + 0.7152 G + 0.0722 B = 0.11"
+  },
+  "albedo_variation": {
+   "value": "x (1 + 0.15 u), u uniform in [-1, 1], independent per 1 cm height-field vertex (vertex colour primvar, interpolated across triangles)",
+   "status": "Assumed",
+   "source": "fine variation; the 2 cm gravel is already in the height field"
+  },
+  "rut_albedo": {
+   "value": "same as undisturbed BP-1",
+   "status": "Assumed",
+   "source": "no data on how compacted wheel tracks change BP-1's appearance"
+  },
+  "walls_and_obstacles": {
+   "value": "same material as the terrain (one mesh)",
+   "status": "Assumed",
+   "source": "simplification"
+  },
+  "lighting_diffuse": {
+   "value": "dome light only (uniform overhead sky), intensity 1500, fixed exposure (auto exposure off)",
+   "status": "Assumed",
+   "source": "arena lighting is unknown"
+  },
+  "lighting_low": {
+   "value": "distant light 15 deg above the horizon (intensity 250000) plus a dome at 300, fixed exposure",
+   "status": "Assumed",
+   "source": "arena lighting is unknown; low light shows ruts by their shadows"
+  }
+ }
+}

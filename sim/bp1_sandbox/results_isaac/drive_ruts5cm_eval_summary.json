@@ -1,0 +1,63 @@
+{
+ "thresholds": {
+  "l1": 6.8,
+  "d455": 0.85
+ },
+ "rut_near_m": 0.15,
+ "summary": {
+  "l1": {
+   "ruts": {
+    "fa_frames": 153,
+    "fa_frames_on_ruts": 138,
+    "fa_unique": 26,
+    "fa_unique_on_ruts": 24,
+    "phantom_frames": 0,
+    "phantom_frames_on_ruts": 0,
+    "last_frame_fa": 9,
+    "last_frame_fa_kinds": [
+     "neg",
+     "neg",
+     "neg",
+     "neg",
+     "neg",
+     "neg",
+     "neg",
+     "neg",
+     "neg"
+    ]
+   },
+   "noruts": {
+    "fa_frames": 0,
+    "fa_frames_on_ruts": 0,
+    "fa_unique": 0,
+    "fa_unique_on_ruts": 0,
+    "phantom_frames": 0,
+    "phantom_frames_on_ruts": 0,
+    "last_frame_fa": 0,
+    "last_frame_fa_kinds": []
+   }
+  },
+  "d455": {
+   "ruts": {
+    "fa_frames": 0,
+    "fa_frames_on_ruts": 0,
+    "fa_unique": 0,
+    "fa_unique_on_ruts": 0,
+    "phantom_frames": 0,
+    "phantom_frames_on_ruts": 0,
+    "last_frame_fa": 0,
+    "last_frame_fa_kinds": []
+   },
+   "noruts": {
+    "fa_frames": 0,
+    "fa_frames_on_ruts": 0,
+    "fa_unique": 0,
+    "fa_unique_on_ruts": 0,
+    "phantom_frames": 0,
+    "phantom_frames_on_ruts": 0,
+    "last_frame_fa": 0,
+    "last_frame_fa_kinds": []
+   }
+  }
+ }
+}

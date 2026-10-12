@@ -1,0 +1,133 @@
+{
+ "settings": {
+  "orb_nfeatures": 2000,
+  "fast_threshold": 7,
+  "ratio": 0.8,
+  "reproj_px": 3.0,
+  "edge_near_m": 0.03,
+  "intrinsics": [
+   446.80277311912806,
+   423.5,
+   239.5
+  ]
+ },
+ "results": {
+  "diffuse": {
+   "A": {
+    "features_mean": 553.25,
+    "near_rut_edge_share": 0.07939448712155445
+   },
+   "Arep": {
+    "features_mean": 564.825,
+    "near_rut_edge_share": 0.07847563404594343,
+    "survival_mean": 0.5247948724379223,
+    "survival_min": 0.3507246376811594,
+    "survival_off_rut_mean": 0.53005488841672,
+    "ratio_matches": 12276,
+    "correct_matches": 12136,
+    "visible_A_features": 22130
+   },
+   "Acam32": {
+    "features_mean": 537.65,
+    "near_rut_edge_share": 0.08188412536036455,
+    "survival_mean": 0.3533062423924526,
+    "survival_min": 0.16501650165016502,
+    "survival_off_rut_mean": 0.357053983302665,
+    "ratio_matches": 8481,
+    "correct_matches": 8233,
+    "visible_A_features": 22126
+   },
+   "B32": {
+    "features_mean": 1425.3,
+    "near_rut_edge_share": 0.7575247316354452,
+    "survival_mean": 0.16271415785251603,
+    "survival_min": 0.019801980198019802,
+    "survival_off_rut_mean": 0.18520735730371268,
+    "ratio_matches": 3635,
+    "correct_matches": 3427,
+    "visible_A_features": 22126
+   },
+   "B32cam": {
+    "features_mean": 1409.275,
+    "near_rut_edge_share": 0.7465895584609108,
+    "survival_mean": 0.2251345848871898,
+    "survival_min": 0.02304147465437788,
+    "survival_off_rut_mean": 0.2567645822544902,
+    "ratio_matches": 5110,
+    "correct_matches": 4956,
+    "visible_A_features": 22130
+   },
+   "B50": {
+    "features_mean": 1541.25,
+    "near_rut_edge_share": 0.7474939172749392,
+    "survival_mean": 0.11381413664354392,
+    "survival_min": 0.0,
+    "survival_off_rut_mean": 0.1258078091709684,
+    "ratio_matches": 2951,
+    "correct_matches": 2743,
+    "visible_A_features": 22087
+   }
+  },
+  "low": {
+   "A": {
+    "features_mean": 53.9,
+    "near_rut_edge_share": 0.026437847866419294
+   },
+   "Arep": {
+    "features_mean": 65.45,
+    "near_rut_edge_share": 0.04125286478227655,
+    "survival_mean": 0.31825092169640024,
+    "survival_min": 0.0,
+    "survival_off_rut_mean": 0.31001140257344006,
+    "ratio_matches": 778,
+    "correct_matches": 687,
+    "visible_A_features": 2156
+   },
+   "Acam32": {
+    "features_mean": 51.775,
+    "near_rut_edge_share": 0.04490584258812168,
+    "survival_mean": 0.1754479093511429,
+    "survival_min": 0.0,
+    "survival_off_rut_mean": 0.1778969446252431,
+    "ratio_matches": 505,
+    "correct_matches": 385,
+    "visible_A_features": 2152
+   },
+   "B32": {
+    "features_mean": 332.275,
+    "near_rut_edge_share": 0.7839891656007825,
+    "survival_mean": 0.12538624441834995,
+    "survival_min": 0.0,
+    "survival_off_rut_mean": 0.13489293161511395,
+    "ratio_matches": 432,
+    "correct_matches": 311,
+    "visible_A_features": 2155
+   },
+   "B32cam": {
+    "features_mean": 311.475,
+    "near_rut_edge_share": 0.7616181073922466,
+    "survival_mean": 0.2176257615437147,
+    "survival_min": 0.0,
+    "survival_off_rut_mean": 0.23066144891823312,
+    "ratio_matches": 586,
+    "correct_matches": 508,
+    "visible_A_features": 2149
+   },
+   "B50": {
+    "features_mean": 539.225,
+    "near_rut_edge_share": 0.7508924845843572,
+    "survival_mean": 0.1200567827480898,
+    "survival_min": 0.0,
+    "survival_off_rut_mean": 0.12438200663117085,
+    "ratio_matches": 369,
+    "correct_matches": 282,
+    "visible_A_features": 2123
+   }
+  }
+ },
+ "render_noise_std_grey": {
+  "diffuse": 0.89,
+  "low": 7.3,
+  "note": "A vs Arep, 16 renders averaged per image"
+ }
+}

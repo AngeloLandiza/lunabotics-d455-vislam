@@ -34,6 +34,10 @@ parser.add_argument("--seed", type=int, default=1)
 parser.add_argument("--rut-depth", type=float, default=None, help="m (default ruts.rut_depth(robot))")
 parser.add_argument("--earlier-trips", type=int, default=0)
 parser.add_argument("--remesh", type=float, default=0.3, help="m driven between terrain mesh updates")
+parser.add_argument("--path", choices=["approach", "trip"], default="approach",
+                    help="approach: approach.trial's straight line; trip: one obstacle-avoiding ruts.earlier_trips trip")
+parser.add_argument("--trip-seed", type=int, default=None, help="rng seed for the trip (default seed + 1)")
+parser.add_argument("--no-ruts", action="store_true", help="drive the same path without stamping ruts")
 parser.add_argument("--scans", type=int, default=2, help="L1 scans merged per frame (RTX drops ~2%% per scan)")
 parser.add_argument("--headless", action="store_true")
 parser.add_argument("--gui-hold", type=float, default=0.3)
@@ -56,12 +60,14 @@ import params as pr  # noqa: E402
 from params import v  # noqa: E402
 from approach import DS  # noqa: E402
 from arena import Arena  # noqa: E402
-from isaac_approach import approach_poses  # noqa: E402
+from drive_path import approach_path, stamp_to as stamp_path, trip_path  # noqa: E402
 from robot import Robot  # noqa: E402
 from ruts import Ruts, add_earlier_ruts, rut_depth, wheel_offsets  # noqa: E402
 from telemetry import Telemetry  # noqa: E402
 
-out_path = args.out or os.path.join(HERE, "isaac_out", f"drive_seed{args.seed}.npz")
+TAG = f"drive_seed{args.seed}_{args.path}{'' if args.path == 'approach' else args.trip_seed or args.seed + 1}" \
+      f"{'_noruts' if args.no_ruts else ''}"
+out_path = args.out or os.path.join(HERE, "isaac_out", f"{TAG}.npz")
 def gpu_mib():
     try:
         import subprocess
@@ -100,19 +106,16 @@ ruts = Ruts(arena, depth, width=robot.wheels[0][2])
 LAT = wheel_offsets(robot)
 WHEELS = np.array([c for c, _, _ in robot.wheels])          # wheel centres in the robot frame
 X_FRONT, X_REAR = WHEELS[:, 0].max(), WHEELS[:, 0].min()
-poses = approach_poses(args.seed)
-print(f"[drive] seed {args.seed}: {len(poses)} frames, rut depth {100 * depth:.2f} cm, earlier trips {len(trips)}",
+poses = approach_path(args.seed) if args.path == "approach" else \
+    trip_path(arena, np.random.default_rng(args.trip_seed if args.trip_seed is not None else args.seed + 1))
+print(f"[drive] {TAG}: {len(poses)} frames, rut depth {100 * depth:.2f} cm, earlier trips {len(trips)}",
       flush=True)
 
 
 def stamp_to(k):
-    """Ruts under every wheel track from the rear wheels' start to the front wheels at frame k."""
-    x0, y0, yaw = poses[0]
-    xk, yk, _ = poses[k]
-    h = np.array([np.cos(np.radians(yaw)), np.sin(np.radians(yaw))])
-    a, b = (np.array([x0, y0]) + X_REAR * h), (np.array([xk, yk]) + X_FRONT * h)
-    ruts.path([(a[0], a[1], yaw), (b[0], b[1], yaw)], LAT)
-    ruts.apply()
+    """Ruts under every wheel track from the rear wheels' start to the front wheels at frame k (none with --no-ruts)."""
+    if not args.no_ruts:
+        stamp_path(ruts, poses, k, X_REAR, X_FRONT, LAT)
 
 
 def base_pose(pose):
@@ -304,16 +307,17 @@ def show(pose, origin, R, r):
 
 
 # ---------------------------------------------------------------- drive
-out = {"poses": np.array(poses), "rut_depth": depth, "x0": arena.x0, "y0": arena.y0, "res": arena.res,
+out = {"poses": np.array(poses), "rut_depth": 0.0 if args.no_ruts else depth, "path": args.path,
+       "trip_seed": args.trip_seed if args.trip_seed is not None else args.seed + 1, "no_ruts": args.no_ruts, "x0": arena.x0, "y0": arena.y0, "res": arena.res,
        "seed": args.seed}
 tel = Telemetry(kind="isaac", total=len(poses), args=vars(args),
-                label=f"Isaac drive with ruts, seed {args.seed}, {100 * depth:.1f} cm")
+                label=f"Isaac drive {TAG}, ruts {'off' if args.no_ruts else f'{100 * depth:.1f} cm'}")
 BODY_LO, BODY_HI = robot.extents(exclude=("lidar3d_link", "d455_link"))
 app_utils.play()
 app_utils.update_app(steps=5)
 last_mesh_s, t0 = None, time.time()
 for k, pose in enumerate(poses):
-    s = k * DS
+    s = float(np.sum(np.hypot(*np.diff(np.array(poses)[: k + 1, :2], axis=0).T))) if k else 0.0   # distance driven
     stamp_to(k)
     if last_mesh_s is None or s - last_mesh_s >= args.remesh - 1e-9:
         remesh()
