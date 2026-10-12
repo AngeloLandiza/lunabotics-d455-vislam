@@ -1,0 +1,128 @@
+{
+ "settings": {
+  "orb_nfeatures": 2000,
+  "fast_threshold": 7,
+  "ratio": 0.8,
+  "reproj_px": 3.0,
+  "edge_near_m": 0.03,
+  "intrinsics": [
+   446.80277311912806,
+   423.5,
+   239.5
+  ]
+ },
+ "results": {
+  "diffuse": {
+   "A": {
+    "features_mean": 1548.75,
+    "near_rut_edge_share": 0.103454398708636
+   },
+   "Arep": {
+    "features_mean": 1549.675,
+    "near_rut_edge_share": 0.10076306322293384,
+    "survival_mean": 0.5606823735341763,
+    "survival_min": 0.3519865696698377,
+    "survival_off_rut_mean": 0.5635790709402941,
+    "ratio_matches": 35273,
+    "correct_matches": 34841,
+    "visible_A_features": 61950
+   },
+   "Acam32": {
+    "features_mean": 1554.95,
+    "near_rut_edge_share": 0.10628959130518666,
+    "survival_mean": 0.39187017064427926,
+    "survival_min": 0.2506994963626189,
+    "survival_off_rut_mean": 0.3957858862853161,
+    "ratio_matches": 24981,
+    "correct_matches": 24305,
+    "visible_A_features": 61939
+   },
+   "B32": {
+    "features_mean": 1718.8,
+    "near_rut_edge_share": 0.4511723295322318,
+    "survival_mean": 0.18533661783952718,
+    "survival_min": 0.03641975308641975,
+    "survival_off_rut_mean": 0.22095747686381015,
+    "ratio_matches": 11278,
+    "correct_matches": 10620,
+    "visible_A_features": 61939
+   },
+   "B32cam": {
+    "features_mean": 1716.25,
+    "near_rut_edge_share": 0.4399854333576111,
+    "survival_mean": 0.2582047459365559,
+    "survival_min": 0.03973105134474328,
+    "survival_off_rut_mean": 0.30525000399095165,
+    "ratio_matches": 15241,
+    "correct_matches": 14707,
+    "visible_A_features": 61950
+   },
+   "B50": {
+    "features_mean": 1761.225,
+    "near_rut_edge_share": 0.5403199477636305,
+    "survival_mean": 0.14587941684715167,
+    "survival_min": 0.004839685420447671,
+    "survival_off_rut_mean": 0.16720736122991214,
+    "ratio_matches": 8779,
+    "correct_matches": 8071,
+    "visible_A_features": 61874
+   }
+  },
+  "low": {
+   "A": {
+    "features_mean": 172.475,
+    "near_rut_edge_share": 0.04464415132627917
+   },
+   "Arep": {
+    "features_mean": 221.125,
+    "near_rut_edge_share": 0.08241944601469757,
+    "survival_mean": 0.3830379066913749,
+    "survival_min": 0.13881278538812786,
+    "survival_off_rut_mean": 0.3951694459488234,
+    "ratio_matches": 2574,
+    "correct_matches": 2293,
+    "visible_A_features": 6899
+   },
+   "Acam32": {
+    "features_mean": 185.525,
+    "near_rut_edge_share": 0.07734806629834254,
+    "survival_mean": 0.23069543505754186,
+    "survival_min": 0.07945205479452055,
+    "survival_off_rut_mean": 0.22937572070979834,
+    "ratio_matches": 1693,
+    "correct_matches": 1314,
+    "visible_A_features": 6892
+   },
+   "B32": {
+    "features_mean": 383.475,
+    "near_rut_edge_share": 0.5710280983114936,
+    "survival_mean": 0.17889334863154807,
+    "survival_min": 0.019230769230769232,
+    "survival_off_rut_mean": 0.19101740929919092,
+    "ratio_matches": 1239,
+    "correct_matches": 930,
+    "visible_A_features": 6892
+   },
+   "B32cam": {
+    "features_mean": 402.225,
+    "near_rut_edge_share": 0.5236496985518055,
+    "survival_mean": 0.27765643354454383,
+    "survival_min": 0.0,
+    "survival_off_rut_mean": 0.29377305543181453,
+    "ratio_matches": 1789,
+    "correct_matches": 1509,
+    "visible_A_features": 6899
+   },
+   "B50": {
+    "features_mean": 553.95,
+    "near_rut_edge_share": 0.6722177091795288,
+    "survival_mean": 0.15060361473141132,
+    "survival_min": 0.0,
+    "survival_off_rut_mean": 0.16025371729317453,
+    "ratio_matches": 1080,
+    "correct_matches": 766,
+    "visible_A_features": 6838
+   }
+  }
+ }
+}
