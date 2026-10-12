@@ -265,8 +265,9 @@ class Ruts:
         res = self.xs[1] - self.xs[0]
         box = [10 ** 9, -1, 10 ** 9, -1]
         for a, b in zip(self.last, P):
-            lo = np.minimum(a, b) - self.half - res
-            hi = np.maximum(a, b) + self.half + res
+            reach = self.half + val("berm_width", "nominal") + res
+            lo = np.minimum(a, b) - reach
+            hi = np.maximum(a, b) + reach
             i0, i1 = np.searchsorted(self.xs, lo[0]), np.searchsorted(self.xs, hi[0])
             j0, j1 = np.searchsorted(self.ys, lo[1]), np.searchsorted(self.ys, hi[1])
             if i1 <= i0 or j1 <= j0:
