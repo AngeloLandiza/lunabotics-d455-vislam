@@ -12,13 +12,16 @@ Run with Nav2 already up (run_nav2.sh does both):
 --rtf is the real-time factor: sim seconds per wall second. Nav2 keeps its own timers on /clock, so if it cannot keep
 up its control loop runs late in sim time; the node reports the controller's command rate per leg so a run that was
 too fast can be seen and rerun slower.
+
+Everything runs on the main thread: the node is spun with spin_once inside the sim loop and the waits, never from a
+second thread, since rclpy's action client is not safe to call from one thread while another spins it (the first
+version did that and aborted with "terminate called without an active exception" on the third goal).
 """
 import argparse
 import json
 import math
 import os
 import sys
-import threading
 import time
 
 import numpy as np
@@ -79,7 +82,6 @@ class Bridge(Node):
         self.t = 0.0
         self.cmd = (0.0, 0.0)
         self.n_cmd = 0
-        self.lock = threading.Lock()
         self.robot = None
         self.clock_pub = self.create_publisher(Clock, "/clock", 10)
         self.odom_pub = self.create_publisher(Odometry, "/odom", 10)
@@ -97,13 +99,11 @@ class Bridge(Node):
         self.static_tf.sendTransform(t)
 
     def _on_plan(self, msg):
-        with self.lock:
-            self.n_plan += 1
+        self.n_plan += 1
 
     def _on_cmd(self, msg):
-        with self.lock:
-            self.cmd = (float(msg.linear.x), float(msg.angular.z))
-            self.n_cmd += 1
+        self.cmd = (float(msg.linear.x), float(msg.angular.z))
+        self.n_cmd += 1
 
     def publish_map(self, w):
         occ, origin = occupancy(w)
@@ -147,8 +147,8 @@ class Bridge(Node):
         wall0, t0 = time.time(), self.t
         vb = wb = 0.0
         for k in range(n):
-            with self.lock:
-                cmd = self.cmd
+            rclpy.spin_once(self, timeout_sec=0)
+            cmd = self.cmd
             if self.robot is not None:
                 p0 = self.robot.pose[:2].copy()
                 vb, wb = self.robot.step(cmd[0], cmd[1], a2.SIM_DT)
@@ -160,10 +160,23 @@ class Bridge(Node):
             self.t += a2.SIM_DT
             if k % n_odom == 0:
                 self._publish_state(vb, wb)
-            lag = (self.t - t0) / self.rtf - (time.time() - wall0)
-            if lag > 0:
-                time.sleep(lag)
+            self.wait_wall(wall0 + (self.t - t0) / self.rtf)
         return vb, wb
+
+    def wait_wall(self, until):
+        """Handle callbacks until the wall clock reaches `until`."""
+        while True:
+            left = until - time.time()
+            if left <= 0:
+                return
+            rclpy.spin_once(self, timeout_sec=left)
+
+    def cancel(self, gh, w=None, track=None, limit=10.0):
+        """Cancel a goal and wait (sim time running) for the cancel and the goal's end, so the next goal starts clean."""
+        cf, rf = gh.cancel_goal_async(), gh.get_result_async()
+        wall0 = time.time()
+        while not (cf.done() and rf.done()) and time.time() - wall0 < limit:
+            self.advance(0.05, w, track)
 
     def goal_msg(self, g):
         goal = NavigateToPose.Goal()
@@ -178,22 +191,21 @@ class Bridge(Node):
 
     def run_leg(self, w, g, timeout):
         track = {"dist": 0.0, "min_clear": np.inf, "contact_steps": 0}
-        with self.lock:
-            self.n_cmd, n_plan0 = 0, self.n_plan
+        self.n_cmd, n_plan0 = 0, self.n_plan
         # sim time stands still until Nav2's first plan for this goal arrives, as planning is left out of the custom
         # planners' leg times too; the wall time it took is reported as plan_s (this machine, not the Orin NX)
         wall0 = time.time()
         fut = self.nav.send_goal_async(self.goal_msg(g))
         while not fut.done() and time.time() - wall0 < 10.0:
-            time.sleep(0.001)
+            rclpy.spin_once(self, timeout_sec=0.01)
         gh = fut.result() if fut.done() else None
         if gh is None or not gh.accepted:
             return {"planned": False, "fail": "goal rejected", "plan_s": time.time() - wall0}
         while self.n_plan == n_plan0 and time.time() - wall0 < 10.0:
-            time.sleep(0.001)
+            rclpy.spin_once(self, timeout_sec=0.01)
         plan_s = time.time() - wall0
         if self.n_plan == n_plan0:
-            gh.cancel_goal_async()
+            self.cancel(gh)
             return {"planned": False, "fail": "no plan within 10 s", "plan_s": plan_s}
         t0 = self.t
         res_fut = gh.get_result_async()
@@ -201,15 +213,12 @@ class Bridge(Node):
             self.advance(0.05, w, track)
         status = None
         if not res_fut.done():
-            cf = gh.cancel_goal_async()
-            while not cf.done():
-                self.advance(0.05, w, track)
+            self.cancel(gh, w, track)
             status = "timeout"
         else:
             status = {4: "succeeded", 5: "canceled", 6: "aborted"}.get(res_fut.result().status, str(res_fut.result().status))
-        with self.lock:
-            self.cmd = (0.0, 0.0)
-            n_cmd = self.n_cmd
+        self.cmd = (0.0, 0.0)
+        n_cmd = self.n_cmd
         t_end = self.t
         while abs(self.robot.vl) + abs(self.robot.vr) > 1e-6:     # wheels spin down, counted in the leg time
             self.advance(a2.SIM_DT, w, track)
@@ -236,8 +245,14 @@ def main():
     a = ap.parse_args()
     rclpy.init()
     node = Bridge(a.rtf)
-    spin = threading.Thread(target=rclpy.spin, args=(node,), daemon=True)
-    spin.start()
+    try:
+        run(node, a)
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+
+def run(node, a):
     runs = json.load(open(a.out))["runs"] if os.path.exists(a.out) else []
     done = {(r["seed"], r["slip"]) for r in runs}
     todo = [(level, seed) for level in a.slip.split(",") for seed in range(a.seed0, a.seed0 + a.seeds)
@@ -253,7 +268,7 @@ def main():
     if todo:            # Nav2's costmaps only activate once they have a map and the robot's transform
         setup(*todo[0])
     node.get_logger().info("waiting for navigate_to_pose ...")
-    while not node.nav.wait_for_server(timeout_sec=1.0):
+    while not node.nav.server_is_ready():
         node.advance(0.1)
     for level, seed in todo:
         w, goals = setup(level, seed)
@@ -271,8 +286,6 @@ def main():
         runs.append({"planner": a.label, "seed": seed, "slip": level, "complete": ok, "legs": legs,
                      "time": float(sum(l.get("time", 0.0) for l in legs))})
         json.dump({"meta": {"label": a.label, "rtf": a.rtf, "map_res": MAP_RES}, "runs": runs}, open(a.out, "w"))
-    node.destroy_node()
-    rclpy.shutdown()
 
 
 if __name__ == "__main__":

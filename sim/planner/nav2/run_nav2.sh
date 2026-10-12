@@ -52,9 +52,19 @@ echo "lattice: $LATTICE"
 
 RUN=$(mktemp -d)
 NAV= VIZ=
+# Nav2 and RViz run in their own process groups; stop each group with SIGINT, then SIGKILL if it is still up after
+# 10 s (Nav2's launch could hang on shutdown and keep this script from exiting)
+alive() { ps -e -o pgid=,stat= | awk -v g="$1" '$1 == g && $2 !~ /^Z/ {f = 1} END {exit !f}'; }
+stop() {
+  [ -n "$1" ] || return 0
+  kill -INT -- "-$1" 2>/dev/null || return 0
+  for _ in $(seq 100); do alive "$1" || { wait "$1" 2>/dev/null; return 0; }; sleep 0.1; done
+  echo "process group $1 did not stop on SIGINT, killing it"
+  kill -KILL -- "-$1" 2>/dev/null || true
+}
 cleanup() {
-  [ -n "$VIZ" ] && kill -INT "$VIZ" 2>/dev/null && wait "$VIZ" 2>/dev/null
-  [ -n "$NAV" ] && kill -INT "$NAV" 2>/dev/null && wait "$NAV" 2>/dev/null
+  stop "$VIZ"
+  stop "$NAV"
   rm -rf "$RUN"
 }
 trap cleanup EXIT
@@ -86,12 +96,12 @@ EOF
 export ROS_DOMAIN_ID=$DOMAIN ROS_LOCALHOST_ONLY=1
 mkdir -p "$(dirname "$OUT")"
 LOG=${OUT%.json}.nav2.log
-ros2 launch nav2_bringup navigation_launch.py params_file:="$RUN/params.yaml" use_sim_time:=True autostart:=True \
+setsid ros2 launch nav2_bringup navigation_launch.py params_file:="$RUN/params.yaml" use_sim_time:=True autostart:=True \
   >"$LOG" 2>&1 &
 NAV=$!
 echo "Nav2 started (log $LOG), domain $DOMAIN, rtf $RTF"
 if [ "$RVIZ" = 1 ]; then
-  rviz2 -d "$(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz" \
+  setsid rviz2 -d "$(ros2 pkg prefix nav2_bringup)/share/nav2_bringup/rviz/nav2_default_view.rviz" \
     --ros-args -p use_sim_time:=true >"${OUT%.json}.rviz.log" 2>&1 &
   VIZ=$!
 fi
