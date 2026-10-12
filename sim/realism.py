@@ -66,6 +66,9 @@ PARAMS = {
     "kphi": P(0.82, "N/cm^(n+2)", "Verified", "same"),
     "n": P(1.0, "", "Verified", "same"),
     "rut_min_move": P(0.02, "m", "Assumed", "stamp ruts after the wheel has moved this far"),
+    "berm_frac": P(0.3, "", "Assumed", "share of the trench volume pushed into side berms; the rest is compaction of "
+                   "fluffy BP-1 (" + SB + " RUTS)"),
+    "berm_width": P(0.06, "m", "Assumed", "width of each side berm (" + SB + " RUTS)"),
     # dust plume after a dig or dump
     "dust_beta": P({"nominal": 1.5, "heavy": 3.0}, "1/m", "Assumed", "peak extinction (" + SB + " DUST)"),
     "dust_sigma_h": P(0.5, "m", "Assumed", SB + " DUST"),
@@ -238,7 +241,8 @@ def rut_depth(mass_kg, n_wheels, wheel_width, wheel_diam, g=9.81):
 
 class Ruts:
     """Stamps wheel tracks into the height map H (rows = x, cols = y) while the rover drives. A cell under a wheel is
-    lowered to H0 - depth (never raised, never dug deeper by later passes; digging by the dig tool still wins)."""
+    lowered to H0 - depth (never dug deeper by later passes; digging by the dig tool still wins), and a low berm
+    holding berm_frac of the trench section is raised on each side (sim/bp1_sandbox/ruts.py shape)."""
 
     def __init__(self, level, xs, ys, H0, depth, wheel_width, wheel_xy):
         self.on = level != "off"
@@ -274,10 +278,18 @@ class Ruts:
             d = np.hypot(X - a[0] - tt * ab[0], Y - a[1] - tt * ab[1])
             under = d <= self.half
             sub = H[i0:i1, j0:j1]
-            floor = self.H0[i0:i1, j0:j1] - self.depth
+            h0 = self.H0[i0:i1, j0:j1]
+            floor = h0 - self.depth
             # only on the open bed: not on rocks (well above the original surface) and not in dug holes
-            ok = under & (sub > floor) & (sub < self.H0[i0:i1, j0:j1] + 0.03)
-            if ok.any():
+            bed = (sub < h0 + 0.03) & (sub > h0 - self.depth - 0.005)
+            ok = under & bed & (sub > floor)
+            # side berms: a raised-cosine ridge just outside the wheel, holding berm_frac of the trench section
+            bw = val("berm_width", "nominal")
+            ring = (d > self.half) & (d <= self.half + bw) & bed & ~under
+            if ok.any() or ring.any():
+                hb = 2 * val("berm_frac", "nominal") * self.depth * (2 * self.half) / (2 * bw)   # peak of 1-cos profile
+                prof = hb * 0.5 * (1 + np.cos(np.pi * (2 * (d - self.half) / bw - 1)))
+                sub[ring] = np.maximum(sub[ring], (h0 + prof)[ring])
                 sub[ok] = floor[ok]
                 box = [min(box[0], i0), max(box[1], i1), min(box[2], j0), max(box[3], j1)]
         self.last = P
