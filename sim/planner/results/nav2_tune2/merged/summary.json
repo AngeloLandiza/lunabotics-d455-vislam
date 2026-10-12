@@ -1,0 +1,44 @@
+{
+ "meta": {
+  "merged": [
+   "/home/angelo/lunabotics/vislam-bp1/sim/planner/results/nav2_tune2/finalcombo.json",
+   "/home/angelo/lunabotics/vislam-bp1/sim/planner/results/nav2_tune2/finalturn.json"
+  ],
+  "planners": [
+   "nav2_finalcombo",
+   "nav2_finalturn"
+  ]
+ },
+ "summary": [
+  {
+   "slip": "nominal",
+   "planner": "nav2_finalcombo",
+   "missions": 20,
+   "complete": 0,
+   "unplanned_legs": 0,
+   "legs_with_contact": 6,
+   "min_clearance_p5": -0.0930541108692816,
+   "paired_missions": 0,
+   "mission_time_median": null,
+   "mission_time_p95": null,
+   "dump_on_target": 0.0,
+   "plan_s_median": 0.0031790733337402344,
+   "plan_s_p95": 0.02616567611694336
+  },
+  {
+   "slip": "nominal",
+   "planner": "nav2_finalturn",
+   "missions": 20,
+   "complete": 1,
+   "unplanned_legs": 2,
+   "legs_with_contact": 1,
+   "min_clearance_p5": 0.060933957631185545,
+   "paired_missions": 0,
+   "mission_time_median": null,
+   "mission_time_p95": null,
+   "dump_on_target": 0.3333333333333333,
+   "plan_s_median": 0.0139082670211792,
+   "plan_s_p95": 4.532790160179131
+  }
+ ]
+}
