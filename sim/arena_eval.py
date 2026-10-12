@@ -9,7 +9,7 @@
      - dug / dumped volume: SLAM (/terrain/volume) vs truth, counting only changes > 3 cm
        like the mapper does
 
-Run with the arena sim + SLAM up (./run_arena.sh --eval does all of it).
+Run with the arena sim + SLAM up (run/sim/arena/arena.sh --eval does all of it).
 Parameters: seed (layout, must match the sim), laps_per_phase.
 """
 import json

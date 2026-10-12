@@ -8,10 +8,14 @@
 #                            markers (/terrain/obstacles) and an occupancy grid
 #                            (/terrain/obstacle_grid) for driving and path planning
 #
+# On the robot (installed package):
+#   ros2 launch lunabotics_slam lunabotics.launch.py base_frame:=base_link \
+#       camera_mount:="0.30 0 0.42 0 0.70 0" viz:=false
+#
 # Competition workflow (prior-map anchoring, the arena analogue of DEM anchoring):
-#   1. ./run_lunabotics.sh                      survey: map the arena + terrain baseline
-#   2. ./run_lunabotics.sh localization:=true   runs: localize in that map, load the saved
-#                                               terrain, report volume vs. the survey
+#   1. run/physical/lunabotics.sh                      survey: map the arena + terrain baseline
+#   2. run/physical/lunabotics.sh localization:=true   runs: localize in that map, load the saved
+#                                                      terrain, report volume vs. the survey
 
 import os
 
@@ -20,11 +24,12 @@ from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchD
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
-REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))   # package root (source or install)
 
 
 def generate_launch_description():
-    passthrough = ['viz', 'localization', 'new_map', 'database_path', 'config', 'rtabmap_args', 'sim']
+    passthrough = ['viz', 'localization', 'new_map', 'database_path', 'config', 'rtabmap_args', 'sim',
+                   'base_frame', 'camera_mount', 'odom_guess_frame']
 
     slam = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(os.path.join(REPO, 'launch', 'd455_fusion.launch.py')),
@@ -66,7 +71,13 @@ def generate_launch_description():
                               description='Start from the saved terrain/baseline (default: in localization).'),
         DeclareLaunchArgument('rtabmap_args', default_value=''),
         DeclareLaunchArgument('sim', default_value='false',
-                              description='Use Isaac Sim (./run_sim.sh) instead of the real D455.'),
+                              description='Use Isaac Sim (run/sim/) instead of the real D455.'),
+        DeclareLaunchArgument('base_frame', default_value='camera_link',
+                              description='Robot frame for odometry and SLAM (e.g. base_link).'),
+        DeclareLaunchArgument('camera_mount', default_value='',
+                              description='camera_link pose in base_frame, "x y z roll pitch yaw" (m, rad).'),
+        DeclareLaunchArgument('odom_guess_frame', default_value='',
+                              description='Wheel odometry frame to use as the motion guess (empty = IMU only).'),
         slam,
         terrain,
         obstacles,

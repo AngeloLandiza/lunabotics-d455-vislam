@@ -13,7 +13,7 @@ Publishes what the real D455 driver does, so the SLAM stack runs unchanged (sim:
   /arena/heightmap (true terrain, 32FC1 rows = x)   /arena/volume ([cut, fill, berm] m^3)
 drives from /cmd_vel, and digs/dumps where told on /arena/dig ([x, y, radius, depth]).
 
-Run via ./run_sim.sh (Isaac Sim's own Python + internal ROS 2 libraries):  python sim/isaac_lunar_sim.py [--headless]
+Run via run/sim/procedural/lunar_terrain.sh or run/sim/arena/arena.sh (Isaac Sim's own Python + internal ROS 2 libraries):  python sim/isaac_lunar_sim.py [--headless]
   --dig-at T     at sim time T, dig a hole at --dig-xy (tests terrain re-mapping)
 """
 import argparse

@@ -195,6 +195,8 @@ class DigTool(Node):
         cv2.rectangle(img, self.px(cx - s / 2, cy - s / 2), self.px(cx + s / 2, cy + s / 2), (200, 200, 200), -1)
         for b in self.boulders:
             cv2.circle(img, self.px(b.x, b.y), int(b.diameter / 2 / A.RES * SCALE), (240, 240, 240), 2, cv2.LINE_AA)
+        for x, y in A.POLES:
+            cv2.circle(img, self.px(x, y), 3, (40, 40, 230), -1, cv2.LINE_AA)
         if self.rover:
             x, y, yaw = self.rover
             c, s_ = math.cos(yaw), math.sin(yaw)
