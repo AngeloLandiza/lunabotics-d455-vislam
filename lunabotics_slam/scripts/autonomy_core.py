@@ -510,13 +510,19 @@ class TagFix:
         import cv2
         self.cv2 = cv2
         dic = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_APRILTAG_36h11)
-        prm = cv2.aruco.DetectorParameters()
-        prm.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
-        self.det = cv2.aruco.ArucoDetector(dic, prm)
+        if hasattr(cv2.aruco, 'ArucoDetector'):       # OpenCV >= 4.7
+            prm = cv2.aruco.DetectorParameters()
+            prm.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
+            det = cv2.aruco.ArucoDetector(dic, prm)
+            self._detect = det.detectMarkers
+        else:                                          # Ubuntu 22.04's OpenCV 4.5.4: the older function API
+            prm = cv2.aruco.DetectorParameters_create()
+            prm.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
+            self._detect = lambda g: cv2.aruco.detectMarkers(g, dic, parameters=prm)
         self.world = tag_corners()
 
     def detect(self, gray):
-        corners, ids, _ = self.det.detectMarkers(gray)
+        corners, ids, _ = self._detect(gray)
         if ids is None:
             return {}
         return {int(i): c.reshape(4, 2) for i, c in zip(ids.ravel(), corners) if int(i) in self.world}
