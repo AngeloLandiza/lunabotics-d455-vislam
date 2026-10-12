@@ -141,6 +141,8 @@ def main():
     meta = {"planners": planners, "slip_levels": {k: a2.SLIP_LEVELS[k] for k in levels}, "seeds": [a.seed0, a.seed0 + a.seeds - 1],
             "params": {k: [p.value, p.unit, p.status, p.source] for k, p in a2.PARAMS.items()}, "seconds": time.time() - t0}
     json.dump({"meta": meta, "summary": summ, "runs": runs}, open(os.path.join(a.out, "compare.json"), "w"))
+    # small copy without the per-leg runs; committed, so the dashboard on any machine can show it
+    json.dump({"meta": meta, "summary": summ}, open(os.path.join(a.out, "summary.json"), "w"), indent=1)
     md = table(summ)
     open(os.path.join(a.out, "compare.md"), "w").write(md + "\n")
     print(md)

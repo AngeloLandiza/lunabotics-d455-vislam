@@ -1,0 +1,203 @@
+{
+ "meta": {
+  "planners": [
+   "tangent"
+  ],
+  "slip_levels": {
+   "none": [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   "nominal": [
+    0.1,
+    0.05,
+    1.5,
+    0.15
+   ],
+   "heavy": [
+    0.25,
+    0.08,
+    2.0,
+    0.25
+   ]
+  },
+  "seeds": [
+   3000,
+   3099
+  ],
+  "params": {
+   "footprint": [
+    [
+     -0.438,
+     0.558,
+     -0.353,
+     0.346
+    ],
+    "m (x0,x1,y0,y1) about base_link",
+    "Verified",
+    "uic_bot_2027.xacro body extents (robot.py Robot.extents)"
+   ],
+   "track": [
+    0.54,
+    "m",
+    "Verified",
+    "wheel centres at y = +-0.27 (uic_bot_2027.xacro)"
+   ],
+   "v_wheel_max": [
+    0.75,
+    "m/s",
+    "Assumed",
+    "motor limit unknown; 0.75 m/s is the fastest speed with no missed hazards in the sandbox speed runs"
+   ],
+   "a_wheel_max": [
+    0.5,
+    "m/s^2",
+    "Assumed",
+    "wheel acceleration limit"
+   ],
+   "slip_long": [
+    0.1,
+    "",
+    "Assumed",
+    "mean longitudinal slip ratio on loose regolith"
+   ],
+   "slip_long_sd": [
+    0.05,
+    "",
+    "Assumed",
+    "variation of the slip ratio, redrawn every SLIP_TAU seconds"
+   ],
+   "icr_factor": [
+    1.5,
+    "",
+    "Assumed",
+    "effective / geometric track width when turning (skid-steer ICR expansion)"
+   ],
+   "icr_factor_sd": [
+    0.15,
+    "",
+    "Assumed",
+    "variation of the ICR factor"
+   ],
+   "slip_tau": [
+    1.0,
+    "s",
+    "Assumed",
+    "how long one slip draw lasts"
+   ],
+   "dig_box": [
+    [
+     0.7,
+     1.8,
+     0.7,
+     4.3
+    ],
+    "m (x0,x1,y0,y1)",
+    "Assumed",
+    "excavation zone overlaps the start zone (16.1.1); its size is in the unreadable Figure 9"
+   ],
+   "dump_x": [
+    [
+     4.7,
+     5.38,
+     6.06
+    ],
+    "m",
+    "Assumed",
+    "three dump spots along the 2.2 m berm side, used in turn; a spot an obstacle blocks is skipped"
+   ],
+   "dump_clear": [
+    0.05,
+    "m",
+    "Assumed",
+    "gap between the robot's front and the berm box edge at the dump pose"
+   ],
+   "dump_heading": [
+    -90.0,
+    "deg",
+    "Assumed",
+    "front faces the berm (robot drives in forwards); the team's dump direction is not known"
+   ],
+   "goal_tol": [
+    [
+     0.1,
+     10.0
+    ],
+    "m, deg",
+    "Assumed",
+    "pose accepted at a dig point or the dump pose"
+   ],
+   "berm_tol": [
+    [
+     0.05,
+     5.0
+    ],
+    "m, deg",
+    "Assumed",
+    "dump pose error that counts as on target (scored, not enforced)"
+   ],
+   "cycles": [
+    3,
+    "",
+    "Assumed",
+    "dig -> dump -> dig cycles per mission"
+   ],
+   "leg_timeout": [
+    60.0,
+    "s",
+    "Assumed",
+    "a leg that takes longer counts as failed"
+   ]
+  },
+  "seconds": 790.787163734436
+ },
+ "summary": [
+  {
+   "slip": "none",
+   "planner": "tangent",
+   "missions": 100,
+   "complete": 82,
+   "unplanned_legs": 18,
+   "legs_with_contact": 6,
+   "min_clearance_p5": 0.016693778815237124,
+   "paired_missions": 82,
+   "mission_time_median": 100.65000000001459,
+   "mission_time_p95": 153.3595000000055,
+   "dump_on_target": 1.0,
+   "plan_s_median": 0.34683215618133545,
+   "plan_s_p95": 4.989967167377471
+  },
+  {
+   "slip": "nominal",
+   "planner": "tangent",
+   "missions": 100,
+   "complete": 82,
+   "unplanned_legs": 18,
+   "legs_with_contact": 2,
+   "min_clearance_p5": 0.016902360717691585,
+   "paired_missions": 82,
+   "mission_time_median": 120.8150000000249,
+   "mission_time_p95": 179.6349999999816,
+   "dump_on_target": 1.0,
+   "plan_s_median": 0.3377023935317993,
+   "plan_s_p95": 4.807284343242645
+  },
+  {
+   "slip": "heavy",
+   "planner": "tangent",
+   "missions": 100,
+   "complete": 80,
+   "unplanned_legs": 18,
+   "legs_with_contact": 1,
+   "min_clearance_p5": 0.014266312415175762,
+   "paired_missions": 80,
+   "mission_time_median": 146.8600000000114,
+   "mission_time_p95": 202.09249999996115,
+   "dump_on_target": 1.0,
+   "plan_s_median": 0.32670021057128906,
+   "plan_s_p95": 4.748871088027954
+  }
+ ]
+}

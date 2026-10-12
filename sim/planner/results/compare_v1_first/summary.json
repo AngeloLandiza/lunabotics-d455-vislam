@@ -1,0 +1,249 @@
+{
+ "meta": {
+  "planners": [
+   "tangent",
+   "gcs"
+  ],
+  "slip_levels": {
+   "none": [
+    0.0,
+    0.0,
+    1.0,
+    0.0
+   ],
+   "nominal": [
+    0.1,
+    0.05,
+    1.5,
+    0.15
+   ],
+   "heavy": [
+    0.25,
+    0.08,
+    2.0,
+    0.25
+   ]
+  },
+  "seeds": [
+   3000,
+   3099
+  ],
+  "params": {
+   "footprint": [
+    [
+     -0.438,
+     0.558,
+     -0.353,
+     0.346
+    ],
+    "m (x0,x1,y0,y1) about base_link",
+    "Verified",
+    "uic_bot_2027.xacro body extents (robot.py Robot.extents)"
+   ],
+   "track": [
+    0.54,
+    "m",
+    "Verified",
+    "wheel centres at y = +-0.27 (uic_bot_2027.xacro)"
+   ],
+   "v_wheel_max": [
+    0.75,
+    "m/s",
+    "Assumed",
+    "motor limit unknown; 0.75 m/s is the fastest speed with no missed hazards in the sandbox speed runs"
+   ],
+   "a_wheel_max": [
+    0.5,
+    "m/s^2",
+    "Assumed",
+    "wheel acceleration limit"
+   ],
+   "slip_long": [
+    0.1,
+    "",
+    "Assumed",
+    "mean longitudinal slip ratio on loose regolith"
+   ],
+   "slip_long_sd": [
+    0.05,
+    "",
+    "Assumed",
+    "variation of the slip ratio, redrawn every SLIP_TAU seconds"
+   ],
+   "icr_factor": [
+    1.5,
+    "",
+    "Assumed",
+    "effective / geometric track width when turning (skid-steer ICR expansion)"
+   ],
+   "icr_factor_sd": [
+    0.15,
+    "",
+    "Assumed",
+    "variation of the ICR factor"
+   ],
+   "slip_tau": [
+    1.0,
+    "s",
+    "Assumed",
+    "how long one slip draw lasts"
+   ],
+   "dig_box": [
+    [
+     0.7,
+     1.8,
+     0.7,
+     4.3
+    ],
+    "m (x0,x1,y0,y1)",
+    "Assumed",
+    "excavation zone overlaps the start zone (16.1.1); its size is in the unreadable Figure 9"
+   ],
+   "dump_x": [
+    [
+     4.7,
+     5.38,
+     6.06
+    ],
+    "m",
+    "Assumed",
+    "three dump spots along the 2.2 m berm side, used in turn; a spot an obstacle blocks is skipped"
+   ],
+   "dump_clear": [
+    0.05,
+    "m",
+    "Assumed",
+    "gap between the robot's front and the berm box edge at the dump pose"
+   ],
+   "dump_heading": [
+    -90.0,
+    "deg",
+    "Assumed",
+    "front faces the berm (robot drives in forwards); the team's dump direction is not known"
+   ],
+   "goal_tol": [
+    [
+     0.1,
+     10.0
+    ],
+    "m, deg",
+    "Assumed",
+    "pose accepted at a dig point or the dump pose"
+   ],
+   "berm_tol": [
+    [
+     0.05,
+     5.0
+    ],
+    "m, deg",
+    "Assumed",
+    "dump pose error that counts as on target (scored, not enforced)"
+   ],
+   "cycles": [
+    3,
+    "",
+    "Assumed",
+    "dig -> dump -> dig cycles per mission"
+   ],
+   "leg_timeout": [
+    60.0,
+    "s",
+    "Assumed",
+    "a leg that takes longer counts as failed"
+   ]
+  },
+  "seconds": 1381.0181238651276
+ },
+ "summary": [
+  {
+   "slip": "none",
+   "planner": "tangent",
+   "missions": 100,
+   "complete": 57,
+   "unplanned_legs": 43,
+   "legs_with_contact": 24,
+   "min_clearance_p5": -0.04166121758331692,
+   "paired_missions": 10,
+   "mission_time_median": 87.75000000000799,
+   "mission_time_p95": 96.51000000001247,
+   "dump_on_target": 0.9659090909090909,
+   "plan_s_median": 0.2975907325744629,
+   "plan_s_p95": 0.9645146369934078
+  },
+  {
+   "slip": "none",
+   "planner": "gcs",
+   "missions": 100,
+   "complete": 10,
+   "unplanned_legs": 90,
+   "legs_with_contact": 22,
+   "min_clearance_p5": -0.06529321083043786,
+   "paired_missions": 10,
+   "mission_time_median": 122.51500000002576,
+   "mission_time_p95": 131.84300000002506,
+   "dump_on_target": 0.8181818181818182,
+   "plan_s_median": 3.085679292678833,
+   "plan_s_p95": 8.328627824783325
+  },
+  {
+   "slip": "nominal",
+   "planner": "tangent",
+   "missions": 100,
+   "complete": 57,
+   "unplanned_legs": 43,
+   "legs_with_contact": 24,
+   "min_clearance_p5": -0.013241147821886696,
+   "paired_missions": 9,
+   "mission_time_median": 99.8900000000142,
+   "mission_time_p95": 114.9540000000219,
+   "dump_on_target": 0.9028571428571428,
+   "plan_s_median": 0.31535518169403076,
+   "plan_s_p95": 0.9154115200042725
+  },
+  {
+   "slip": "nominal",
+   "planner": "gcs",
+   "missions": 100,
+   "complete": 9,
+   "unplanned_legs": 91,
+   "legs_with_contact": 1,
+   "min_clearance_p5": 0.025150452446411405,
+   "paired_missions": 9,
+   "mission_time_median": 131.33000000002554,
+   "mission_time_p95": 149.9440000000086,
+   "dump_on_target": 0.9821428571428571,
+   "plan_s_median": 3.1150048971176147,
+   "plan_s_p95": 8.882859933376311
+  },
+  {
+   "slip": "heavy",
+   "planner": "tangent",
+   "missions": 100,
+   "complete": 57,
+   "unplanned_legs": 43,
+   "legs_with_contact": 119,
+   "min_clearance_p5": -0.10020773629389464,
+   "paired_missions": 8,
+   "mission_time_median": 136.03500000002126,
+   "mission_time_p95": 157.3045000000019,
+   "dump_on_target": 0.7085714285714285,
+   "plan_s_median": 0.28242242336273193,
+   "plan_s_p95": 0.8839870691299438
+  },
+  {
+   "slip": "heavy",
+   "planner": "gcs",
+   "missions": 100,
+   "complete": 9,
+   "unplanned_legs": 91,
+   "legs_with_contact": 4,
+   "min_clearance_p5": 0.010291048476842726,
+   "paired_missions": 8,
+   "mission_time_median": 161.89499999999774,
+   "mission_time_p95": 178.34249999998278,
+   "dump_on_target": 1.0,
+   "plan_s_median": 3.045463800430298,
+   "plan_s_p95": 7.888253545761108
+  }
+ ]
+}
