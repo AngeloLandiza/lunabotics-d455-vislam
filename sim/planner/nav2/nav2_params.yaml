@@ -82,8 +82,11 @@ controller_server:
     general_goal_checker:
       stateful: True
       plugin: "nav2_controller::SimpleGoalChecker"
-      xy_goal_tolerance: 0.10           # arena2d goal_tol
-      yaw_goal_tolerance: 0.1745        # 10 deg
+      # tighter than the bench's 0.10 m / 10 deg, as the custom executor's final turn (to 2 deg) is: the robot keeps
+      # moving a little after Nav2 stops (wheel spin-down, slip), and a goal met exactly at 10 deg scored 11.1 deg in
+      # the smoke test (seed 3001). Assumed margin.
+      xy_goal_tolerance: 0.08
+      yaw_goal_tolerance: 0.0873        # 5 deg
     FollowPath:
       plugin: "nav2_mppi_controller::MPPIController"
       time_steps: 56                    # Nav2 default
