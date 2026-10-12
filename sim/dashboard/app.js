@@ -689,6 +689,8 @@
     const metas = by("approaches_meta");
     if (metas.length) body.append(approachesBlock(metas, data.roots));
     for (const it of by("isaac_tags")) body.append(isaacTagsBlock(it));
+    const drift = by("odometry_drift"), isaacVo = by("isaac_vo");
+    if (drift.length || isaacVo.length) body.append(odometrySection(drift, isaacVo));
     const recs = by("records");
     if (recs.length) body.append(recordsBlock(recs));
     if (errs.length) {
@@ -953,6 +955,88 @@
           "Turn to a tag median (deg) / never"].map((h) => el("th", { class: "num", text: h })))),
       el("tbody", null, rows))));
     card.append(el("p", { class: "source" }, "Source: ", pathNode(it.path), ` (sim/fiducial/isaac_tags_eval.py; detector ${c.detector ?? DASH})`));
+    return card;
+  }
+
+  // Odometry drift (sim/odometry/results/drift_*/summary.json; isaac_vo_* summaries are shown as their keys)
+  function odometrySection(drift, isaacVo) {
+    const wrap = el("div", null);
+    wrap.append(el("div", { class: "section-head" }, el("h2", { text: "Odometry drift" }),
+      el("span", { class: "sub", text: "position and heading error of each estimator, newest results first" })));
+    const newest = (a, b) => (b.mtime || 0) - (a.mtime || 0);
+    for (const it of [...drift].sort(newest)) wrap.append(odometryDriftBlock(it));
+    for (const it of [...isaacVo].sort(newest)) wrap.append(isaacVoBlock(it));
+    return wrap;
+  }
+
+  function odometryDriftBlock(it) {
+    const c = it.content || {};
+    const m = c.meta || {};
+    const rows = Array.isArray(c.summary) ? c.summary.filter((r) => r && typeof r === "object") : [];
+    const folder = String(it.path).split("/").slice(-2, -1)[0] || it.path;
+    const seeds = Array.isArray(m.seeds) && m.seeds.length === 2 ? `seeds ${m.seeds[0]}\u2013${m.seeds[1]}` : null;
+    const card = el("div", { class: "card" });
+    card.append(el("div", { class: "section-head" }, el("h3", { text: folder }),
+      el("span", { class: "sub", text: [seeds, m.mount ? `mount ${m.mount}` : null, `modified ${when(it.mtime)}`].filter(Boolean).join(" \u00b7 ") })));
+    if (!rows.length) {
+      card.append(el("p", { class: "empty", text: "No rows in summary." }));
+    } else {
+      // group rows by slip, then point, keeping the order they were written in
+      const groups = new Map();
+      for (const r of rows) {
+        const key = `${r.slip ?? DASH}\u0000${r.point ?? DASH}`;
+        if (!groups.has(key)) groups.set(key, { slip: r.slip ?? DASH, point: r.point ?? DASH, rows: [] });
+        groups.get(key).rows.push(r);
+      }
+      const tbody = el("tbody", null);
+      for (const g of groups.values()) {
+        tbody.append(el("tr", { class: "group" }, el("td", { colspan: "6", text: `${g.slip} slip \u00b7 ${g.point}` })));
+        for (const r of g.rows) {
+          const ci = Array.isArray(r.xy_ci_cm) ? `[${fmt(r.xy_ci_cm[0], 1)}, ${fmt(r.xy_ci_cm[1], 1)}]` : "";
+          tbody.append(el("tr", null,
+            el("td", { text: r.estimator ?? DASH }),
+            el("td", { class: "num", text: r.n ?? DASH }),
+            el("td", { class: "num", text: isNum(r.dist_median_m) ? `${fmt(r.dist_median_m, 1)} m` : DASH }),
+            el("td", { class: "num", text: `${fmt(r.xy_median_cm, 1)} ${ci}`.trim() }),
+            el("td", { class: "num", text: fmt(r.xy_p95_cm, 1) }),
+            el("td", { class: "num", text: `${fmt(r.yaw_median_deg, 1)} / ${fmt(r.yaw_p95_deg, 1)}` })));
+        }
+      }
+      card.append(el("div", { class: "table-wrap" }, el("table", null,
+        el("thead", null, el("tr", null, el("th", { text: "Estimator" }),
+          ["Runs", "Distance", "Position error median [95% CI] (cm)", "Position error p95 (cm)", "Heading median / p95 (deg)"]
+            .map((h) => el("th", { class: "num", text: h })))),
+        tbody)));
+    }
+    card.append(sourceLine(it.path, it.mtime, " · values as written in the file: xy_median_cm with its xy_ci_cm, xy_p95_cm, yaw_median_deg, yaw_p95_deg, dist_median_m"));
+    return card;
+  }
+
+  // Generic view of an isaac_vo_* summary.json whose format is not fixed yet: top-level keys, types and short values
+  function isaacVoBlock(it) {
+    const c = it.content || {};
+    const card = el("div", { class: "card" });
+    const folder = String(it.path).split("/").slice(-2, -1)[0] || it.path;
+    card.append(el("div", { class: "section-head" }, el("h3", { text: folder }),
+      el("span", { class: "sub", text: `Isaac visual odometry · modified ${when(it.mtime)}` })));
+    const keys = c && typeof c === "object" && !Array.isArray(c) ? Object.keys(c) : null;
+    const describe = (v) => {
+      if (Array.isArray(v)) return `list, ${v.length} items`;
+      if (v && typeof v === "object") return `object, ${Object.keys(v).length} keys`;
+      return fmtValue(v);
+    };
+    if (!keys) {
+      card.append(el("p", { class: "source", text: `Top level is ${Array.isArray(c) ? "a list" : typeof c}, not an object; nothing to list.` }));
+    } else {
+      card.append(el("div", { class: "table-wrap" }, el("table", null,
+        el("thead", null, el("tr", null, el("th", { text: "Key" }), el("th", { text: "Value or size" }))),
+        el("tbody", null, keys.map((k) => {
+          const v = c[k];
+          const text = describe(v);
+          return el("tr", null, el("td", null, code(k)), el("td", { class: "wrap-any", text: text.length > 160 ? text.slice(0, 157) + "..." : text }));
+        })))));
+    }
+    card.append(sourceLine(it.path, it.mtime, " · format not fixed yet: keys are shown as found"));
     return card;
   }
 
