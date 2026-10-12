@@ -29,6 +29,7 @@ REPO = os.path.dirname(os.path.dirname(DASH))
 SANDBOX = os.path.join(REPO, "sim", "bp1_sandbox")
 SUMMARIES = os.path.join(SANDBOX, "summaries")
 FIDUCIAL_RESULTS = os.path.join(REPO, "sim", "fiducial", "results")
+ODOMETRY_RESULTS = os.path.join(REPO, "sim", "odometry", "results")
 RESEARCH_INDEX = os.path.join(DASH, "research_index.json")
 STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -424,15 +425,18 @@ def result_roots():
         pass
     if os.path.isdir(SUMMARIES):
         roots.append(SUMMARIES)
-    if os.path.isdir(FIDUCIAL_RESULTS):
-        roots.append(FIDUCIAL_RESULTS)
+    for extra in (FIDUCIAL_RESULTS, ODOMETRY_RESULTS):
+        if os.path.isdir(extra):
+            roots.append(extra)
     return roots
 
 
 def result_kind(dirpath, name):
-    """Kind of a result file by its name; summary.json is generic, so it counts only in an isaac_tags* folder."""
-    if name == "summary.json" and os.path.basename(dirpath).startswith("isaac_tags"):
-        return "isaac_tags"
+    """Kind of a result file by its name; summary.json is generic, so it counts only in an isaac_tags* or isaac_vo*
+    folder."""
+    for prefix in ("isaac_tags", "isaac_vo"):
+        if name == "summary.json" and os.path.basename(dirpath).startswith(prefix):
+            return prefix
     return RESULT_FILES.get(name)
 
 

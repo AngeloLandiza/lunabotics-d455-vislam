@@ -689,6 +689,7 @@
     const metas = by("approaches_meta");
     if (metas.length) body.append(approachesBlock(metas, data.roots));
     for (const it of by("isaac_tags")) body.append(isaacTagsBlock(it));
+    for (const it of by("isaac_vo")) body.append(isaacVoBlock(it));
     const recs = by("records");
     if (recs.length) body.append(recordsBlock(recs));
     if (errs.length) {
@@ -953,6 +954,34 @@
           "Turn to a tag median (deg) / never"].map((h) => el("th", { class: "num", text: h })))),
       el("tbody", null, rows))));
     card.append(el("p", { class: "source" }, "Source: ", pathNode(it.path), ` (sim/fiducial/isaac_tags_eval.py; detector ${c.detector ?? DASH})`));
+    return card;
+  }
+
+  function isaacVoBlock(it) {
+    const c = it.content || {};
+    const m = c.meta || {};
+    const card = el("div", { class: "card" });
+    card.append(el("div", { class: "section-head" }, el("h2", { text: "D455 stereo visual odometry in Isaac Sim" }),
+      el("span", { class: "sub", text: `${Object.keys(c.drives || {}).length} drives · ${(m.image || []).join(" x ")}, ${fmt(m.hfov_deg, 0)} deg, baseline ${fmt((m.baseline_m ?? NaN) * 1000, 0)} mm · 15 Hz · modified ${when(it.mtime)}` })));
+    const legs = ["dig1", "dump1", "dig2", "end"];
+    const cell = (v) => (v ? `${fmt(v.e_xy * 100, 1)} cm / ${fmt(v.e_yaw_deg, 2)}°` : DASH);
+    const rows = [];
+    for (const [drive, d] of Object.entries(c.drives || {})) {
+      for (const [name, est] of Object.entries(d.estimators || {})) {
+        rows.push(el("tr", null,
+          el("td", { text: drive.replace("_", " · ") }),
+          el("td", { text: name }),
+          legs.map((l) => el("td", { class: "num", text: cell(est[l]) })),
+          el("td", { class: "num", text: `${fmt(d.features_tracked_median, 0)} (min ${d.features_tracked_min ?? DASH})` }),
+          el("td", { class: "num", text: `${d.lost_frames ?? DASH} / ${isNum(d.frames) ? d.frames - 1 : DASH}` }),
+          el("td", { class: "num", text: fmt(d.path_m, 1) })));
+      }
+    }
+    card.append(el("div", { class: "table-wrap" }, el("table", null,
+      el("thead", null, el("tr", null, el("th", { text: "Drive" }), el("th", { text: "Estimator" }),
+        ["Dig 1", "Dump 1", "Dig 2", "End", "Tracked features median", "Lost frames", "Path (m)"].map((h) => el("th", { class: "num", text: h })))),
+      el("tbody", null, rows))));
+    card.append(el("p", { class: "source" }, "Position / heading error at each leg end. vo: camera only; vo_gyro: gyro heading, VO translation. Source: ", pathNode(it.path), " (sim/odometry/vo_eval.py)"));
     return card;
   }
 
