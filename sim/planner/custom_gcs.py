@@ -180,12 +180,16 @@ def fillet(poly, max_cut=0.05, step=0.01):
 
 
 class Profile:
-    """Arc-length spline of a route and its TOPP-RA timing in wheel coordinates."""
+    """Arc-length spline of a route and its TOPP-RA timing in wheel coordinates (without the toppra package:
+    the same limits by a forward-backward pass in the phase plane, _numpy_profile)."""
 
     def __init__(self, pts, B_eff, vmax, amax, ds=0.01):
-        import toppra as ta
-        import toppra.algorithm as algo
-        import toppra.constraint as constraint
+        try:
+            import toppra as ta
+            import toppra.algorithm as algo
+            import toppra.constraint as constraint
+        except ImportError:
+            ta = None
         seg = np.hypot(*np.diff(pts, axis=0).T)
         keep = np.concatenate([[True], seg > 1e-6])
         pts = pts[keep]
@@ -201,6 +205,9 @@ class Profile:
         self.length = float(s2[-1])
         th = np.unwrap(np.arctan2(self.sy(s2, 1), self.sx(s2, 1)))
         self.sth = CubicSpline(s2, th)
+        if ta is None:
+            self._numpy_profile(s2, B_eff, vmax, amax)
+            return
         q = np.stack([s2 - B_eff / 2 * (th - th[0]), s2 + B_eff / 2 * (th - th[0]), s2], 1)
         path = ta.SplineInterpolator(s2, q)
         vlim = np.array([[-vmax, vmax], [-vmax, vmax], [-10.0, 10.0]])
@@ -216,6 +223,38 @@ class Profile:
             sd = np.clip(self.traj(tt, 1)[:, 2], 0, None)
             order = np.argsort(st, kind="stable")
             self._s, self._sd = st[order], sd[order]
+
+    def _numpy_profile(self, s, B_eff, vmax, amax):
+        """Minimum-time path speed under each wheel's speed and acceleration limits, starting and ending at rest.
+
+        Wheel speeds are sd (1 -+ B k / 2) with k the path curvature, so the speed limit is vmax / (1 + B |k| / 2);
+        wheel accelerations are sdd (1 -+ B k / 2) -+ sd^2 B k' / 2. On the grid of x = sd^2, a forward pass
+        accelerates as hard as both wheels allow and a backward pass brakes as hard (the classic phase-plane method that
+        TOPP-RA solves exactly; here the acceleration bound is taken at the start of each step, slightly conservative).
+        """
+        k = self.sth(s, 1)
+        dk = self.sth(s, 2)
+        c = np.stack([1 - B_eff * k / 2, 1 + B_eff * k / 2])          # wheel speed per unit path speed
+        d = np.stack([-B_eff * dk / 2, B_eff * dk / 2])               # wheel acceleration per unit sd^2
+        xmax = (vmax / np.maximum(np.abs(c).max(0), 1e-6)) ** 2
+
+        def acc(x, i):
+            lim = (amax - np.abs(d[:, i]) * x) / np.maximum(np.abs(c[:, i]), 1e-6)
+            return max(float(lim.min()), 1e-3)
+        ds = np.diff(s)
+        x = np.minimum(xmax, np.inf)
+        x[0] = 0.0
+        for i in range(len(s) - 1):
+            x[i + 1] = min(x[i + 1], x[i] + 2 * ds[i] * acc(x[i], i))
+        x[-1] = 0.0
+        for i in range(len(s) - 1, 0, -1):
+            x[i - 1] = min(x[i - 1], x[i] + 2 * ds[i - 1] * acc(x[i], i))
+        sd = np.sqrt(np.maximum(x, 0))
+        self._s, self._sd = s, sd
+        dt = 2 * ds / np.maximum(sd[1:] + sd[:-1], 1e-6)
+        self.T = float(dt.sum())
+        self.ok = True
+        self.traj = None
 
     def speed_at(self, s):
         """TOPP-RA's path speed at path position s (m/s)."""
