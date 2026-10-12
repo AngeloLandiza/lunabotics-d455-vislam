@@ -1,0 +1,104 @@
+{
+ "usd": "usd/arena_seed1.usda",
+ "mounts": {
+  "lidar3d": {
+   "xyz": [
+    -0.353,
+    0.0,
+    0.9861
+   ],
+   "R_robot_from_sensor": [
+    [
+     1.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     -0.9999999999964793,
+     -2.65358979335273e-06
+    ],
+    [
+     0.0,
+     2.65358979335273e-06,
+     -0.9999999999964793
+    ]
+   ]
+  },
+  "base_height": 0.2651,
+  "excluded_links": [
+   "lidar3d_link"
+  ],
+  "robot_digest": "9342c6e4cedb",
+  "n_triangles": 467422,
+  "pattern": "ROTARY hemisphere grid: 91 elevations 0-90 deg x 360 azimuth ticks"
+ },
+ "n_rays": 32760,
+ "scans_per_capture": 4,
+ "captures": [
+  {
+   "pose": [
+    3.0,
+    2.5,
+    0.0
+   ],
+   "scene": "flat",
+   "case": "with",
+   "returns": 30220,
+   "elements_per_scan": [
+    32760
+   ],
+   "max_dir_change_deg": 1.4787793334710982e-06,
+   "max_el_err_deg": 7.105427357601002e-15,
+   "scan_range_spread_m": 0.0
+  },
+  {
+   "pose": [
+    3.0,
+    2.5,
+    0.0
+   ],
+   "scene": "flat",
+   "case": "without",
+   "returns": 30240,
+   "elements_per_scan": [
+    32760
+   ],
+   "max_dir_change_deg": 1.4787793334710982e-06,
+   "max_el_err_deg": 7.105427357601002e-15,
+   "scan_range_spread_m": 0.0
+  },
+  {
+   "pose": [
+    1.0,
+    2.5,
+    0.0
+   ],
+   "scene": "arena_seed1",
+   "case": "with",
+   "returns": 32721,
+   "elements_per_scan": [
+    32760
+   ],
+   "max_dir_change_deg": 1.4787793334710982e-06,
+   "max_el_err_deg": 7.105427357601002e-15,
+   "scan_range_spread_m": 0.0
+  },
+  {
+   "pose": [
+    1.0,
+    2.5,
+    0.0
+   ],
+   "scene": "arena_seed1",
+   "case": "without",
+   "returns": 32755,
+   "elements_per_scan": [
+    32760
+   ],
+   "max_dir_change_deg": 1.4787793334710982e-06,
+   "max_el_err_deg": 7.105427357601002e-15,
+   "scan_range_spread_m": 0.0
+  }
+ ]
+}
