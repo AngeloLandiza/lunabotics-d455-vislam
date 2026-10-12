@@ -1,0 +1,626 @@
+<?xml version="1.0"?>
+<!--
+  uic_bot 2027 sensor layout, derived from educationmoment/EDT-Lunabotics-2026
+  src/description_pkg/urdf/uic_bot.xacro at commit a720e46 (2026 robot). Body, wheels, D456 and IMU are unchanged.
+
+  Changes for the 2027 autonomy plan (each one Assumed until the team measures the real robot):
+  - lidar3d_link: a generic 3D LiDAR replaces the 2D RPLIDAR S3, at the S3's mount (0, 0.102, 0.470), pitched 30 deg
+    down. Housing is a generic 0.05 m radius x 0.07 m cylinder. Gazebo sensor: 16 beams over +-15 deg, 0.4 deg steps
+    (the sandbox "spin16" pattern), 0.3 to 8 m.
+  - d455_link: moved from the rear (facing back) to the front centre, pitched 40 deg down (Angelo's 2027 layout;
+    the 40 deg is Angelo's, the position is Assumed).
+  - rear_cam_link: monocular camera for fiducials at the 2026 D455 pose (rear, facing back, 15 deg up).
+  Mesh paths still use $(find description_pkg), so this file can be dropped into that package.
+-->
+<robot name="uic_bot"
+  xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:arg name="use_sim" default="true" />
+
+  <material name="camera_grey">
+    <color rgba="0.81 0.81 0.81 1.0" />
+  </material>
+
+  <material name="black">
+    <color rgba="0.22 0.22 0.22 1.0" />
+  </material>
+
+  <xacro:if value="$(arg use_sim)">
+    <xacro:property name="camera_sim_link_offset" value="0" />
+    <xacro:property name="camera_sim_joint_offset" value="0" />
+  </xacro:if>
+  <xacro:unless value="$(arg use_sim)">
+    <xacro:property name="camera_sim_link_offset" value="0" />
+    <xacro:property name="camera_sim_joint_offset" value="0" />
+  </xacro:unless>
+
+  <!-- ================================= -->
+  <!--            BODY LINKS             -->
+  <!-- ================================= -->
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/body.dae"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/body.stl"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </collision>
+    <inertial>
+      <mass value="65.0"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="3.553940" ixy="0.0" ixz="0.0" iyy="8.736520" iyz="0.0" izz="12.290460"/>
+    </inertial>
+  </link>
+
+  <!-- ================================= -->
+  <!--           SENSOR LINKS            -->
+  <!-- ================================= -->
+
+  <link name="d456_link">
+    <visual>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/d456_camera.stl" />
+      </geometry>
+    <!--  <origin xyz="0 -${camera_sim_link_offset} 0" rpy="0 0 0" /> -->
+      <material name="camera_grey" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/d456_camera.stl" />
+      </geometry>
+    <!--  <origin xyz="0 -${camera_sim_link_offset} 0" rpy="0 0 0" /> -->
+    </collision>
+  </link>
+
+  <link name="d456_optical_link"></link>
+
+  <link name="d455_link">
+    <visual>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/d455_camera.stl" />
+      </geometry>
+    <!--  <origin xyz="0 -${camera_sim_link_offset} 0" rpy="0 0 0" /> -->
+      <material name="camera_grey" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/d455_camera.stl" />
+      </geometry>
+    <!--  <origin xyz="0 -${camera_sim_link_offset} 0" rpy="0 0 0" /> -->
+    </collision>
+  </link>
+
+  <link name="d455_optical_link"></link>
+
+  <link name="lidar3d_link">
+    <visual>
+      <geometry>
+        <cylinder radius="0.05" length="0.07" />
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <material name="black" />
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.05" length="0.07" />
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </collision>
+  </link>
+
+  <link name="rear_cam_link">
+    <visual>
+      <geometry>
+        <box size="0.03 0.03 0.03" />
+      </geometry>
+      <material name="camera_grey" />
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.03 0.03 0.03" />
+      </geometry>
+    </collision>
+  </link>
+
+  <link name="rear_cam_optical_link"></link>
+
+  <link name="imu_link"></link>
+
+  <!-- ================================= -->
+  <!--            WHEEL LINKS            -->
+  <!-- ================================= -->
+
+  <link name="front_right_wheel_link">
+    <inertial>
+      <mass value="2.27"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0255" ixy="0.0" ixz="0.0" iyy="0.0255" iyz="0.0" izz="0.0510"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/wheel.dae"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.1651" length="0.1"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+    </collision>
+  </link>
+
+  <link name="front_left_wheel_link">
+    <inertial>
+      <mass value="2.27"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0255" ixy="0.0" ixz="0.0" iyy="0.0255" iyz="0.0" izz="0.0510"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/wheel.dae"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.1651" length="0.1"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+    </collision>
+  </link>
+
+  <link name="rear_right_wheel_link">
+    <inertial>
+      <mass value="2.27"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0255" ixy="0.0" ixz="0.0" iyy="0.0255" iyz="0.0" izz="0.0510"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/wheel.dae"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.1651" length="0.1"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+    </collision>
+  </link>
+
+  <link name="rear_left_wheel_link">
+    <inertial>
+      <mass value="2.27"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.0255" ixy="0.0" ixz="0.0" iyy="0.0255" iyz="0.0" izz="0.0510"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <mesh filename="file:///$(find description_pkg)/meshes/uic_bot/wheel.dae"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <material name="black"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.1651" length="0.1"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+    </collision>
+  </link>
+
+
+  <!-- ================================= -->
+  <!--           SENSOR JOINTS           -->
+  <!-- ================================= -->
+
+  <joint name="base_d455_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="d455_link" />
+    <origin xyz="0.535 0 0.37" rpy="0 0.6981 0" />
+  </joint>
+
+  <joint name="d455_optical_joint" type="fixed">
+    <parent link="d455_link" />
+    <child link="d455_optical_link" />
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+  </joint>
+
+  <joint name="base_d456_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="d456_link" />
+    <origin xyz="0.535 -0.28 0.141" rpy="0 -0.2618 0" />
+  </joint>
+
+  <joint name="d456_optical_joint" type="fixed">
+    <parent link="d456_link" />
+    <child link="d456_optical_link" />
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+  </joint>
+
+  <joint name="base_lidar3d_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="lidar3d_link" />
+    <origin xyz="0.0 0.102 0.470" rpy="0 0.5236 0" />
+  </joint>
+
+  <joint name="base_rear_cam_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="rear_cam_link" />
+    <origin xyz="-0.42 0 0.37" rpy="0 -0.2618 3.14159" />
+  </joint>
+
+  <joint name="rear_cam_optical_joint" type="fixed">
+    <parent link="rear_cam_link" />
+    <child link="rear_cam_optical_link" />
+    <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708" />
+  </joint>
+
+  <joint name="imu_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="imu_link" />
+    <origin xyz="0 0 0" rpy="3.14159 0 -1.57" />
+  </joint>
+
+  <!-- ================================= -->
+  <!--            WHEEL JOINTS           -->
+  <!-- ================================= -->
+
+  <joint name="base_rear_right_wheel_joint" type="continuous">
+    <parent link="base_link" />
+    <child link="rear_right_wheel_link" />
+    <origin xyz="-0.18 -0.27 -0.1" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <joint name="base_rear_left_wheel_joint" type="continuous">
+    <parent link="base_link" />
+    <child link="rear_left_wheel_link" />
+    <origin xyz="-0.18 0.27 -0.1" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <joint name="base_front_right_wheel_joint" type="continuous">
+    <parent link="base_link" />
+    <child link="front_right_wheel_link" />
+    <origin xyz="0.275 -0.27 -0.1" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <joint name="base_front_left_wheel_joint" type="continuous">
+    <parent link="base_link" />
+    <child link="front_left_wheel_link" />
+    <origin xyz="0.275 0.27 -0.1" rpy="0 0 0" />
+    <axis xyz="0 1 0" />
+  </joint>
+
+  <!-- ================================= -->
+  <!--       GAZEBO CONFIGURATION        -->
+  <!-- ================================= -->
+
+  <xacro:if value="$(arg use_sim)">
+    <gazebo reference="front_left_wheel_link">
+      <material>
+        <ambient>0.4 0.4 0.4 1</ambient>
+        <diffuse>0.83137 0.0 0.19216 1.0</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+        <emissive>0 0 0 1</emissive>
+      </material>
+      <surface>
+        <friction>
+          <ode>
+            <mu>3.0</mu>
+            <mu2>3.0</mu2>
+            <slip1>0.0</slip1>
+            <slip2>0.0</slip2>
+            <fdir1>1 0 0</fdir1>
+          </ode>
+        </friction>
+        <contact>
+          <ode>
+            <kp>1e7</kp>
+            <kd>1e4</kd>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
+
+    <gazebo reference="front_right_wheel_link">
+      <material>
+        <ambient>0.4 0.4 0.4 1</ambient>
+        <diffuse>0.4 0.4 0.4 1</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+        <emissive>0 0 0 1</emissive>
+      </material>
+      <surface>
+        <friction>
+          <ode>
+            <mu>3.0</mu>
+            <mu2>3.0</mu2>
+            <slip1>0.0</slip1>
+            <slip2>0.0</slip2>
+            <fdir1>1 0 0</fdir1>
+          </ode>
+        </friction>
+        <contact>
+          <ode>
+            <kp>1e7</kp>
+            <kd>1e4</kd>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
+
+    <gazebo reference="rear_right_wheel_link">
+      <material>
+        <ambient>0.4 0.4 0.4 1</ambient>
+        <diffuse>0.4 0.4 0.4 1</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+        <emissive>0 0 0 1</emissive>
+      </material>
+      <surface>
+        <friction>
+          <ode>
+            <mu>3.0</mu>
+            <mu2>3.0</mu2>
+            <slip1>0.0</slip1>
+            <slip2>0.0</slip2>
+            <fdir1>1 0 0</fdir1>
+          </ode>
+        </friction>
+        <contact>
+          <ode>
+            <kp>1e7</kp>
+            <kd>1e4</kd>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
+
+    <gazebo reference="rear_left_wheel_link">
+      <material>
+        <ambient>0.4 0.4 0.4 1</ambient>
+        <diffuse>0.4 0.4 0.4 1</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+        <emissive>0 0 0 1</emissive>
+      </material>
+      <surface>
+        <friction>
+          <ode>
+            <mu>3.0</mu>
+            <mu2>3.0</mu2>
+            <slip1>0.0</slip1>
+            <slip2>0.0</slip2>
+            <fdir1>1 0 0</fdir1>
+          </ode>
+        </friction>
+        <contact>
+          <ode>
+            <kp>1e7</kp>
+            <kd>1e4</kd>
+          </ode>
+        </contact>
+      </surface>
+    </gazebo>
+
+    <gazebo reference="d456_link">
+      <sensor type="depth" name="d456">
+        <pose>0 0 0 0 0 0</pose>
+        <update_rate>60.0</update_rate>
+        <visualize>true</visualize>
+        <camera>
+          <horizontal_fov>1.434</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>360</height>
+            <format>R8G8B8</format>
+          </image>
+          <distortion>
+            <k1>-0.06792929080519726</k1>
+            <k2>0.08058277259698843</k2>
+            <k3>-0.04417756393089296</k3>
+            <p1>-0.001690544521662593</p1>
+            <p2>-0.0008235437909836152</p2>
+          </distortion>
+          <clip>
+            <near>0.05</near>
+            <far>10.0</far>
+          </clip>
+        </camera>
+        <plugin name="d456_controller" filename="libgazebo_ros_camera.so">
+          <ros>
+            <remapping>/d456/image_raw:=/d456/color/image_raw</remapping>
+            <remapping>/d456/points:=/d456/color/points</remapping>
+            <remapping>/d456/camera_info:=/d456/color/camera_info</remapping>
+            <remapping>/d456/depth/image_raw:=/d456/depth/image_rect_raw</remapping>
+          </ros>
+          <frame_name>d456_optical_link</frame_name>
+          <publish_tf>false</publish_tf>
+          <publish_point_cloud>true</publish_point_cloud>
+        </plugin>
+      </sensor>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="d455_link">
+      <sensor type="depth" name="d455">
+        <pose>0 0 0 0 0 0</pose>
+        <update_rate>60.0</update_rate>
+        <visualize>true</visualize>
+        <camera>
+          <horizontal_fov>1.540</horizontal_fov>
+          <image>
+            <width>640</width>
+            <height>360</height>
+            <format>R8G8B8</format>
+          </image>
+          <distortion>
+            <k1>-0.06792929080519726</k1>
+            <k2>0.08058277259698843</k2>
+            <k3>-0.04417756393089296</k3>
+            <p1>-0.001690544521662593</p1>
+            <p2>-0.0008235437909836152</p2>
+          </distortion>
+          <clip>
+            <near>0.05</near>
+            <far>10.0</far>
+          </clip>
+        </camera>
+        <plugin name="d455_controller" filename="libgazebo_ros_camera.so">
+          <ros>
+            <remapping>/d455/image_raw:=/d455/color/image_raw</remapping>
+            <remapping>/d455/points:=/d455/color/points</remapping>
+            <remapping>/d455/camera_info:=/d455/color/camera_info</remapping>
+            <remapping>/d455/depth/image_raw:=/d455/depth/image_rect_raw</remapping>
+          </ros>
+          <frame_name>d455_optical_link</frame_name>
+          <publish_tf>false</publish_tf>
+          <publish_point_cloud>true</publish_point_cloud>
+        </plugin>
+      </sensor>
+      <material>Gazebo/Grey</material>
+    </gazebo>
+
+    <gazebo reference="lidar3d_link">
+      <sensor type="ray" name="lidar3d">
+        <pose>0 0 0 0 0 0</pose>
+        <visualize>false</visualize>
+        <update_rate>10.0</update_rate>
+        <ray>
+          <scan>
+            <horizontal>
+              <samples>900</samples>
+              <resolution>1</resolution>
+              <min_angle>-3.14159</min_angle>
+              <max_angle>3.13461</max_angle>
+            </horizontal>
+            <vertical>
+              <samples>16</samples>
+              <resolution>1</resolution>
+              <min_angle>-0.2618</min_angle>
+              <max_angle>0.2618</max_angle>
+            </vertical>
+          </scan>
+          <range>
+            <min>0.3</min>
+            <max>8.0</max>
+          </range>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.02</stddev>
+          </noise>
+        </ray>
+        <plugin name="lidar3d_controller" filename="libgazebo_ros_ray_sensor.so">
+          <frame_name>lidar3d_link</frame_name>
+          <ros>
+            <remapping>~/out:=/lidar3d/points</remapping>
+          </ros>
+          <output_type>sensor_msgs/PointCloud2</output_type>
+        </plugin>
+      </sensor>
+      <material>Gazebo/Black</material>
+    </gazebo>
+
+    <gazebo reference="rear_cam_link">
+      <sensor type="camera" name="rear_cam">
+        <update_rate>30.0</update_rate>
+        <camera>
+          <horizontal_fov>1.2</horizontal_fov>
+          <image>
+            <width>1280</width>
+            <height>720</height>
+            <format>R8G8B8</format>
+          </image>
+          <clip>
+            <near>0.05</near>
+            <far>10.0</far>
+          </clip>
+        </camera>
+        <plugin name="rear_cam_controller" filename="libgazebo_ros_camera.so">
+          <frame_name>rear_cam_optical_link</frame_name>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+    <gazebo reference="imu_link">
+      <gravity>false</gravity>
+      <sensor name="imu_sensor" type="imu">
+        <always_on>true</always_on>
+        <update_rate>200</update_rate>
+        <visualize>true</visualize>
+        <plugin filename="libgazebo_ros_imu_sensor.so" name="imu_plugin">
+          <ros>
+            <namespace></namespace>
+            <remapping>~/out:=/imu/data</remapping>
+          </ros>
+          <bodyName>base_link</bodyName>
+          <gaussianNoise>0.0</gaussianNoise>
+          <xyzOffset>0 0 0</xyzOffset>
+          <rpyOffset>0 0 0</rpyOffset>
+          <frameName>imu_link</frameName>
+          <publish_tf>false</publish_tf>
+          <initialOrientationAsReference>false</initialOrientationAsReference>
+        </plugin>
+        <pose>0 0 0 0 0 0</pose>
+      </sensor>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <robot_param>robot_description</robot_param>
+        <robot_param_node>robot_state_publisher</robot_param_node>
+        <parameters>$(find config_pkg)/params/gazebo/gazebo_uic_bot_params.yaml</parameters>
+      </plugin>
+    </gazebo>
+
+    <ros2_control name="GazeboSystem" type="system">
+      <hardware>
+        <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+      </hardware>
+      <joint name="base_front_right_wheel_joint">
+        <command_interface name="velocity">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+      <joint name="base_front_left_wheel_joint">
+        <command_interface name="velocity">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+      <joint name="base_rear_right_wheel_joint">
+        <command_interface name="velocity">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+      <joint name="base_rear_left_wheel_joint">
+        <command_interface name="velocity">
+          <param name="min">-1</param>
+          <param name="max">1</param>
+        </command_interface>
+        <state_interface name="position" />
+        <state_interface name="velocity" />
+      </joint>
+    </ros2_control>
+  </xacro:if>
+</robot>
