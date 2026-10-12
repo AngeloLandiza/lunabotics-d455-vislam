@@ -66,7 +66,9 @@ MOUNTS = {
 ROBOT = {
     "urdf": P("sim/robot/uic_bot_2027.xacro", "", "Verified",
               "educationmoment/EDT-Lunabotics-2026 uic_bot.xacro (a720e46), 2027 sensor layout added (see the file header)"),
-    "lidar_link": P("lidar3d_link", "", "Verified", "Unitree L1 at the comp-day-one mount: (-0.353, 0, 0.721) from base_link, upside down"),
+    "lidar_link": P("lidar3d_link", "", "Assumed", "Unitree L1 (Verified, team repo). 2027 mount at the front top, axis 45 deg "
+                    "forward of down (Angelo's choice 2026-10-12, position Assumed); the comp-day-one mount "
+                    "(-0.353, 0, 0.721) from base_link, upside down, is robot.LIDAR_MOUNTS['rear2026']"),
     "d455_link": P("d455_link", "", "Assumed", "D455 moved to the front centre (0.535, 0, 0.37), 40 deg down (Angelo's 2027 layout)"),
     "body_reflectivity": P(0.5, "", "Assumed", "robot frame and panels at the LiDAR wavelength; only matters for returns under ~1 m, which pass at any value above ~0.01"),
     "mask_margin": P(0.06, "m", "Assumed", "self-mask drops returns up to this far beyond the modelled body (3 sigma of the L1's 2 cm noise)"),

@@ -32,24 +32,20 @@ STARTS = {                  # start pose error sigmas (m, deg): odometry drift, 
     "hard": (0.40, 15.0),
 }
 MOUNTS = {
-    "rear_real": None,                                       # URDF mount: upside down at the rear top
-    "front45": (0.45, 0.0, 0.75, 180.0, -45.0, 0.0),         # front top, axis 45 deg forward of straight down
+    "rear2026": "rear2026",                                  # the team's 2026 mount: upside down at the rear top
+    "front45": (0.45, 0.0, 0.75, 180.0, -45.0, 0.0),         # front top, axis 45 deg forward of straight down (2027)
 }
 _CACHE = {}
 
 
 def parts(name):
     if name not in _CACHE:
-        from robot import Robot, BodyCaster, rpy_matrix
+        from robot import Robot, BodyCaster
         rb = _CACHE.get("robot") or Robot()
         _CACHE["robot"] = rb
         body = _CACHE.get("body") or BodyCaster(rb, v(pr.ROBOT, "lidar_link"))
         _CACHE["body"] = body
-        m = MOUNTS[name]
-        if m is None:
-            xyz, R = rb.mount(v(pr.ROBOT, "lidar_link"))
-        else:
-            xyz, R = tuple(m[:3]), rpy_matrix(*np.radians(m[3:]))
+        xyz, R = rb.lidar_mount(MOUNTS[name], v(pr.ROBOT, "lidar_link"))
         _CACHE[name] = (xyz, R, selfmask.MaskTable(body, xyz, R))
     return _CACHE[name]
 

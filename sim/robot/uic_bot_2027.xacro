@@ -5,9 +5,12 @@
 
   Changes for the 2027 autonomy plan (each one Assumed until the team measures the real robot):
   - lidar3d_link: the team's 3D LiDAR, a Unitree L1 (branches 5-27-2026 and comp-day-one: unitree_lidar_ros2 driver,
-    unilidar_sdk, Point-LIO config unilidar_l1.yaml), replacing the 2D RPLIDAR S3. Mount copied from comp-day-one
-    (3bd79d3) src/neptune_bringup/launch/test.launch.py, static transform base_link -> s3_lidar_link:
-    xyz (-0.353, 0, 0.721), roll 180 deg ("upside down"), so its 360 x 90 deg hemisphere looks down. Housing is the
+    unilidar_sdk, Point-LIO config unilidar_l1.yaml), replacing the 2D RPLIDAR S3. Since 2026-10-12 it sits at the
+    front top, upside down and pitched so its axis points 45 deg forward of straight down: xyz (0.45, 0, 0.4849),
+    rpy (180, -45, 0) deg, 0.75 m above the ground (Angelo's choice after the sandbox hazard and localization runs;
+    the position is Assumed until the team finds a real mount point there). The team's 2026 mount, from comp-day-one
+    (3bd79d3) src/neptune_bringup/launch/test.launch.py, static transform base_link -> s3_lidar_link, was
+    xyz (-0.353, 0, 0.721), roll 180 deg ("upside down"); robot.LIDAR_MOUNTS["rear2026"] keeps it. Housing is the
     L1's 75 x 75 x 65 mm (Unitree L1 user manual v1.1). Gazebo sensor: a 360 x 90 deg approximation of its field of
     view; the sandbox models the L1's mirror-and-core scan itself (sensors.l1_dirs).
   - d455_link: moved from the rear (facing back) to the front centre, pitched 40 deg down (Angelo's 2027 layout;
@@ -255,7 +258,7 @@
   <joint name="base_lidar3d_joint" type="fixed">
     <parent link="base_link" />
     <child link="lidar3d_link" />
-    <origin xyz="-0.353 0 0.721" rpy="3.14159 0 0" />
+    <origin xyz="0.45 0 0.4849" rpy="3.14159 -0.785398 0" />
   </joint>
 
   <joint name="base_rear_cam_joint" type="fixed">

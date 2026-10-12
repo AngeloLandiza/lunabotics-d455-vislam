@@ -13,8 +13,9 @@ transparent, raw lets it block and return rays with no mask, box and table add t
 --rut-trips earlier drives (ruts.py) into each arena, from their own random stream. --sensors runs only the listed
 sensors (the D455 never sees the body, so mask cases can skip it). --frame-s sets how long the L1 collects per frame:
 frames are DS apart, so DS / speed matches the rays a robot at that speed gets (0.15 s at 1 m/s, 0.6 s at 0.25 m/s).
---lidar-mount moves the LiDAR off its URDF mount: position in m in the robot frame (ground under base_link) and URDF
-roll, pitch, yaw in degrees; 180,-45,0 points an upside-down L1's axis 45 deg forward of straight down.
+--lidar-mount moves the LiDAR off its URDF mount: a name from robot.LIDAR_MOUNTS (rear2026 is the team's 2026 mount, the
+URDF's until 2026-10-12), or position in m in the robot frame (ground under base_link) and URDF roll, pitch, yaw in
+degrees; 180,-45,0 points an upside-down L1's axis 45 deg forward of straight down.
 --rms sets the floor roughness (params.py default 0.01 m), --undulation adds long-wavelength floor waves of that RMS,
 --pitch-err makes the robot's attitude estimate wrong by that many degrees (sign alternates with the seed). The extra
 draws use their own random stream, so every case sees the same arenas, starts and sensor noise as the others. The
@@ -62,12 +63,9 @@ _CACHE = {}
 def robot_parts():
     """Per-process robot model, body caster and self-mask (Embree scenes cannot be pickled to the workers)."""
     if "robot" not in _CACHE:
-        from robot import Robot, BodyCaster, rpy_matrix
+        from robot import Robot, BodyCaster
         rb = Robot()
-        xyz, R = rb.mount(v(pr.ROBOT, "lidar_link"))
-        if CASE["lidar_mount"] is not None:
-            m = CASE["lidar_mount"]
-            xyz, R = tuple(m[:3]), rpy_matrix(*np.radians(m[3:]))
+        xyz, R = rb.lidar_mount(CASE["lidar_mount"], v(pr.ROBOT, "lidar_link"))
         body = BodyCaster(rb, v(pr.ROBOT, "lidar_link"))
         _CACHE.update(robot=rb, body=body, lidar_mount=(xyz, R), d455_mount=rb.mount_pitch(v(pr.ROBOT, "d455_link")))
         if CASE["body"] == "table":
@@ -244,11 +242,15 @@ def main():
     ap.add_argument("--rut-trips", type=int, default=v(pr.RUTS, "trips"))
     ap.add_argument("--sensors", default="lidar,d455", help="comma-separated subset of lidar,d455")
     ap.add_argument("--frame-s", type=float, default=None, help="L1 collection time per frame in s (default 0.1)")
-    ap.add_argument("--lidar-mount", default=None, help="x,y,z (m, robot frame) and roll,pitch,yaw (deg) for the LiDAR")
+    ap.add_argument("--lidar-mount", default=None,
+                    help="a robot.LIDAR_MOUNTS name, or x,y,z (m, robot frame) and roll,pitch,yaw (deg) for the LiDAR")
     ap.add_argument("--label", default="", help="case name shown on the dashboard")
     a = ap.parse_args()
     assert a.body == "none" or a.robot, "--body needs --robot"
-    assert a.lidar_mount is None or len(a.lidar_mount.split(",")) == 6, "--lidar-mount takes x,y,z,roll,pitch,yaw"
+    mount = a.lidar_mount
+    if mount is not None and "," in mount:
+        mount = [float(x) for x in mount.split(",")]
+        assert len(mount) == 6, "--lidar-mount takes a mount name or x,y,z,roll,pitch,yaw"
     sensors = a.sensors.split(",")
     assert sensors and set(sensors) <= {"lidar", "d455"}, "--sensors takes lidar, d455 or both"
     if a.frame_s is not None:  # set before the pool forks, like --rms
@@ -268,7 +270,7 @@ def main():
         pr.DETECT["ground_spread"] = pr.P(a.ground_spread, old.unit, "Assumed", "approach.py --ground-spread")
     CASE.update(undulation=a.undulation, pitch_err=a.pitch_err, clear_only=a.clear_only, robot=a.robot,
                 lidar=a.lidar, body=a.body, inflate=a.inflate, mask_err=a.mask_err, ruts=a.ruts, rut_trips=a.rut_trips,
-                sensors=sensors, lidar_mount=[float(x) for x in a.lidar_mount.split(",")] if a.lidar_mount else None)
+                sensors=sensors, lidar_mount=mount)
     if a.robot:          # robot size from the URDF, set before the pool forks
         global FRONT, BACK, HALF_W
         parts = robot_parts()

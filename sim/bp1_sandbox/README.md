@@ -177,7 +177,7 @@ python3 robot.py                      # robot geometry and sensor mounts from th
 python3 approach.py 48 out 3000 --robot --lidar l1 --body table --sensors lidar   # one case
 ```
 
-`--robot` takes the robot from the team's URDF ([educationmoment/EDT-Lunabotics-2026](https://github.com/educationmoment/EDT-Lunabotics-2026), `sim/robot/uic_bot_2027.xacro` adds the 2027 sensors). The 3D LiDAR is the team's Unitree L1, upside down at the rear top as on the comp-day-one branch, 0.986 m above the ground (Verified from the repo). `sensors.l1_dirs` models its scan from the L1 manual: 21,600 points per second over a 360 x 90 deg hemisphere, so 2,160 per 0.1 s frame (the scan geometry is Inferred). The robot body blocks about 20% of that hemisphere, all forward and down; Isaac Sim agrees with `robot.BodyCaster` on 99.7% of blocked beams (`results_isaac/selfmask_l1.*`).
+`--robot` takes the robot from the team's URDF ([educationmoment/EDT-Lunabotics-2026](https://github.com/educationmoment/EDT-Lunabotics-2026), `sim/robot/uic_bot_2027.xacro` adds the 2027 sensors). The 3D LiDAR is the team's Unitree L1, upside down at the rear top as on the comp-day-one branch, 0.986 m above the ground (Verified from the repo). Since 2026-10-12 the 2027 model carries it at the front top instead, upside down with its axis 45 deg forward of straight down, 0.75 m above the ground (Angelo's choice after the hazard and localization runs below; the position is Assumed). Every run in this section used the 2026 rear mount unless it says front: `--lidar-mount rear2026` (`robot.LIDAR_MOUNTS`) reproduces them, and `run_selfmask.sh` names it. `sensors.l1_dirs` models its scan from the L1 manual: 21,600 points per second over a 360 x 90 deg hemisphere, so 2,160 per 0.1 s frame (the scan geometry is Inferred). The robot body blocks about 20% of that hemisphere, all forward and down; Isaac Sim agrees with `robot.BodyCaster` on 99.7% of blocked beams at the rear mount (`results_isaac/selfmask_l1.*`).
 
 `selfmask.py` keeps the body out of the map. The table mask stores the body range per direction (0.25 deg grid) and widens it to the farthest body range within 1 deg; a return no farther than that plus 6 cm is dropped. The box mask drops every return inside the robot's bounding box plus 5 cm. `selfmask_eval.py` scores every case with fixed thresholds (L1 6.8, tuned on seeds 3000-3023 in dust; D455 0.85) on seeds 3024-3047.
 
@@ -214,6 +214,10 @@ That rear view is tested in `localize.py` (`python3 localize.py results_selfmask
 | Front top, 45 deg down | 239 of 240 | 79% | 3,348 | 672 / 262 |
 
 Both mounts fit the walls to under 1 cm when the guess is normal (the 0.7 cm median is the sandbox's wall edge on its 1 cm grid, the same for both). The front mount sees about a fifth fewer wall points and, facing a nearby wall, little of the side walls, so its weakest direction is held by about 2.4 times fewer points and its fit fails more often from a bad guess. The bad-guess failures start about 0.8-0.9 m off and lock onto the wrong wall; that needs a global fix (fiducials, the start zone, or a correlative matcher) with either mount (Inferred).
+
+The test gives the robot the wall positions. Guidebook §16.3 allows detected walls as localization features only with no a priori knowledge, so on the robot the wall map has to come from its own scans (for example at the start), which adds that map's error (Inferred).
+
+On 2026-10-12 Angelo chose the front mount; `sim/robot/uic_bot_2027.xacro` now has it, so new `--robot` runs use it by default.
 
 ## Parameter status
 

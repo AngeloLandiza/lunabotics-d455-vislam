@@ -51,6 +51,15 @@ def load_stl(path):
     return np.array(v, np.float64).reshape(-1, 3, 3)
 
 
+# 3D LiDAR mounts as URDF joint origins from base_link (xyz in m, rpy in rad). uic_bot_2027.xacro carries front45 since
+# 2026-10-12 (Angelo's choice after the hazard and localization runs; position Assumed). rear2026 is the team's 2026
+# mount from comp-day-one, kept so the runs made with it reproduce.
+LIDAR_MOUNTS = {
+    "rear2026": ((-0.353, 0.0, 0.721), (3.14159, 0.0, 0.0)),
+    "front45": ((0.45, 0.0, 0.4849), (3.14159, -0.785398, 0.0)),
+}
+
+
 def rpy_matrix(r, p, y):
     """URDF fixed-axis roll, pitch, yaw: R = Rz(y) Ry(p) Rx(r). Positive pitch turns +x downwards."""
     cr, sr, cp, sp, cy, sy = np.cos(r), np.sin(r), np.cos(p), np.sin(p), np.cos(y), np.sin(y)
@@ -171,6 +180,16 @@ class Robot:
     def mount(self, link):
         """(xyz in the robot frame, robot-from-sensor rotation) of a sensor link."""
         return tuple(self.to_robot(self.T[link][1]).tolist()), self.T[link][0].copy()
+
+    def lidar_mount(self, spec=None, link="lidar3d_link"):
+        """(xyz in the robot frame, robot-from-sensor rotation) of the 3D LiDAR: the URDF's (None), a LIDAR_MOUNTS name,
+        or six numbers x, y, z (m, robot frame) and roll, pitch, yaw (deg)."""
+        if spec is None:
+            return self.mount(link)
+        if isinstance(spec, str):
+            xyz, rpy = LIDAR_MOUNTS[spec]
+            return tuple(self.to_robot(xyz).tolist()), rpy_matrix(*rpy)
+        return tuple(float(x) for x in spec[:3]), rpy_matrix(*np.radians(spec[3:]))
 
     def mount_pitch(self, link):
         """(xyz, pitch down in degrees) for a forward-facing sensor with no roll or yaw, as sensors.rot() models it."""
