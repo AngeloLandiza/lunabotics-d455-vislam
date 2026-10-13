@@ -1,6 +1,6 @@
 """(d) Replay hazard_detector.py's HazardMap offline from an arena.sh --autonomy bag, with different poses.
 
-Same frame logic as lunabotics_slam/scripts/hazard_detector.py for the L1 (the D455 depth stream is not in the bag):
+Same frame logic as lunabotics_slam/scripts/hazard_detector.py (ground refit every 1 s, as its publish timer does) for the L1 (the D455 depth stream is not in the bag):
 body points masked, the cloud placed with the pose at its stamp, frames skipped while |yaw rate| over the last 0.2 s
 exceeds turn_max, the footprint marked as driven over every 3 cm. Pose variants:
   gt        /ground_truth/base_pose: what the map would be with a perfect localizer
@@ -40,10 +40,16 @@ def replay(d, P, turn_max=0.3, still_skip=False, t0=None):
     T_bs = d['T_base'][d['cloud_frame']]
     last_swept = None
     n_used = n_turn = n_still = 0
+    t_refit = None                      # the node refits the ground every publish_s (1 s) before publishing
     t_lo, t_hi = max(P[0, 0], t0 if t0 is not None else -1e9) + 0.25, P[-1, 0]
     for t, cloud in d['clouds']:
         if t < t_lo or t > t_hi or len(cloud) == 0:
             continue
+        if t_refit is None:
+            t_refit = t
+        elif t - t_refit >= 1.0:
+            m.refit()
+            t_refit = t
         pose = bag_io.interp_pose(P, np.array([t]))[0]
         if last_swept is None or math.hypot(*(pose[:2] - last_swept[:2])) > 0.03 or \
                 abs(ac.wrap(pose[2] - last_swept[2])) > 0.05:

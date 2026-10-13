@@ -317,24 +317,12 @@ class HazardMap:
         self.shallow = []
         self.dropped = []                   # this call's drops only (it grew without bound across publishes)
         cell = self.grid.cell
-        cx, cy, cr = COLUMN_DISC
         for sensor in ('lidar', 'd455'):
             lp, ln = self.lp[sensor], self.ln[sensor]
             for d in detect.clusters(lp > 0, ln > 0, self.grid, lp, ln, detect.l_decide(sensor)):
-                edge = min(d['x'], d['y'], self.size[0] - d['x'], self.size[1] - d['y'])
-                if edge < val('wall_margin'):
-                    continue
-                if edge - math.sqrt(d['cells'] * cell * cell / math.pi) < val('wall_touch'):
-                    self.dropped.append(('duct', round(d['x'], 2), round(d['y'], 2), d['cells']))
-                    continue                                    # the disc reaches the duct: the duct itself
-                if math.hypot(d['x'] - cx, d['y'] - cy) < cr + val('column_margin'):
-                    continue
-                if any(math.hypot(d['x'] - px, d['y'] - py) < val('pole_margin') for px, py in A27.POLES):
-                    continue
-                ci, cj, cin = self.grid.idx(np.array([d['x']]), np.array([d['y']]))
-                if cin[0] and self.swept[ci[0], cj[0]]:
-                    continue
                 r = math.sqrt(d['cells'] * cell * cell / math.pi) + cell / 2
+                if r <= val('max_radius') and self._known(d, r):
+                    continue
                 if r < val('min_radius'):
                     continue
                 if r > val('max_radius'):
@@ -353,6 +341,8 @@ class HazardMap:
             pos, neg = (lp >= strong, ln * 0 > 1) if d['kind'] == 'pos' else (lp * 0 > 1, ln >= strong)
             for e in detect.clusters(pos, neg, self.grid, lp, ln, detect.l_decide(sensor)):
                 r = math.sqrt(e['cells'] * cell * cell / math.pi) + cell / 2
+                if self._known(e, r):           # the split pieces get the same checks (run 14: the column leaked here)
+                    continue
                 if e['kind'] == 'neg' and not self.depression(e['x'], e['y'], r):
                     continue
                 if val('min_radius') <= r <= val('max_radius') and math.hypot(e['x'] - d['x'], e['y'] - d['y']) < 3:
@@ -360,6 +350,24 @@ class HazardMap:
                                 'r': r, 'evidence': e['evidence'], 'sensor': sensor})
             self.dropped.append((d['kind'], round(d['x'], 2), round(d['y'], 2), d['cells']))
         return merge_discs(out)
+
+    def _known(self, d, r):
+        """True for a cluster that is the wall, a duct, the column, a range pole or ground already driven over. Only
+        for discs up to max_radius: a sprawling blob's equivalent disc 'reaches a duct' from mid-arena (run 14 replay:
+        a 2.2 m blob dropped whole as a duct, with real boulders inside it)."""
+        cx, cy, cr = COLUMN_DISC
+        edge = min(d['x'], d['y'], self.size[0] - d['x'], self.size[1] - d['y'])
+        if edge < val('wall_margin'):
+            return True
+        if edge - (r - self.grid.cell / 2) < val('wall_touch'):
+            self.dropped.append(('duct', round(d['x'], 2), round(d['y'], 2), d['cells']))
+            return True                                         # the disc reaches the duct: the duct itself
+        if math.hypot(d['x'] - cx, d['y'] - cy) < cr + val('column_margin'):
+            return True
+        if any(math.hypot(d['x'] - px, d['y'] - py) < val('pole_margin') for px, py in A27.POLES):
+            return True
+        ci, cj, cin = self.grid.idx(np.array([d['x']]), np.array([d['y']]))
+        return bool(cin[0] and self.swept[ci[0], cj[0]])
 
     def drove(self, pose):
         """Mark the ground under the footprint, shrunk by sweep_shrink, as driven over: no boulder or crater can be
