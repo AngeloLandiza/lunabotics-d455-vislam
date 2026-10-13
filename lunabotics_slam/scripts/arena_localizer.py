@@ -48,10 +48,12 @@ class ArenaLocalizer(Node):
         p('base_frame', 'base_link')
         p('tf_child', 'autonomy_base')  # TF arena -> this frame for RViz; empty = no TF
         p('walls', True)
+        p('slip_guard', False)          # IMU check on the encoder speed (autonomy_core.SlipGuard); on after replays
         g = lambda k: self.get_parameter(k).value  # noqa: E731
         self.arena_frame, self.tf_child = g('arena_frame'), g('tf_child')
         self.ext = ar.Extrinsics(self, g('base_frame'))
         self.f = ac.WallFilter(scale=g('wheel_scale'))
+        self.slip = ac.SlipGuard(scale=g('wheel_scale')) if g('slip_guard') else None
         self.v_wheel = 0.0
         self.t_wheel = None
         self.calib = []
@@ -93,8 +95,9 @@ class ArenaLocalizer(Node):
         T = self.ext.get(msg.header.frame_id)
         if T is None:
             return
-        w = msg.angular_velocity
-        wz = float((T[:3, :3] @ np.array([w.x, w.y, w.z]))[2])      # yaw rate in base_link
+        w, a = msg.angular_velocity, msg.linear_acceleration
+        wb = T[:3, :3] @ np.array([w.x, w.y, w.z])
+        wz = float(wb[2])                                            # yaw rate in base_link
         if self.bias is None:
             # still means wheels AND gyro: a tag-search pivot has zero wheel speed (run 10 replay calibrated on one:
             # 3.6 deg/s bias, 35 deg of yaw per 10 s)
@@ -111,9 +114,13 @@ class ArenaLocalizer(Node):
                     self.f.init(self.pending_init, t)
                     self.get_logger().info(f'initial pose from the parameter: {np.round(self.pending_init, 3)}')
             return
+        v = self.v_wheel
+        if self.slip is not None:
+            wb[2] -= self.bias
+            v = self.slip.step(t, wb, T[:3, :3] @ np.array([a.x, a.y, a.z]), self.v_wheel)
         if not self.f.ready:
             return
-        self.f.predict(self.v_wheel, wz - self.bias, t)
+        self.f.predict(v, wz - self.bias, t)
         self.publish(msg.header.stamp)
         if self.t_last_fix is None:
             self.t_last_fix = t
@@ -198,7 +205,9 @@ class ArenaLocalizer(Node):
         sd = np.sqrt(np.diag(self.f.Pc))
         self.get_logger().info(f'pose {np.round(self.f.x[:2], 3).tolist()} yaw {math.degrees(self.f.x[2]):.1f} deg, '
                                f'sd {sd[0] * 100:.1f}/{sd[1] * 100:.1f} cm {math.degrees(sd[2]):.2f} deg; '
-                               f'wall fixes {self.counts}')
+                               f'wall fixes {self.counts}'
+                               + (f'; slip {self.slip.episodes} episodes {self.slip.slip_s:.1f} s'
+                                  if self.slip is not None else ''))
 
 
 def main():
