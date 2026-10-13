@@ -7,6 +7,9 @@ exceeds turn_max, the footprint marked as driven over every 3 cm. Pose variants:
   est       /autonomy/pose (the live localizer): should reproduce the live map
   est_still est, and frames also skipped while turning in place (|v| < 0.03 m/s, |w| > 0.1 rad/s on the estimate):
             in-place pivots slide the rover about 0.2 m/rad unseen (pivot test), so their frames land smeared
+Every variant starts where the live detector did, at the first /autonomy/pose (14.6 s in run 14): the L1 frames before
+it (rover at the start facing the west wall for the tag turn) place the bed ~0.3 m high and spoil the first ground fit,
+which left the gt map nearly empty (run 14: 2 hazards, 10 of 13 obstacles missed).
 Hazards are scored against the seed's true layout: matched (centre within r_true + 0.25), false, missed.
 
 Usage: python3 sim/autonomy_diag/replay_detector.py ~/bags/run14 <seed> [out.json]
@@ -32,12 +35,12 @@ def rate_and_speed(P, t, half=0.1):
     return ac.wrap(b[2] - a[2]) / dt, math.hypot(*(b[:2] - a[:2])) / dt
 
 
-def replay(d, P, turn_max=0.3, still_skip=False):
+def replay(d, P, turn_max=0.3, still_skip=False, t0=None):
     m = ac.HazardMap()
     T_bs = d['T_base'][d['cloud_frame']]
     last_swept = None
     n_used = n_turn = n_still = 0
-    t_lo, t_hi = P[0, 0] + 0.25, P[-1, 0]
+    t_lo, t_hi = max(P[0, 0], t0 if t0 is not None else -1e9) + 0.25, P[-1, 0]
     for t, cloud in d['clouds']:
         if t < t_lo or t > t_hi or len(cloud) == 0:
             continue
@@ -88,7 +91,7 @@ def main():
     out = {}
     for name, P, still in (('gt', d['gt'], False), ('est', d['est'], False), ('est_still', d['est'], True),
                            ('gt_still', d['gt'], True)):
-        objs, info = replay(d, P, still_skip=still)
+        objs, info = replay(d, P, still_skip=still, t0=d['est'][0, 0])
         out[name] = {**info, **score(objs, truth)}
         print(name, {k: v for k, v in out[name].items() if k != 'hazards'})
     if len(sys.argv) > 3:
