@@ -9,7 +9,7 @@ wall_every s. Variants change autonomy_core PARAMS before each replay:
   runs1_7    turn_scrub = 0 and pose_sd_min = (0, 0)
 Reports xy error vs /ground_truth/base_pose (sampled at 1 Hz) and the fix / gated / relock / weak counts.
 
-Usage: python3 sim/autonomy_diag/replay_localizer.py ~/bags/run10 [out.json]
+Usage: python3 sim/autonomy_diag/replay_localizer.py ~/bags/run10 [out.json] [gyro bias deg/s from the live log]
 """
 import json
 import math
@@ -25,10 +25,10 @@ sys.path.insert(0, HERE)
 import autonomy_core as ac          # noqa: E402
 import bag_io                       # noqa: E402
 
-VARIANTS = {'now': {}, 'no_scrub': {'turn_scrub': 0.0}, 'runs1_7': {'turn_scrub': 0.0, 'pose_sd_min': (0.0, 0.0)}}
+VARIANTS = {'now': {}, 'icr0': {'icr_offset': 0.0}, 'scrub006': {'turn_scrub': 0.06}}
 
 
-def replay(d, overrides, wheel_scale=0.95, calib_s=2.0):
+def replay(d, overrides, wheel_scale=0.95, calib_s=2.0, bias=None):
     import dataclasses
     saved = {k: ac.PARAMS[k] for k in overrides}
     for k, v in overrides.items():
@@ -40,7 +40,10 @@ def replay(d, overrides, wheel_scale=0.95, calib_s=2.0):
         ev = ([(t, 0, i) for i, t in enumerate(d['wheel'][:, 0])] + [(t, 1, i) for i, t in enumerate(d['imu'][:, 0])]
               + [(t, 2, i) for i, t in enumerate(d['tags'][:, 0])] + [(c[0], 3, i) for i, c in enumerate(d['clouds'])])
         ev.sort()
-        v_wheel, t_wheel, calib, t_c0, bias, t_last, counts, track = 0.0, None, [], None, None, None, {}, []
+        # bias: the live node's standstill estimate (its log line 'gyro bias ... deg/s') when the bag starts after it;
+        # otherwise estimated here, which is wrong if the robot already pivots (wheel speed 0) inside the window
+        v_wheel, t_wheel, calib, t_c0, t_last, counts, track = 0.0, None, [], None, None, {}, []
+        bias = None if bias is None else math.radians(bias)
         x0, x1, y0, y1 = ac.v(ac.pr.ARENA, 'start_zone')
         every = ac.drift.v(ac.drift.PARAMS, 'wall_every')
         for t, kind, i in ev:
@@ -103,13 +106,14 @@ def score(track, gt, est_live=None):
 
 def main():
     bag = os.path.expanduser(sys.argv[1])
+    bias = float(sys.argv[3]) if len(sys.argv) > 3 else None     # deg/s, from the live run's log
     d = bag_io.load(bag)
     out = {}
     if len(d['est']):
         out['live'] = score(d['est'], d['gt'])
         print('live /autonomy/pose:', out['live'])
     for name, ov in VARIANTS.items():
-        track, counts = replay(d, ov)
+        track, counts = replay(d, ov, bias=bias)
         out[name] = {**score(track, d['gt']), 'counts': counts, 'overrides': {k: list(v) if isinstance(v, tuple) else v
                                                                                for k, v in ov.items()}}
         print(name, out[name])

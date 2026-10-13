@@ -1,0 +1,51 @@
+{
+ "live": {
+  "samples": 68,
+  "median_cm": 37.73783721040262,
+  "p95_cm": 99.7950018409522,
+  "max_cm": 100.42270325177785
+ },
+ "now": {
+  "samples": 68,
+  "median_cm": 15.438205858050157,
+  "p95_cm": 98.59798015609792,
+  "max_cm": 99.1465734883798,
+  "counts": {
+   "tag used": 39,
+   "weak": 54,
+   "gated": 4,
+   "fix": 9
+  },
+  "overrides": {}
+ },
+ "icr0": {
+  "samples": 68,
+  "median_cm": 16.322688342373063,
+  "p95_cm": 100.75475338924353,
+  "max_cm": 101.17310703682037,
+  "counts": {
+   "tag used": 39,
+   "weak": 53,
+   "gated": 7,
+   "fix": 7
+  },
+  "overrides": {
+   "icr_offset": 0.0
+  }
+ },
+ "scrub006": {
+  "samples": 68,
+  "median_cm": 15.442115908988008,
+  "p95_cm": 98.55749154727485,
+  "max_cm": 99.10610081278695,
+  "counts": {
+   "tag used": 39,
+   "weak": 54,
+   "gated": 5,
+   "fix": 8
+  },
+  "overrides": {
+   "turn_scrub": 0.06
+  }
+ }
+}

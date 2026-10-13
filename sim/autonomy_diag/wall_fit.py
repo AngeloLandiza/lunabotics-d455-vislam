@@ -2,7 +2,7 @@
 
 Every wall_every s: that interval's L1 wall-band points (base_link, body box removed, band from autonomy_core
 wall_band), placed in the arena with the TRUE pose at each cloud's time, expressed in the true robot frame at the fix
-time, and matched by localize.icp seeded at the truth, with the same wall-offset shift WallFilter.wall_fix uses.
+time, and matched by autonomy_core.wall_icp (the fix's ICP) seeded at the truth, with the same wall-offset shift WallFilter.wall_fix uses.
 Reports (fit - truth) in x / y / yaw, lam and n_used, and for fits off by more than 5 cm (or 0.5 deg) where the
 in-gate points (|r| < 0.5 m) that are NOT within 5 cm of a wall face lie, by arena structure.
 
@@ -91,7 +91,7 @@ def main():
         if len(Pl) < ac.drift.v(ac.drift.PARAMS, 'wall_min_pts'):
             rows.append({'t': t, 'status': 'few', 'n': len(Pl)})
             continue
-        pose, lam, n_used = localize.icp(Pl, truth + o, Lw, Ww)
+        pose, lam, n_used = ac.wall_icp(Pl, truth + o, Lw, Ww)
         e = pose - o - truth
         e[2] = (e[2] + math.pi) % (2 * math.pi) - math.pi
         row = {'t': round(t, 2), 'n': len(Pl), 'n_used': int(n_used), 'lam': None if lam is None else float(lam),
