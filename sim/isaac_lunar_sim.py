@@ -865,6 +865,32 @@ yaw_i = 0.0
 terrain_dirty, last_terrain_pub = True, -1e9
 prof, n_prof = np.zeros(3), 0
 n_frame = 0
+# --profile: per-piece wall time over the last 60 frames (ms per frame) and the tiles ever re-meshed
+PIECES = ('physics', 'render', 'cameras', 'rear', 'lidar', 'ruts', 'remesh', 'dig', 'rest', 'dust')
+pt = dict.fromkeys(PIECES, 0.0)
+tiles_touched = set()
+if args.profile and dust is not None:
+    _od = dust.optical_depth
+
+    def _timed_od(*a, **k):
+        t_ = time.perf_counter()
+        out = _od(*a, **k)
+        pt['dust'] += time.perf_counter() - t_
+        return out
+    dust.optical_depth = _timed_od
+if args.profile:
+    _upd = terrain.update
+
+    def _timed_update(i0, i1, j0, j1):
+        t_ = time.perf_counter()
+        n = _upd(i0, i1, j0, j1)
+        t = terrain.tile
+        for ti in range((max(i0 - 1, 0) // t) * t, min(i1 + 1, len(terrain.xs) - 1), t):
+            for tj in range((max(j0 - 1, 0) // t) * t, min(j1 + 1, len(terrain.ys) - 1), t):
+                tiles_touched.add((ti, tj))
+        pt['remesh'] += time.perf_counter() - t_
+        return n
+    terrain.update = _timed_update
 print('[sim] running', flush=True)
 while app.is_running():
     # Skid-steer (tank) drive: same speed for every wheel on a side. Skid turns slip by an
@@ -890,13 +916,16 @@ while app.is_running():
         world.render()  # same pose, no physics: lets temporal history settle
     t2 = time.perf_counter()
     publish_cameras(world.current_time)
+    tc = time.perf_counter()
     now = world.current_time
     stamp = Time(sec=int(now), nanosec=int((now % 1) * 1e9))
     publish_gt_camera(stamp)
     publish_wheel_odom(stamp)
+    tr0 = time.perf_counter()
     if REAR and n_frame % 3 == 0:                 # ~10 Hz is plenty for the tags
         publish_rear(stamp)
     n_frame += 1
+    tr1 = time.perf_counter()
     if ruts is not None and ruts.on:
         pos, q = rover.get_world_pose()
         Rb = quat_wxyz_to_R(np.asarray(q, float))
@@ -904,18 +933,22 @@ while app.is_running():
         if bb:
             terrain.update(*bb)
             terrain_dirty = True
+    tr2 = time.perf_counter()
     if LIDAR:
         publish_lidar(stamp)
+    tl = time.perf_counter()
     for _ in range(20):                       # non-blocking: handle queued /arena/dig requests
         rclpy.spin_once(ros, timeout_sec=0.0)
     if not dug and 0 <= args.dig_at <= now:
         dig_queue.append([*args.dig_xy, args.dig_radius, args.dig_depth])
         print(f'[sim] dug {args.dig_depth} m hole at {args.dig_xy} (t={now:.1f}s)', flush=True)
         dug = True
+    td0 = time.perf_counter()
     if dig_queue:
         apply_digs(dig_queue)
         dig_queue.clear()
         terrain_dirty = True
+    td1 = time.perf_counter()
     if (terrain_dirty and now - last_terrain_pub > 0.3) or now - last_terrain_pub > 5.0:
         publish_terrain(stamp)
         terrain_dirty, last_terrain_pub = False, now
@@ -930,9 +963,21 @@ while app.is_running():
     if args.profile:
         prof += [t1 - t0, t2 - t1, t3 - t2]
         n_prof += 1
+        pt['physics'] += t1 - t0
+        pt['render'] += t2 - t1
+        pt['cameras'] += tc - t2
+        pt['rear'] += tr1 - tr0
+        pt['ruts'] += tr2 - tr1          # includes the re-mesh of rut-touched tiles (also counted in remesh)
+        pt['lidar'] += tl - tr2
+        pt['dig'] += td1 - td0
+        pt['rest'] += (t3 - t2) - (tc - t2) - (tr1 - tr0) - (tr2 - tr1) - (tl - tr2) - (td1 - td0)
         if n_prof % 60 == 0:
-            ms = prof / n_prof * 1000
-            print(f'[sim] per frame: physics-only steps {ms[0]:.1f} ms, render step {ms[1]:.1f} ms, publish {ms[2]:.1f} ms', flush=True)
+            wall = time.perf_counter()
+            rtf = (now - prof_t[1]) / (wall - prof_t[0]) if 'prof_t' in globals() else float('nan')
+            prof_t = (wall, now)
+            print(f'[sim] prof t={now:.1f} RTF {rtf:.3f} ms/frame ' + ' '.join(f'{k} {pt[k] / 60 * 1000:.1f}' for k in PIECES)
+                  + f' | tiles re-meshed so far {len(tiles_touched)} of {len(terrain.meshes)}', flush=True)
+            pt = dict.fromkeys(PIECES, 0.0)
 ros.destroy_node()
 rclpy.try_shutdown()
 app.close()
