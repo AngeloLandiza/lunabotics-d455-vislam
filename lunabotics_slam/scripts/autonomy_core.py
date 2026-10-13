@@ -777,6 +777,52 @@ def relocate_goal(kind, g, hazards, robot=None, step=0.1, n_plan=6):
     return None
 
 
+def path_len(P):
+    return float(np.hypot(*np.diff(P, axis=0).T).sum()) if len(P) > 1 else 0.0
+
+
+def retrace_points(w, pose, trail, max_back=1.2):
+    """The way the robot came, reversed, as poses (x, y, yaw), up to the first trail pose where it could turn in place
+    again (or at most max_back of travel). None if the robot can already turn where it is, or there is no trail. A
+    robot that drove into a pocket (arena.sh run 6: wall on one side, a crater seen late ahead, a boulder behind the
+    turn circle) cannot turn there, and a straight move does not get it out; its own trail is space it has just
+    driven, in those headings."""
+    if len(trail) < 2 or a2.turn_clearance(w, pose[:2]) >= ex.CHECK_MARGIN:
+        return None
+    P = [np.asarray(pose, float)]
+    for q in reversed(trail):
+        P.append(np.asarray(q, float))
+        if a2.turn_clearance(w, q[:2]) >= 0.0 or path_len(np.array(P)[:, :2]) >= max_back:
+            break
+    return np.array(P) if len(P) > 1 else None
+
+
+def reverse_pursuit(pose, P, state, v=0.12, reach=0.04):
+    """(v, w, done) to back through the trail poses P[1:] in order: back straight towards each one with the rear
+    leading, and on reaching it turn in place to its heading (the trail holds a pose for every 0.1 rad the robot
+    turned on the way in, so the turns happen where it turned before). state holds the index of the current target."""
+    k = state.setdefault('k', 1)
+    while k < len(P):
+        q = P[k]
+        dx, dy = q[0] - pose[0], q[1] - pose[1]
+        dist = math.hypot(dx, dy)
+        if dist < reach:
+            err = wrap(q[2] - pose[2])
+            if abs(err) > 0.08:
+                return 0.0, float(np.clip(1.5 * err, -0.4, 0.4)), False
+            k = state['k'] = k + 1
+            continue
+        # back with the rear leading, unless the robot reversed into this stretch on the way in (then drive forwards):
+        # whichever keeps the heading it had there
+        fwd, rev = math.atan2(dy, dx), math.atan2(-dy, -dx)
+        sgn, hd = (1.0, fwd) if abs(wrap(fwd - q[2])) < abs(wrap(rev - q[2])) else (-1.0, rev)
+        err = wrap(hd - pose[2])
+        if abs(err) > 0.12:
+            return 0.0, float(np.clip(1.5 * err, -0.4, 0.4)), False
+        return sgn * min(v, 1.5 * dist + 0.03), float(np.clip(3.0 * err, -0.4, 0.4)), False
+    return 0.0, 0.0, True
+
+
 class Leg:
     """One leg: tangent-graph route (TangentController's inflation sequence and grid fallback) and the executor."""
 
@@ -836,7 +882,9 @@ class MissionRunner:
              and the goal is skipped after plan_tries
     drive    run the Leg; when a new hazard lands on the rest of the route, stop, then plan again from rest
     stop     zero command until the wheels are still (RobotModel), then plan
-    retreat  after a failed plan: a straight move forwards or backwards of up to retreat_m that ends where the robot
+    retrace  after a failed plan where the robot cannot turn in place: back along its own trail to where it could
+             (retrace_points), then plan again
+    retreat  after a failed plan otherwise: a straight move forwards or backwards of up to retreat_m that ends where the robot
              has the most room to turn (escape_move), then plan again; a stop beside a hazard seen late, or the start
              pose by a wall, can leave no route from where the robot is
     move     after a second failure: the goal itself may sit too close to a detected hazard (detected discs come out a
@@ -864,6 +912,8 @@ class MissionRunner:
         self.stuck_s, self.stuck_m = stuck_s, stuck_m
         self.moved_at = None                # (t, xy) of the last time the robot had moved stuck_m
         self.why_stuck = None
+        self.trail = []                     # xy every 5 cm while driving, for backing out the way the robot came
+        self.back = None                    # (points to reverse through, end index) while retracing
         self.log = []                       # (t, message) for the node to print
 
     def _go(self, state, t):
@@ -909,6 +959,13 @@ class MissionRunner:
                         self.t_state = t - self.retry_s
                         return self._cmd(0.0, 0.0, dt) + (None,)
                 if self.tries == 1:
+                    self.back = retrace_points(make_world(hazards), pose, self.trail)
+                    if self.back is not None:
+                        self.back_state = {}
+                        self.log.append((t, f'goal {self.k + 1} {kind}: backing {path_len(self.back[:, :2]):.2f} m along '
+                                            'the way it came, to where it can turn'))
+                        self._go('retrace', t)
+                        return self._cmd(0.0, 0.0, dt) + (None,)
                     self.retreat_from = np.asarray(pose, float)[:2].copy()
                     self.log.append((t, f'goal {self.k + 1} {kind}: backing out to plan again'))
                     self._go('retreat', t)
@@ -922,6 +979,10 @@ class MissionRunner:
                 self.t_state = t
                 return self._cmd(0.0, 0.0, dt) + (None,)
         if self.state == 'drive':
+            q = np.asarray(pose, float)
+            if not self.trail or math.hypot(*(xy - self.trail[-1][:2])) >= 0.05 or \
+                    abs(wrap(q[2] - self.trail[-1][2])) >= 0.1:
+                self.trail = (self.trail + [q.copy()])[-600:]
             if self.leg.blocked_by(hazards, pose):
                 self.log.append((t, f'goal {self.k + 1} {kind}: new hazard on the route, stopping to replan'))
                 self._go('stop', t)
@@ -937,6 +998,15 @@ class MissionRunner:
             if self._still():
                 self._go('plan', t)
             return self._cmd(0.0, 0.0, dt) + (None,)
+        if self.state == 'retrace':
+            cv, cw, done = reverse_pursuit(pose, self.back, self.back_state)
+            if done or t - self.t_state > 4 * path_len(self.back[:, :2]) / 0.12 + 20.0:
+                if self._still():
+                    self.back = None
+                    self.trail = []
+                    self._go('plan', t - self.retry_s)
+                return self._cmd(0.0, 0.0, dt) + (None,)
+            return self._cmd(cv, cw, dt) + (None,)
         if self.state == 'retreat':
             if self.escape is None:
                 self.escape = escape_move(make_world(hazards), pose, self.retreat_m)
