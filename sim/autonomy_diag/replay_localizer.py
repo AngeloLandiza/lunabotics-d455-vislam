@@ -30,6 +30,11 @@ VARIANTS = {'now': BASE}
 if os.environ.get('SWEEP'):     # SWEEP=1: turn_scrub x wall_confirm_sd grid
     VARIANTS = {f'scrub{s_}_confirm{c_}': {**BASE, 'turn_scrub': s_, 'wall_confirm_sd': c_}
                 for s_ in (0.12, 0.20) for c_ in (0.10, 0.20, 0.30)}
+if os.environ.get('ODO'):       # ODO=1: which odometry piece under-reads at speed (run 15: estimate at half the
+    VARIANTS = {'now': BASE,    # true speed at 0.65 m/s)
+                'no_slip': {**BASE, 'slip': False}, 'no_cmd': {**BASE, 'cmd': False}, 'no_cap': {**BASE, 'cap': False},
+                'raw': {'cap': False, 'slip': False, 'cmd': False}, 'raw_scale1': {'cap': False, 'slip': False,
+                                                                                 'cmd': False, 'wheel_scale': 1.0}}
 
 
 def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, slip=False, cmd=False):
