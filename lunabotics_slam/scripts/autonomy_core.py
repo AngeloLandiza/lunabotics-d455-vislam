@@ -110,6 +110,11 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'sweep_shrink': pr.P(0.10, 'm', 'Assumed', 'the footprint is shrunk by this before marking ground as driven '
                          'over, so a few cm of pose error does not erase a real hazard beside the track (run 7 '
                          'localizer: 8 cm median error)'),
+    'turn_scrub': pr.P(0.03, 'm per sqrt(rad)', 'Assumed', 'sideways position random walk while turning (skid-steer '
+                       'scrub on BP-1); 7.5 cm sd after a full pivot. Not measured: the filter had no turning term and '
+                       'went overconfident in arena.sh run 8 (many pivots and back-outs)'),
+    'pose_sd_min': pr.P((0.015, 0.3), 'm, deg', 'Assumed', 'floor on the filter sd, so tag and wall fixes keep '
+                        'passing the gate (run 8: sd 0.7 cm / 0.17 deg claimed, 20 cm median error)'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
     'tag_ids': pr.P((0, 1), '', 'Assumed', 'tag on the y = 0 wall, tag on the x = 0 wall'),
     'tag_xy': pr.P(((1.0, -A27.DUCT_D, 90.0), (-A27.DUCT_D, 1.0, 0.0)), 'm, m, deg facing', 'Assumed',
@@ -471,15 +476,27 @@ class WallFilter:
         J1 = np.array([[1, 0, -s * vv * dt], [0, 1, c * vv * dt], [0, 0, 1]])
         dvar = sig_d ** 2 * (self.d_q ** 2 - d0 ** 2) + 1e-10
         span1 = span0 + dt
+        # turning scrubs the tracks sideways on BP-1 (skid-steer pivots move the centre): a random walk per radian
+        dvar += val('turn_scrub') ** 2 * abs(w_gyro) * dt
         q = np.diag([dvar, dvar, math.radians(_P('gyro_noise')) ** 2 * dt
                      + math.radians(_P('gyro_bias')) ** 2 * (span1 ** 2 - span0 ** 2)])
-        self.Pc = J1 @ self.Pc @ J1.T + q
+        self.Pc = self._floor(J1 @ self.Pc @ J1.T + q)
         x0, P0, t0, dist, _ = self.win
         self.win = (x0, P0, t0, dist + abs(vv) * dt, t - t0)
         self.t = t
         self.hist.append((t, *self.x))
         if len(self.hist) > 4000:
             self.hist = self.hist[-2000:]
+
+    def _floor(self, P):
+        """Keep the covariance at least pose_sd_min: arena.sh run 8 claimed 0.7 cm / 0.17 deg while 20 cm off, and
+        gated out about 100 tag and wall fixes that would have corrected it."""
+        sxy, sa = val('pose_sd_min')
+        lo = np.array([sxy ** 2, sxy ** 2, math.radians(sa) ** 2])
+        d = np.diag(P)
+        if np.all(d >= lo):
+            return P
+        return P + np.diag(np.maximum(lo - d, 0.0))
 
     # -- optional LiDAR odometry window
     def lidar_window(self, inc_l):
@@ -525,7 +542,7 @@ class WallFilter:
         Kg = self.Pc @ np.linalg.inv(S)
         self.x = self.x + Kg @ z
         self.x[2] = wrap(self.x[2])
-        self.Pc = (np.eye(3) - Kg) @ self.Pc
+        self.Pc = self._floor((np.eye(3) - Kg) @ self.Pc)
         return True
 
     # -- wall fix
@@ -587,7 +604,7 @@ class WallFilter:
             Kg = self.Pc @ np.linalg.inv(S)
             self.x = self.x + Kg @ z
             self.x[2] = wrap(self.x[2])
-            self.Pc = (np.eye(3) - Kg) @ self.Pc
+            self.Pc = self._floor((np.eye(3) - Kg) @ self.Pc)
             self.stats['wall_fixes'] += 1
             if self.hist:
                 self.hist[-1] = (self.hist[-1][0], *self.x)
