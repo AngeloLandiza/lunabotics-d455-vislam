@@ -249,6 +249,23 @@
    "largest_radius_m": 0.28,
    "detector_ms": null,
    "note": "first dump ever (berm at x 4.47 y 1.19) after dig 1 at (1.64, 2.28); tilt-placed L1 cleared the corridor; localizer fell 80 cm behind on a 0.7 m/s drive to the berm (t 75-79 s), so the rover overshot between the berm poles at x 4.28 and then could not pivot (35 s of 1.67 rad/s commanded, no yaw change); 1 settle pause"
+  },
+  {
+   "run": 16,
+   "commit": "95459e4",
+   "ended": "stopped by Angelo's request at goal 3 (sim slowed to RTF 0.01 after the dump's terrain edit)",
+   "goals_reached": 1,
+   "goals_skipped": 1,
+   "loc_xy_median_cm": 3.6,
+   "loc_xy_max_cm": 45.9,
+   "true_path_m": 6.9,
+   "hazards": 5,
+   "matched": 2,
+   "missed": 7,
+   "false": 3,
+   "largest_radius_m": 0.35,
+   "detector_ms": null,
+   "note": "goal 1 dig skipped after 2 stalled back-outs near the start; goal 2 dump moved to (3.67, 1.20) and reached: dump at (4.47, 1.20) with no dig before it; slip sweep: run 16 p95 38 cm in every slip variant (error not from the slip guard); rel 0.25 / persist 0 fits runs 10 (p95 16.2) and 15 (11.9)"
   }
  ]
 }
