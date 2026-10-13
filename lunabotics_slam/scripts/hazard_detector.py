@@ -168,7 +168,9 @@ class HazardDetector(Node):
         self.pub_g.publish(g)
         if self.busy_s:
             self.get_logger().info(f'{len(objs)} hazards ({sum(o["kind"] == "boulder" for o in objs)} boulders), '
-                                   f'{len(self.map.shallow)} shallow crater blobs dropped; {self.n_turning} frames skipped while turning; '
+                                   f'{len(self.map.shallow)} shallow crater blobs dropped, '
+                                   f'{sum(x[0] == "duct" for x in self.map.dropped)} touching a duct; '
+                                   f'{self.n_turning} frames skipped while turning; '
                                    f'{self.map.frames} frames, {1000 * np.mean(self.busy_s):.0f} ms per frame',
                                    throttle_duration_sec=10.0)
             self.busy_s = []

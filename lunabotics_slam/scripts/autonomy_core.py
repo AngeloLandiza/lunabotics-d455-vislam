@@ -315,6 +315,7 @@ class HazardMap:
         Wall returns and the known column are dropped (the planner already has both)."""
         out, big = [], []
         self.shallow = []
+        self.dropped = []                   # this call's drops only (it grew without bound across publishes)
         cell = self.grid.cell
         cx, cy, cr = COLUMN_DISC
         for sensor in ('lidar', 'd455'):
@@ -324,6 +325,7 @@ class HazardMap:
                 if edge < val('wall_margin'):
                     continue
                 if edge - math.sqrt(d['cells'] * cell * cell / math.pi) < val('wall_touch'):
+                    self.dropped.append(('duct', round(d['x'], 2), round(d['y'], 2), d['cells']))
                     continue                                    # the disc reaches the duct: the duct itself
                 if math.hypot(d['x'] - cx, d['y'] - cy) < cr + val('column_margin'):
                     continue
