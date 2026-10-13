@@ -183,6 +183,11 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'arrive_check': pr.P((2.5, 0.15, 15.0), 's, m, deg', 'Assumed', 'on arrival the mission holds still this long '
                          '(two or more wall fixes, which catch a pivot slide the encoders and IMU miss), then works '
                          'only if the fixed pose is within this of the goal; otherwise it approaches again'),
+    'dump_spot_clear': pr.P(0.03, 'm', 'Inferred', 'dump spots with less footprint clearance than this are not used '
+                            '(was 0.10: mission2d seed 1 dropped the only reachable spot, 5.5 cm clear; arena.sh seed '
+                            '0 dumped from the same west-end spot)'),
+    'dump_plan_n': pr.P(8, 'spots', 'Assumed', 'dump spots planned (nearest first) when a dump goal starts; the '
+                        'shortest route wins (about 0.1-0.7 s per plan on the laptop CPU)'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -1265,15 +1270,36 @@ def escape_move(w, pose, max_d, step=0.05):
 
 
 def dump_spots(w):
-    """Dump poses beside the berm: arena2d's spots along its start-side (north) edge facing it, then spots at its
-    west end facing +x. In Angelo's arena the north edge borders the obstacle zone (arena.sh seed 0: boulders 0.2-0.5 m
-    apart there, no route), while the west end is reached along the y = 0 wall from the start zone."""
+    """Dump poses beside the berm: along its start-side (north) edge facing it, then along its west end facing +x,
+    every 0.2 m / 0.15 m. In Angelo's arena the north edge borders the obstacle zone (arena.sh seed 0: boulders 0.2-0.5 m
+    apart there, no route), while the west end is reached along the y = 0 wall from the start zone. mission2d over 50
+    seeds with arena2d's three fixed north spots: a dump skipped on 30 seeds, with a west-end spot reachable."""
     fp = v(a2.PARAMS, 'footprint')
     clear = v(a2.PARAMS, 'dump_clear')
     x0, x1, y0, y1 = w.berm
-    north = [(x, y1 + clear + fp[1], -math.pi / 2) for x in v(a2.PARAMS, 'dump_x')]
-    west = [(x0 - clear - fp[1], y, 0.0) for y in np.linspace(y0 + 0.15, y1 - 0.15, 3)]
+    north = [(float(x), y1 + clear + fp[1], -math.pi / 2) for x in np.arange(x0 + 0.3, x1 - 0.3 + 1e-9, 0.2)]
+    west = [(x0 - clear - fp[1], float(y), 0.0) for y in np.arange(y0 + 0.15, y1 - 0.15 + 1e-9, 0.15)]
     return north + west
+
+
+def choose_dump(hazards, robot, prefer=(), n_plan=None):
+    """The dump spot with the shortest route from the robot's pose on the current map, or None. Spots already reached
+    are tried first and taken if they still have a route (they worked before)."""
+    w = make_world(hazards)
+    n_plan = n_plan or val('dump_plan_n')
+    p = np.asarray(robot.pose[:2], float)
+    for c in prefer:
+        leg = Leg(hazards, robot, tuple(c))
+        if leg.ok:
+            return tuple(c)
+    cands = sorted((c for c in dump_spots(w) if a2.clearance(w, c, berm=False) > val('dump_spot_clear')),
+                   key=lambda c: math.hypot(c[0] - p[0], c[1] - p[1]))
+    best = None
+    for c in cands[:n_plan]:
+        leg = Leg(hazards, robot, c)
+        if leg.ok and (best is None or leg.info['length'] < best[0]):
+            best = (leg.info['length'], c)
+    return best[1] if best else None
 
 
 def relocate_goal(kind, g, hazards, robot=None, step=0.1, n_plan=6, prefer=()):
@@ -1284,7 +1310,7 @@ def relocate_goal(kind, g, hazards, robot=None, step=0.1, n_plan=6, prefer=()):
     w = make_world(hazards)
     if kind == 'dump':
         cands = [c for c in dump_spots(w) if math.hypot(c[0] - g[0], c[1] - g[1]) > 1e-6
-                 and a2.clearance(w, c, berm=False) > 0.10]
+                 and a2.clearance(w, c, berm=False) > val('dump_spot_clear')]
     else:
         x0, x1, y0, y1 = v(a2.PARAMS, 'dig_box')
         cands = []
@@ -1492,6 +1518,14 @@ class MissionRunner:
         if self.state == 'plan':
             if t - self.t_state < (self.retry_s if self.tries else 0.0):
                 return self._cmd(0.0, 0.0, dt) + (None,)
+            if kind == 'dump' and self.tries == 0 and not getattr(self, 'checked_open', None) == self.k:
+                self.checked_open = self.k
+                g2 = choose_dump(hazards, self.r, prefer=self.reached.get(kind, []))
+                if g2 is not None and math.hypot(g2[0] - g[0], g2[1] - g[1]) > 1e-6:
+                    self.goals[self.k] = (kind, g2)
+                    g = g2
+                    self.log.append((t, f'goal {self.k + 1} {kind}: shortest route is to the spot at x {g2[0]:.2f} '
+                                        f'y {g2[1]:.2f}'))
             if kind == 'dig' and self.tries == 0 and not getattr(self, 'checked_open', None) == self.k:
                 self.checked_open = self.k
                 tc = a2.turn_clearance(make_world(hazards), g[:2])
