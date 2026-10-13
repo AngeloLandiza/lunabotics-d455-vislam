@@ -1,0 +1,4758 @@
+{
+ "summary": {
+  "seeds": 50,
+  "level": "nominal",
+  "reveal_m": 4.0,
+  "all_goals_done": 19,
+  "digs_reached": "130/150",
+  "dumps_reached": "61/150",
+  "seeds_with_tight_dig": 41,
+  "tight_dig_goals": 78,
+  "seeds_with_dump_skipped": 30,
+  "seeds_pole_gate_lt5cm": 10,
+  "seeds_pinned": 0,
+  "seeds_contact": 12,
+  "ends": {
+   "done": 42,
+   "two goals in a row skipped": 8
+  },
+  "goals_total": 300
+ },
+ "rows": [
+  {
+   "seed": 0,
+   "start": [
+    0.52,
+    1.0,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     0.72,
+     3.63,
+     0.65
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.37,
+     3.33,
+     0.07
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.73,
+     3.64,
+     -0.78
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 10,
+   "moved": 5,
+   "pinned": 0,
+   "pole_cm": 4.8,
+   "contact_s": 0.4,
+   "t": 152.6,
+   "end": "done",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move -0.40 m",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: moved to x 0.90 y 1.80",
+    "goal 1/6 dig: route tangent 0.80 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.00 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 4.87 m, inflation 0.4",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.30 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 1.20",
+    "goal 2/6 dump: route tangent 2.82 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: tight spot (turn clearance -0.44 m), moved to x 0.90 y 1.80",
+    "goal 3/6 dig: route tangent 2.73 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.00 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 1.20",
+    "goal 4/6 dump: route tangent 2.83 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: tight spot (turn clearance -0.05 m), moved to x 0.90 y 1.80",
+    "goal 5/6 dig: route tangent 2.73 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.00 m",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 1.20",
+    "goal 6/6 dump: route tangent 2.83 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 1,
+   "start": [
+    0.68,
+    1.58,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     1.74,
+     1.82,
+     -0.12
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.61,
+     2.17,
+     0.08
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.73,
+     3.41,
+     0.06
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 152.6,
+   "contact_s": 0.0,
+   "t": 108.6,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance 0.11 m), moved to x 1.70 y 1.70",
+    "goal 1/6 dig: route grid tight 1.26 m, inflation None",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: grid route touches)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.40 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: grid route touches)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.26 m), moved to x 1.70 y 1.70",
+    "goal 3/6 dig: route tangent 0.39 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.40 m",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.59 m), moved to x 1.70 y 1.70",
+    "goal 5/6 dig: route tangent 0.41 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 2,
+   "start": [
+    1.47,
+    1.46,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     0.8,
+     2.86,
+     0.36
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.91,
+     0.9,
+     -0.35
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.42,
+     2.72,
+     -0.55
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 213.9,
+   "contact_s": 0.0,
+   "t": 92.2,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.37 m), moved to x 1.20 y 2.50",
+    "goal 1/6 dig: route tangent 1.08 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3/6 dig: route tangent 1.84 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.00 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 1.88 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 3,
+   "start": [
+    1.43,
+    0.82,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     1.34,
+     1.04,
+     -0.11
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.23,
+     1.28,
+     0.37
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.83,
+     2.11,
+     0.03
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 18,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 169.5,
+   "contact_s": 1.4,
+   "t": 178.5,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 0.23 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.15 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 8.53 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: turn; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: backing 1.23 m along the way it came, to where it can turn",
+    "goal 2/6 dump: route tangent 8.09 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 1.21 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 1.24 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3/6 dig: route tangent 1.05 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.25 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 0.97 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6/6 dump: route tangent 7.08 m, inflation 0.4",
+    "goal 6 dump: new hazard on the route, stopping to replan",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing 0.32 m along the way it came, to where it can turn",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 4,
+   "start": [
+    1.25,
+    1.41,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     0.79,
+     2.89,
+     -0.19
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.58,
+     1.33,
+     0.58
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.3,
+     3.95,
+     -0.04
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 2,
+   "pinned": 0,
+   "pole_cm": 203.1,
+   "contact_s": 0.0,
+   "t": 130.4,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.33 m), moved to x 1.40 y 1.60",
+    "goal 1/6 dig: route tangent 0.24 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.05 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route grid 6.35 m, inflation None",
+    "goal 2 dump: turned 362 deg in place, moving the goal",
+    "goal 2/6 dump: route grid 6.91 m, inflation None",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2/6 dump: route grid 7.75 m, inflation None",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 1.23 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 1.05 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3/6 dig: route tangent 0.43 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.30 m",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.57 m), moved to x 1.40 y 1.60",
+    "goal 5/6 dig: route tangent 0.42 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.05 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 5,
+   "start": [
+    1.09,
+    0.91,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.01,
+     0.89,
+     -0.18
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.15,
+     0.86,
+     -0.71
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.8,
+     3.05,
+     -0.42
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 8,
+   "moved": 4,
+   "pinned": 0,
+   "pole_cm": 4.9,
+   "contact_s": 0.0,
+   "t": 165.2,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 0.07 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.10 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 7.07 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2/6 dump: route tangent 6.79 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.40 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 1.20",
+    "goal 2/6 dump: route tangent 2.19 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3/6 dig: route tangent 2.43 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.20 m",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 1.20",
+    "goal 4/6 dump: route tangent 2.67 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: tight spot (turn clearance -0.24 m), moved to x 1.01 y 0.89",
+    "goal 5/6 dig: route tangent 2.56 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.10 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 1.20",
+    "goal 6/6 dump: route tangent 2.76 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 6,
+   "start": [
+    1.45,
+    0.56,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     1.11,
+     4.25,
+     0.21
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.44,
+     1.89,
+     0.28
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.84,
+     0.89,
+     0.55
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 154.7,
+   "contact_s": 0.0,
+   "t": 103.5,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.29 m), moved to x 1.80 y 1.90",
+    "goal 1/6 dig: route tangent 1.63 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.35 m",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.00 m), moved to x 1.80 y 1.90",
+    "goal 3/6 dig: route tangent 0.33 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.35 m",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 1.71 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 7,
+   "start": [
+    0.87,
+    1.28,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     0.95,
+     1.78,
+     0.59
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.21,
+     1.79,
+     -0.35
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.98,
+     2.3,
+     0.01
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 7,
+   "moved": 3,
+   "pinned": 0,
+   "pole_cm": 8.3,
+   "contact_s": 13.2,
+   "t": 293.5,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.14 m), moved to x 1.20 y 1.50",
+    "goal 1/6 dig: route tangent 0.40 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.25 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 4.82 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 3 dig: backing 1.21 m along the way it came, to where it can turn",
+    "goal 3 dig: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 3 dig: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 3 dig: backing 1.20 m along the way it came, to where it can turn",
+    "goal 3/6 dig: route grid tight 2.19 m, inflation None",
+    "goal 3 dig: turned 361 deg in place, moving the goal",
+    "goal 3/6 dig: route tangent 1.69 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4/6 dump: route grid 5.84 m, inflation None",
+    "goal 4 dump: arrived",
+    "goal 5 dig: tight spot (turn clearance -0.67 m), moved to x 1.20 y 1.50",
+    "goal 5/6 dig: route grid 5.54 m, inflation None",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.25 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 5.38 y 1.96",
+    "goal 6/6 dump: route grid 6.08 m, inflation None",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 8,
+   "start": [
+    0.9,
+    1.55,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     1.57,
+     3.83,
+     -0.17
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.18,
+     2.04,
+     -0.62
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.23,
+     1.57,
+     -0.38
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 1,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 1,
+   "dig_skipped": 1,
+   "no_route": 2,
+   "moved": 3,
+   "pinned": 0,
+   "pole_cm": 128.4,
+   "contact_s": 0.0,
+   "t": 107.2,
+   "end": "two goals in a row skipped",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.52 m), moved to x 1.80 y 2.00",
+    "goal 1/6 dig: route tangent 1.01 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.30 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route grid 6.16 m, inflation None",
+    "goal 2 dump: turned 361 deg in place, moving the goal",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.28 m), moved to x 1.80 y 2.00",
+    "goal 3/6 dig: route grid 3.76 m, inflation None",
+    "goal 3 dig: turned 361 deg in place, moving the goal",
+    "goal 3 dig: skipped",
+    "STUCK: two goals in a row skipped; mission stopped"
+   ]
+  },
+  {
+   "seed": 9,
+   "start": [
+    0.72,
+    0.95,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.56,
+     3.28,
+     0.65
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.65,
+     4.01,
+     -0.74
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.18,
+     2.45,
+     -0.68
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 202.9,
+   "contact_s": 0.0,
+   "t": 64.8,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.65 m), moved to x 1.80 y 2.20",
+    "goal 1/6 dig: route tangent 1.66 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.40 m), moved to x 1.80 y 2.20",
+    "goal 3/6 dig: route tangent 0.41 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.40 m",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.16 m), moved to x 1.80 y 2.20",
+    "goal 5/6 dig: route tangent 0.41 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.40 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 10,
+   "start": [
+    1.36,
+    1.14,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     0.86,
+     2.55,
+     -0.57
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.46,
+     3.73,
+     -0.12
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.75,
+     3.67,
+     -0.25
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 12,
+   "moved": 8,
+   "pinned": 0,
+   "pole_cm": 4.6,
+   "contact_s": 0.0,
+   "t": 219.4,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 1.50 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.15 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 6.06 y 1.96",
+    "goal 2/6 dump: route grid tight 7.47 m, inflation None",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2/6 dump: route grid tight 8.01 m, inflation None",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 1.14 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.60",
+    "goal 2/6 dump: route tangent 1.91 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 3 dig: backing 1.26 m along the way it came, to where it can turn",
+    "goal 3 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 3 dig: moved to x 0.86 y 2.55",
+    "goal 3/6 dig: route tangent 1.67 m, inflation 0.45",
+    "goal 3 dig: turned 360 deg in place, moving the goal",
+    "goal 3/6 dig: route tangent 0.05 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.10 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.60",
+    "goal 4/6 dump: route tangent 3.37 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: backing 1.21 m along the way it came, to where it can turn",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: moved to x 0.86 y 2.55",
+    "goal 5/6 dig: route tangent 1.72 m, inflation 0.45",
+    "goal 5 dig: turned 360 deg in place, moving the goal",
+    "goal 5/6 dig: route tangent 0.05 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.10 m",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.60",
+    "goal 6/6 dump: route tangent 3.37 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 11,
+   "start": [
+    0.83,
+    0.61,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     0.73,
+     1.23,
+     0.67
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.78,
+     1.17,
+     0.7
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.38,
+     2.03,
+     0.02
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 1,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 1,
+   "dig_skipped": 1,
+   "no_route": 4,
+   "moved": 4,
+   "pinned": 0,
+   "pole_cm": 91.3,
+   "contact_s": 0.0,
+   "t": 121.7,
+   "end": "two goals in a row skipped",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance 0.07 m), moved to x 0.90 y 1.20",
+    "goal 1/6 dig: route tangent 0.49 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2/6 dump: route tangent 4.99 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 6.06 y 1.96",
+    "goal 2/6 dump: route tangent 7.75 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2/6 dump: route grid tight 7.43 m, inflation None",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.10 m",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.60",
+    "goal 2/6 dump: route grid tight 4.28 m, inflation None",
+    "goal 2 dump: turned 361 deg in place, moving the goal",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance 0.12 m), moved to x 0.90 y 1.20",
+    "goal 3/6 dig: route grid 1.65 m, inflation None",
+    "goal 3 dig: turned 362 deg in place, moving the goal",
+    "goal 3 dig: skipped",
+    "STUCK: two goals in a row skipped; mission stopped"
+   ]
+  },
+  {
+   "seed": 12,
+   "start": [
+    1.25,
+    1.18,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     0.9,
+     1.96,
+     -0.42
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.44,
+     1.11,
+     0.62
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.82,
+     1.63,
+     -0.13
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 4,
+   "moved": 4,
+   "pinned": 0,
+   "pole_cm": 67.5,
+   "contact_s": 1.2,
+   "t": 294.1,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance 0.09 m), moved to x 1.00 y 1.90",
+    "goal 1/6 dig: route tangent 0.76 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 5.22 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2/6 dump: route grid tight 5.11 m, inflation None",
+    "goal 2 dump: arrived",
+    "goal 3/6 dig: route grid 6.33 m, inflation None",
+    "goal 3 dig: turned 361 deg in place, moving the goal",
+    "goal 3/6 dig: route tangent 1.07 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4/6 dump: route grid tight 5.42 m, inflation None",
+    "goal 4 dump: arrived",
+    "goal 5/6 dig: route grid 5.46 m, inflation None",
+    "goal 5 dig: turned 362 deg in place, moving the goal",
+    "goal 5/6 dig: route tangent 0.32 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 5.38 y 1.96",
+    "goal 6/6 dump: route grid tight 5.21 m, inflation None",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 13,
+   "start": [
+    0.78,
+    0.88,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     0.99,
+     0.98,
+     0.7
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.78,
+     1.73,
+     0.49
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.79,
+     2.28,
+     0.5
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 101.0,
+   "contact_s": 0.0,
+   "t": 105.8,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 0.23 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.15 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 6.06 y 1.96",
+    "goal 2/6 dump: route tangent 5.84 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.61 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.10 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.10 m), moved to x 0.99 y 0.98",
+    "goal 3/6 dig: route tangent 1.10 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.10 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.43 m), moved to x 0.99 y 0.98",
+    "goal 5/6 dig: route tangent 0.11 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.10 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 14,
+   "start": [
+    0.56,
+    0.36,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     1.65,
+     3.01,
+     0.08
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.54,
+     3.28,
+     -0.05
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.33,
+     3.39,
+     -0.69
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 0,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 1,
+   "dig_skipped": 1,
+   "no_route": 10,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 314.7,
+   "contact_s": 0.0,
+   "t": 6.5,
+   "end": "two goals in a row skipped",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move +0.00 m",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: skipped",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.00 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "STUCK: two goals in a row skipped; mission stopped"
+   ]
+  },
+  {
+   "seed": 15,
+   "start": [
+    0.99,
+    0.66,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     0.75,
+     2.76,
+     -0.56
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.49,
+     1.94,
+     -0.07
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.77,
+     3.51,
+     0.54
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 12,
+   "moved": 6,
+   "pinned": 0,
+   "pole_cm": 4.7,
+   "contact_s": 0.0,
+   "t": 185.1,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.34 m), moved to x 1.00 y 1.30",
+    "goal 1/6 dig: route tangent 0.79 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 7.46 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.75 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.60",
+    "goal 2/6 dump: route tangent 2.28 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 3 dig: backing 0.53 m along the way it came, to where it can turn",
+    "goal 3 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 3 dig: moved to x 1.00 y 1.30",
+    "goal 3/6 dig: route tangent 1.92 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.40 m",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.60",
+    "goal 4/6 dump: route tangent 2.39 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: backing 0.87 m along the way it came, to where it can turn",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: moved to x 1.00 y 1.30",
+    "goal 5/6 dig: route tangent 1.74 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.60",
+    "goal 6/6 dump: route tangent 2.39 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 16,
+   "start": [
+    1.26,
+    0.76,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.08,
+     2.94,
+     -0.75
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.66,
+     3.77,
+     -0.72
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.58,
+     1.37,
+     0.31
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 180.9,
+   "contact_s": 0.0,
+   "t": 126.8,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.30 m), moved to x 1.00 y 1.40",
+    "goal 1/6 dig: route tangent 0.69 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route grid 5.84 m, inflation None",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2/6 dump: route grid tight 6.57 m, inflation None",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.74 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.58 m), moved to x 1.00 y 1.40",
+    "goal 3/6 dig: route tangent 0.51 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.40 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance 0.09 m), moved to x 1.00 y 1.40",
+    "goal 5/6 dig: route tangent 0.40 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 17,
+   "start": [
+    1.45,
+    1.5,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.1,
+     1.47,
+     -0.18
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.17,
+     2.9,
+     0.37
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.72,
+     1.61,
+     0.16
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 11,
+   "moved": 5,
+   "pinned": 0,
+   "pole_cm": 3.7,
+   "contact_s": 0.0,
+   "t": 193.3,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 0.35 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.30 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 6.06 y 1.96",
+    "goal 2/6 dump: route tangent 6.40 m, inflation 0.4",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.60",
+    "goal 2/6 dump: route tangent 2.32 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 3 dig: backing 1.24 m along the way it came, to where it can turn",
+    "goal 3 dig: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 3 dig: moved to x 1.10 y 1.47",
+    "goal 3/6 dig: route tangent 1.34 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.30 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.60",
+    "goal 4/6 dump: route tangent 2.43 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: turn; 0.4: turn; 0.37: turn; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 5 dig: backing 1.18 m along the way it came, to where it can turn",
+    "goal 5/6 dig: route tangent 1.88 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.60",
+    "goal 6/6 dump: route tangent 2.80 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 18,
+   "start": [
+    0.42,
+    1.01,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     0.79,
+     4.19,
+     0.1
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.41,
+     2.78,
+     -0.04
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.83,
+     1.83,
+     0.37
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 19,
+   "moved": 2,
+   "pinned": 0,
+   "pole_cm": 202.9,
+   "contact_s": 0.3,
+   "t": 107.2,
+   "end": "done",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move +0.40 m",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: moved to x 1.00 y 2.30",
+    "goal 1/6 dig: route tangent 1.31 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.05 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 5.64 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.74 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.09 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.39 m), moved to x 1.00 y 2.30",
+    "goal 3/6 dig: route tangent 0.25 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.00 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 0.51 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.30 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 19,
+   "start": [
+    0.66,
+    0.91,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     0.77,
+     1.82,
+     0.34
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.56,
+     2.64,
+     -0.3
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.71,
+     4.04,
+     -0.1
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 246.7,
+   "contact_s": 0.0,
+   "t": 101.2,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance 0.11 m), moved to x 0.90 y 1.80",
+    "goal 1/6 dig: route grid 1.45 m, inflation None",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.30 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.26 m), moved to x 0.90 y 1.80",
+    "goal 3/6 dig: route tangent 0.28 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.30 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.26 m), moved to x 0.90 y 1.80",
+    "goal 5/6 dig: route tangent 0.31 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.30 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 20,
+   "start": [
+    1.52,
+    0.44,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     1.27,
+     2.17,
+     -0.67
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.81,
+     4.25,
+     0.3
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.19,
+     3.0,
+     -0.36
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 0,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 1,
+   "dig_skipped": 1,
+   "no_route": 10,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 230.9,
+   "contact_s": 0.0,
+   "t": 6.5,
+   "end": "two goals in a row skipped",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move +0.00 m",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: skipped",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.00 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "STUCK: two goals in a row skipped; mission stopped"
+   ]
+  },
+  {
+   "seed": 21,
+   "start": [
+    0.56,
+    1.09,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     0.8,
+     2.97,
+     0.76
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.17,
+     1.1,
+     0.72
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.44,
+     1.41,
+     0.27
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 68.7,
+   "contact_s": 0.0,
+   "t": 95.0,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.25 m), moved to x 0.90 y 1.90",
+    "goal 1/6 dig: route tangent 1.54 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.00 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 6.06 y 1.96",
+    "goal 2/6 dump: route tangent 6.01 m, inflation 0.4",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.85 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.10 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3/6 dig: route tangent 1.23 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.20 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 0.21 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.10 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 22,
+   "start": [
+    0.93,
+    1.09,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.42,
+     2.35,
+     0.77
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.64,
+     3.71,
+     -0.7
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.31,
+     2.89,
+     -0.71
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 229.9,
+   "contact_s": 0.0,
+   "t": 65.2,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.26 m), moved to x 1.40 y 1.80",
+    "goal 1/6 dig: route tangent 0.87 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.40 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.14 m), moved to x 1.40 y 1.80",
+    "goal 3/6 dig: route tangent 0.41 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.40 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.48 m), moved to x 1.40 y 1.80",
+    "goal 5/6 dig: route tangent 0.41 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.40 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 23,
+   "start": [
+    0.36,
+    1.48,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     0.83,
+     3.05,
+     0.56
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.92,
+     1.48,
+     0.34
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.22,
+     2.19,
+     -0.24
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 2,
+   "dumps": 1,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 2,
+   "dig_skipped": 1,
+   "no_route": 18,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 11.2,
+   "contact_s": 1.0,
+   "t": 197.3,
+   "end": "two goals in a row skipped",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: start not free on the grid; grid 0.02: grid route touches)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move +0.40 m",
+    "goal 1/6 dig: route grid 1.63 m, inflation None",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.13 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 6.06 y 1.96",
+    "goal 2/6 dump: route tangent 7.16 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2/6 dump: route tangent 6.52 m, inflation 0.4",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.10 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3/6 dig: route tangent 3.01 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4/6 dump: route grid tight 5.33 m, inflation None",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: grid route touches)",
+    "goal 5 dig: backing 1.25 m along the way it came, to where it can turn",
+    "goal 5 dig: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: backing 1.26 m along the way it came, to where it can turn",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: turn; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: grid route touches)",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: turn; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: grid route touches)",
+    "goal 5 dig: skipped",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing 0.89 m along the way it came, to where it can turn",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing 0.08 m along the way it came, to where it can turn",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped",
+    "STUCK: two goals in a row skipped; mission stopped"
+   ]
+  },
+  {
+   "seed": 24,
+   "start": [
+    0.79,
+    0.95,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.26,
+     2.73,
+     0.11
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.66,
+     1.01,
+     0.38
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.6,
+     3.26,
+     -0.14
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 158.2,
+   "contact_s": 0.0,
+   "t": 96.7,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.42 m), moved to x 1.80 y 3.20",
+    "goal 1/6 dig: route tangent 2.64 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.20 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3/6 dig: route tangent 2.25 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.40 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance 0.02 m), moved to x 1.80 y 3.20",
+    "goal 5/6 dig: route tangent 2.05 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.20 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 25,
+   "start": [
+    0.59,
+    0.87,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     0.95,
+     3.46,
+     0.65
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.09,
+     3.53,
+     -0.55
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.3,
+     2.85,
+     0.46
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 6,
+   "moved": 3,
+   "pinned": 0,
+   "pole_cm": 5.0,
+   "contact_s": 1.7,
+   "t": 187.5,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.60 m), moved to x 1.80 y 1.60",
+    "goal 1/6 dig: route tangent 6.79 m, inflation 0.4",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.60",
+    "goal 2/6 dump: route tangent 2.41 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: tight spot (turn clearance -0.53 m), moved to x 1.80 y 1.60",
+    "goal 3/6 dig: route grid 2.41 m, inflation None",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.40 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.60",
+    "goal 4/6 dump: route tangent 2.41 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: tight spot (turn clearance -0.25 m), moved to x 1.80 y 1.60",
+    "goal 5/6 dig: route grid 2.40 m, inflation None",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.40 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.60",
+    "goal 6/6 dump: route tangent 2.42 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 26,
+   "start": [
+    1.26,
+    1.21,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     1.48,
+     3.63,
+     0.08
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.4,
+     1.31,
+     0.09
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.89,
+     2.52,
+     -0.25
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 221.0,
+   "contact_s": 0.0,
+   "t": 83.5,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.09 m), moved to x 1.70 y 3.80",
+    "goal 1/6 dig: route tangent 2.64 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.10 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3/6 dig: route tangent 2.58 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.00 m",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.03 m), moved to x 1.70 y 3.80",
+    "goal 5/6 dig: route tangent 2.52 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.10 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 27,
+   "start": [
+    0.98,
+    0.68,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     1.06,
+     4.05,
+     0.46
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.71,
+     1.42,
+     -0.32
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.74,
+     2.15,
+     -0.5
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 4,
+   "moved": 2,
+   "pinned": 0,
+   "pole_cm": 11.3,
+   "contact_s": 0.0,
+   "t": 172.4,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.21 m), moved to x 1.80 y 2.60",
+    "goal 1/6 dig: route grid 2.33 m, inflation None",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.20 m",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 4.11 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: tight spot (turn clearance 0.05 m), moved to x 1.80 y 2.60",
+    "goal 3/6 dig: route tangent 3.84 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4/6 dump: route tangent 4.20 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5/6 dig: route tangent 3.73 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.20 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 5.38 y 1.96",
+    "goal 6/6 dump: route tangent 3.90 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 28,
+   "start": [
+    1.0,
+    1.05,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     0.74,
+     0.88,
+     -0.27
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.66,
+     4.12,
+     0.05
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.56,
+     1.89,
+     0.5
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 5,
+   "moved": 2,
+   "pinned": 0,
+   "pole_cm": 4.9,
+   "contact_s": 1.2,
+   "t": 166.6,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance 0.08 m), moved to x 0.90 y 0.90",
+    "goal 1/6 dig: route tangent 0.18 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2/6 dump: route tangent 4.80 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: tight spot (turn clearance -0.33 m), moved to x 0.90 y 0.90",
+    "goal 3/6 dig: route tangent 4.40 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.00 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.60",
+    "goal 4/6 dump: route tangent 2.81 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: turn; 0.37: turn; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 5 dig: backing 1.26 m along the way it came, to where it can turn",
+    "goal 5/6 dig: route tangent 2.10 m, inflation 0.4",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing 0.42 m along the way it came, to where it can turn",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.60",
+    "goal 6/6 dump: route tangent 2.76 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 29,
+   "start": [
+    1.3,
+    1.25,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     1.13,
+     2.07,
+     -0.75
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.96,
+     3.54,
+     0.18
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.78,
+     3.8,
+     0.21
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 1,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 1,
+   "dig_skipped": 1,
+   "no_route": 2,
+   "moved": 3,
+   "pinned": 0,
+   "pole_cm": 17.1,
+   "contact_s": 4.4,
+   "t": 135.0,
+   "end": "two goals in a row skipped",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.26 m), moved to x 1.40 y 1.70",
+    "goal 1/6 dig: route tangent 0.46 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.35 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route grid 6.60 m, inflation None",
+    "goal 2 dump: turned 361 deg in place, moving the goal",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.35 m), moved to x 1.40 y 1.70",
+    "goal 3/6 dig: route grid tight 5.84 m, inflation None",
+    "goal 3 dig: turned 360 deg in place, moving the goal",
+    "goal 3 dig: skipped",
+    "STUCK: two goals in a row skipped; mission stopped"
+   ]
+  },
+  {
+   "seed": 30,
+   "start": [
+    1.59,
+    1.35,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     1.35,
+     3.52,
+     0.58
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.06,
+     1.09,
+     -0.16
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.35,
+     1.6,
+     0.23
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 212.2,
+   "contact_s": 0.0,
+   "t": 92.1,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.25 m), moved to x 1.20 y 2.60",
+    "goal 1/6 dig: route tangent 1.86 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.25 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 5.49 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.68 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.10 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3/6 dig: route tangent 1.72 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.05 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 0.56 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.00 m",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 31,
+   "start": [
+    1.35,
+    0.92,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     0.76,
+     1.34,
+     0.75
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.03,
+     2.83,
+     0.76
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.48,
+     1.46,
+     -0.12
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 188.6,
+   "contact_s": 0.0,
+   "t": 91.9,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance 0.10 m), moved to x 0.90 y 1.30",
+    "goal 1/6 dig: route tangent 0.59 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.35 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 6.67 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.35 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.33 m), moved to x 0.90 y 1.30",
+    "goal 3/6 dig: route tangent 1.22 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.30 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 0.36 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.05 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 32,
+   "start": [
+    1.2,
+    0.41,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     1.06,
+     3.17,
+     0.74
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.76,
+     3.12,
+     0.52
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.21,
+     1.84,
+     0.07
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 0,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 1,
+   "dig_skipped": 1,
+   "no_route": 10,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 263.3,
+   "contact_s": 0.0,
+   "t": 6.5,
+   "end": "two goals in a row skipped",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move +0.00 m",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: skipped",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.00 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "STUCK: two goals in a row skipped; mission stopped"
+   ]
+  },
+  {
+   "seed": 33,
+   "start": [
+    0.51,
+    0.69,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     0.98,
+     2.82,
+     -0.22
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.53,
+     2.66,
+     -0.47
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.27,
+     1.57,
+     -0.71
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 152.8,
+   "contact_s": 0.5,
+   "t": 103.1,
+   "end": "done",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move -0.20 m",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: moved to x 1.70 y 1.70",
+    "goal 1/6 dig: route tangent 1.09 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.05 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.29 m), moved to x 1.70 y 1.70",
+    "goal 3/6 dig: route tangent 0.04 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.40 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.03 m), moved to x 1.70 y 1.70",
+    "goal 5/6 dig: route tangent 0.41 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.05 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 34,
+   "start": [
+    1.09,
+    1.04,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     1.67,
+     3.94,
+     0.03
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.76,
+     3.98,
+     0.28
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.54,
+     1.34,
+     0.58
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 6,
+   "moved": 3,
+   "pinned": 0,
+   "pole_cm": 9.8,
+   "contact_s": 0.0,
+   "t": 150.1,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.25 m), moved to x 1.70 y 2.00",
+    "goal 1/6 dig: route tangent 1.47 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.40 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.90",
+    "goal 2/6 dump: route tangent 2.03 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: tight spot (turn clearance -0.22 m), moved to x 1.70 y 2.00",
+    "goal 3/6 dig: route tangent 1.80 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.40 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.90",
+    "goal 4/6 dump: route tangent 2.01 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5/6 dig: route tangent 1.64 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.15 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.90",
+    "goal 6/6 dump: route tangent 2.08 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 35,
+   "start": [
+    1.52,
+    0.45,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     1.74,
+     1.05,
+     -0.78
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.2,
+     3.97,
+     0.49
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.69,
+     3.63,
+     -0.53
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 169.2,
+   "contact_s": 0.0,
+   "t": 56.4,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 2.76 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.10 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.27 m), moved to x 1.74 y 1.05",
+    "goal 3/6 dig: route tangent 0.11 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.10 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.03 m), moved to x 1.74 y 1.05",
+    "goal 5/6 dig: route tangent 0.11 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.10 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 36,
+   "start": [
+    1.31,
+    1.33,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     1.14,
+     3.16,
+     0.02
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.29,
+     3.85,
+     -0.4
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.86,
+     1.88,
+     -0.14
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 15,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 221.9,
+   "contact_s": 0.0,
+   "t": 93.0,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.12 m), moved to x 1.50 y 3.00",
+    "goal 1/6 dig: route tangent 1.68 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.05 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.42 m), moved to x 1.50 y 3.00",
+    "goal 3/6 dig: route tangent 0.04 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.40 m",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 1.53 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 37,
+   "start": [
+    0.86,
+    1.12,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     1.47,
+     1.85,
+     -0.08
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.78,
+     0.93,
+     -0.5
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.82,
+     3.75,
+     0.31
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 8,
+   "moved": 4,
+   "pinned": 0,
+   "pole_cm": 9.5,
+   "contact_s": 0.0,
+   "t": 169.1,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 1.33 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.20 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 6.06 y 1.96",
+    "goal 2/6 dump: route tangent 5.85 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.69 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.90",
+    "goal 2/6 dump: route tangent 2.59 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3/6 dig: route tangent 1.63 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.40 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.90",
+    "goal 4/6 dump: route tangent 2.24 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: tight spot (turn clearance -0.11 m), moved to x 1.47 y 1.85",
+    "goal 5/6 dig: route tangent 2.27 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.20 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.90",
+    "goal 6/6 dump: route tangent 2.68 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 38,
+   "start": [
+    0.82,
+    1.12,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     1.4,
+     4.06,
+     -0.72
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.62,
+     2.49,
+     -0.1
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.23,
+     1.19,
+     -0.67
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 2,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 0,
+   "dig_skipped": 1,
+   "no_route": 6,
+   "moved": 5,
+   "pinned": 0,
+   "pole_cm": 9.6,
+   "contact_s": 0.0,
+   "t": 176.7,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.49 m), moved to x 1.80 y 2.30",
+    "goal 1/6 dig: route tangent 1.53 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.30 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.90",
+    "goal 2/6 dump: route tangent 2.16 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: tight spot (turn clearance -0.05 m), moved to x 1.80 y 2.30",
+    "goal 3/6 dig: route grid 2.57 m, inflation None",
+    "goal 3 dig: turned 360 deg in place, moving the goal",
+    "goal 3 dig: skipped",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing 0.06 m along the way it came, to where it can turn",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.90",
+    "goal 4/6 dump: route tangent 2.76 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5/6 dig: route grid 2.91 m, inflation None",
+    "goal 5 dig: turned 360 deg in place, moving the goal",
+    "goal 5/6 dig: route tangent 1.24 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.30 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.90",
+    "goal 6/6 dump: route tangent 2.17 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 39,
+   "start": [
+    1.37,
+    1.43,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.04,
+     2.79,
+     0.46
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.87,
+     1.52,
+     0.69
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.43,
+     3.45,
+     0.25
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 2,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 4,
+   "moved": 2,
+   "pinned": 0,
+   "pole_cm": 12.8,
+   "contact_s": 0.0,
+   "t": 184.9,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.48 m), moved to x 0.90 y 1.60",
+    "goal 1/6 dig: route tangent 0.50 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.05 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route grid 4.83 m, inflation None",
+    "goal 2 dump: arrived",
+    "goal 3/6 dig: route tangent 4.55 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4/6 dump: route grid 4.83 m, inflation None",
+    "goal 4 dump: arrived",
+    "goal 5 dig: tight spot (turn clearance -0.31 m), moved to x 0.90 y 1.60",
+    "goal 5/6 dig: route tangent 4.51 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.05 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 5.38 y 1.96",
+    "goal 6/6 dump: route grid 4.83 m, inflation None",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 40,
+   "start": [
+    1.57,
+    0.75,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     0.77,
+     3.19,
+     0.66
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.22,
+     1.92,
+     0.16
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.5,
+     1.1,
+     -0.61
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 9,
+   "moved": 3,
+   "pinned": 0,
+   "pole_cm": 4.8,
+   "contact_s": 0.0,
+   "t": 165.6,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.46 m), moved to x 0.90 y 1.90",
+    "goal 1/6 dig: route tangent 1.33 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.00 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 1.20",
+    "goal 2/6 dump: route tangent 2.86 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3/6 dig: route grid 2.95 m, inflation None",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.30 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 1.20",
+    "goal 4/6 dump: route tangent 2.84 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: turn; 0.4: turn; 0.37: turn; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 5 dig: backing 0.07 m along the way it came, to where it can turn",
+    "goal 5 dig: no route (0.45: turn; 0.4: turn; 0.37: turn; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 5 dig: no route (0.45: turn; 0.4: turn; 0.37: turn; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 5 dig: backing 1.00 m along the way it came, to where it can turn",
+    "goal 5/6 dig: route tangent 1.16 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.30 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 1.20",
+    "goal 6/6 dump: route tangent 2.40 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 41,
+   "start": [
+    1.15,
+    1.1,
+    1.57
+   ],
+   "goals": [
+    [
+     "dig",
+     1.61,
+     3.76,
+     -0.24
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.26,
+     2.87,
+     -0.25
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.38,
+     3.34,
+     0.57
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 192.9,
+   "contact_s": 0.0,
+   "t": 83.3,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.39 m), moved to x 0.90 y 1.90",
+    "goal 1/6 dig: route tangent 0.84 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.05 m",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 4.90 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.72 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.09 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.32 m), moved to x 0.90 y 1.90",
+    "goal 3/6 dig: route tangent 0.17 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.05 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.26 m), moved to x 0.90 y 1.90",
+    "goal 5/6 dig: route tangent 0.03 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.00 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 42,
+   "start": [
+    0.37,
+    1.28,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.47,
+     1.04,
+     0.75
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.54,
+     3.53,
+     -0.58
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.2,
+     2.03,
+     0.67
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 0,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 1,
+   "dig_skipped": 1,
+   "no_route": 10,
+   "moved": 0,
+   "pinned": 0,
+   "pole_cm": 355.2,
+   "contact_s": 0.0,
+   "t": 6.5,
+   "end": "two goals in a row skipped",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move +0.00 m",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: skipped",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.00 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "STUCK: two goals in a row skipped; mission stopped"
+   ]
+  },
+  {
+   "seed": 43,
+   "start": [
+    0.64,
+    1.02,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     1.53,
+     1.65,
+     -0.13
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.2,
+     4.14,
+     0.62
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.01,
+     1.7,
+     -0.12
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 165.0,
+   "contact_s": 0.0,
+   "t": 103.9,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 1.25 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 6.56 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.66 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.09 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.06 m), moved to x 1.53 y 1.65",
+    "goal 3/6 dig: route tangent 0.23 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.40 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5/6 dig: route tangent 0.13 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.05 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 44,
+   "start": [
+    1.43,
+    1.48,
+    0.0
+   ],
+   "goals": [
+    [
+     "dig",
+     1.77,
+     1.28,
+     0.56
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.88,
+     1.92,
+     0.28
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.38,
+     4.14,
+     -0.14
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 6,
+   "moved": 3,
+   "pinned": 0,
+   "pole_cm": 4.8,
+   "contact_s": 0.0,
+   "t": 135.2,
+   "end": "done",
+   "log": [
+    "goal 1/6 dig: route tangent 0.39 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.10 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 1.20",
+    "goal 2/6 dump: route tangent 2.00 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3/6 dig: route tangent 2.78 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.00 m",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 1.20",
+    "goal 4/6 dump: route tangent 2.88 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: tight spot (turn clearance -0.79 m), moved to x 1.77 y 1.28",
+    "goal 5/6 dig: route tangent 1.80 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.10 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 1.20",
+    "goal 6/6 dump: route tangent 1.98 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 45,
+   "start": [
+    1.29,
+    0.38,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.59,
+     2.54,
+     0.44
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.58,
+     2.84,
+     -0.14
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.44,
+     2.96,
+     0.53
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 0,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 14,
+   "moved": 7,
+   "pinned": 0,
+   "pole_cm": 3.2,
+   "contact_s": 1.5,
+   "t": 210.7,
+   "end": "done",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: start not free on the grid; grid 0.02: start not free on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move -0.40 m",
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 1 dig: moved to x 1.00 y 2.50",
+    "goal 1/6 dig: route tangent 1.75 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.10 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route grid tight 7.45 m, inflation None",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.67 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.60",
+    "goal 2/6 dump: route tangent 3.15 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 3 dig: backing 1.22 m along the way it came, to where it can turn",
+    "goal 3 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 3 dig: moved to x 1.00 y 2.50",
+    "goal 3/6 dig: route tangent 2.07 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.10 m",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.60",
+    "goal 4/6 dump: route tangent 3.39 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: backing 1.26 m along the way it came, to where it can turn",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: moved to x 1.00 y 2.50",
+    "goal 5/6 dig: route tangent 2.08 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move -0.10 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.60",
+    "goal 6/6 dump: route tangent 3.39 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 46,
+   "start": [
+    1.24,
+    0.96,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.38,
+     4.06,
+     -0.65
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.39,
+     3.49,
+     0.02
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.52,
+     3.87,
+     -0.0
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 4,
+   "moved": 2,
+   "pinned": 0,
+   "pole_cm": 6.7,
+   "contact_s": 0.0,
+   "t": 278.5,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.06 m), moved to x 1.50 y 2.60",
+    "goal 1/6 dig: route tangent 1.66 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route grid tight 4.14 m, inflation None",
+    "goal 2 dump: arrived",
+    "goal 3 dig: tight spot (turn clearance -0.30 m), moved to x 1.50 y 2.60",
+    "goal 3/6 dig: route grid tight 4.69 m, inflation None",
+    "goal 3 dig: arrived",
+    "goal 4/6 dump: route grid tight 4.55 m, inflation None",
+    "goal 4 dump: arrived",
+    "goal 5 dig: tight spot (turn clearance -0.29 m), moved to x 1.50 y 2.60",
+    "goal 5/6 dig: route grid tight 4.69 m, inflation None",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 5.38 y 1.96",
+    "goal 6/6 dump: route grid tight 4.16 m, inflation None",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 47,
+   "start": [
+    0.75,
+    1.49,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     0.81,
+     4.18,
+     -0.28
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.92,
+     3.79,
+     0.02
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.9,
+     3.4,
+     0.46
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 0,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 3,
+   "dump_skipped": 3,
+   "dig_skipped": 0,
+   "no_route": 17,
+   "moved": 1,
+   "pinned": 0,
+   "pole_cm": 212.6,
+   "contact_s": 0.0,
+   "t": 115.1,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.62 m), moved to x 0.90 y 1.80",
+    "goal 1/6 dig: route tangent 0.34 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move +0.40 m",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 5.38 y 1.96",
+    "goal 2/6 dump: route tangent 5.79 m, inflation 0.45",
+    "goal 2 dump: new hazard on the route, stopping to replan",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.40 m",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: skipped",
+    "goal 3 dig: tight spot (turn clearance -0.21 m), moved to x 0.90 y 1.80",
+    "goal 3/6 dig: route tangent 0.40 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move +0.40 m",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: skipped",
+    "goal 5 dig: tight spot (turn clearance -0.19 m), moved to x 0.90 y 1.80",
+    "goal 5/6 dig: route tangent 0.41 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.40 m",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: no route (0.45: no route; 0.4: no route; 0.37: no route; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: skipped"
+   ]
+  },
+  {
+   "seed": 48,
+   "start": [
+    1.11,
+    1.42,
+    3.14
+   ],
+   "goals": [
+    [
+     "dig",
+     1.46,
+     3.05,
+     0.57
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.35,
+     2.6,
+     0.43
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.93,
+     1.08,
+     -0.65
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 9,
+   "moved": 4,
+   "pinned": 0,
+   "pole_cm": 3.2,
+   "contact_s": 0.0,
+   "t": 184.7,
+   "end": "done",
+   "log": [
+    "goal 1 dig: tight spot (turn clearance -0.61 m), moved to x 1.80 y 2.30",
+    "goal 1/6 dig: route tangent 1.22 m, inflation 0.45",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing out to plan again",
+    "goal 2 dump: escape move -0.30 m",
+    "goal 2 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.60",
+    "goal 2/6 dump: route tangent 2.72 m, inflation 0.45",
+    "goal 2 dump: arrived",
+    "goal 3 dig: no route (0.45: no arrival; 0.4: no arrival; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 3 dig: backing 1.25 m along the way it came, to where it can turn",
+    "goal 3 dig: no route (0.45: no arrival; 0.4: no arrival; 0.37: no route; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 3 dig: moved to x 1.80 y 2.30",
+    "goal 3/6 dig: route tangent 1.21 m, inflation 0.45",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing out to plan again",
+    "goal 4 dump: escape move -0.35 m",
+    "goal 4 dump: no route (0.45: no arrival; 0.4: no arrival; 0.37: no arrival; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.60",
+    "goal 4/6 dump: route tangent 2.70 m, inflation 0.45",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: turn; 0.4: turn; 0.37: turn; grid 0.04: grid route touches; grid 0.02: grid route touches)",
+    "goal 5 dig: backing 1.25 m along the way it came, to where it can turn",
+    "goal 5/6 dig: route tangent 1.53 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.10 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.60",
+    "goal 6/6 dump: route tangent 2.69 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  },
+  {
+   "seed": 49,
+   "start": [
+    0.77,
+    0.39,
+    4.71
+   ],
+   "goals": [
+    [
+     "dig",
+     1.39,
+     3.06,
+     -0.76
+    ],
+    [
+     "dump",
+     4.7,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     1.55,
+     4.28,
+     0.01
+    ],
+    [
+     "dump",
+     5.38,
+     1.96,
+     -1.57
+    ],
+    [
+     "dig",
+     0.82,
+     3.91,
+     0.2
+    ],
+    [
+     "dump",
+     6.06,
+     1.96,
+     -1.57
+    ]
+   ],
+   "digs": 3,
+   "dumps": 3,
+   "n_dig": 3,
+   "n_dump": 3,
+   "tight": 1,
+   "dump_skipped": 0,
+   "dig_skipped": 0,
+   "no_route": 9,
+   "moved": 5,
+   "pinned": 0,
+   "pole_cm": 9.4,
+   "contact_s": 1.4,
+   "t": 239.9,
+   "end": "done",
+   "log": [
+    "goal 1 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: no route; grid 0.04: start not free on the grid; grid 0.02: start not free on the grid)",
+    "goal 1 dig: backing out to plan again",
+    "goal 1 dig: escape move -0.40 m",
+    "goal 1/6 dig: route grid tight 3.10 m, inflation None",
+    "goal 1 dig: arrived",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: backing 0.84 m along the way it came, to where it can turn",
+    "goal 2 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 2 dump: moved to x 3.67 y 0.90",
+    "goal 2/6 dump: route tangent 3.42 m, inflation 0.4",
+    "goal 2 dump: arrived",
+    "goal 3 dig: tight spot (turn clearance -0.18 m), moved to x 1.39 y 3.06",
+    "goal 3/6 dig: route grid tight 3.30 m, inflation None",
+    "goal 3 dig: arrived",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: backing 0.83 m along the way it came, to where it can turn",
+    "goal 4 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 4 dump: moved to x 3.67 y 0.90",
+    "goal 4/6 dump: route grid tight 3.50 m, inflation None",
+    "goal 4 dump: arrived",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: backing 1.24 m along the way it came, to where it can turn",
+    "goal 5 dig: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 5 dig: moved to x 1.39 y 3.06",
+    "goal 5/6 dig: route grid 2.34 m, inflation None",
+    "goal 5 dig: turned 360 deg in place, moving the goal",
+    "goal 5/6 dig: route tangent 0.71 m, inflation 0.45",
+    "goal 5 dig: arrived",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: backing out to plan again",
+    "goal 6 dump: escape move +0.35 m",
+    "goal 6 dump: no route (0.45: start or goal blocked; 0.4: start or goal blocked; 0.37: start or goal blocked; grid 0.04: no route on the grid; grid 0.02: no route on the grid)",
+    "goal 6 dump: moved to x 3.67 y 0.90",
+    "goal 6/6 dump: route tangent 1.82 m, inflation 0.45",
+    "goal 6 dump: arrived"
+   ]
+  }
+ ]
+}
