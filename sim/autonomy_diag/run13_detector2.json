@@ -1,0 +1,567 @@
+{
+ "gt": {
+  "frames": 1196,
+  "skipped_turning": 141,
+  "skipped_in_place": 0,
+  "duct_drops": [
+   [
+    0.84,
+    3.89
+   ],
+   [
+    3.06,
+    4.35
+   ]
+  ],
+  "n": 6,
+  "matched": 3,
+  "false": 3,
+  "missed": [
+   [
+    "boulder",
+    4.89,
+    3.86
+   ],
+   [
+    "boulder",
+    4.42,
+    2.45
+   ],
+   [
+    "boulder",
+    1.37,
+    2.84
+   ],
+   [
+    "boulder",
+    1.86,
+    4.62
+   ],
+   [
+    "crater",
+    2.86,
+    3.88
+   ],
+   [
+    "crater",
+    5.56,
+    2.69
+   ],
+   [
+    "crater",
+    4.25,
+    4.69
+   ],
+   [
+    "crater",
+    0.81,
+    4.1
+   ]
+  ],
+  "hazards": [
+   {
+    "kind": "boulder",
+    "x": 1.47,
+    "y": 0.53,
+    "r": 0.4,
+    "ev": 418.4,
+    "match": false,
+    "nearest": [
+     "boulder",
+     1.37,
+     2.84,
+     2.05
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.03,
+    "y": 0.67,
+    "r": 0.26,
+    "ev": 157.4,
+    "match": false,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     2.07
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 5.02,
+    "y": 1.8,
+    "r": 0.17,
+    "ev": 74.8,
+    "match": true,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     -0.2
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.98,
+    "y": 3.22,
+    "r": 0.17,
+    "ev": 66.2,
+    "match": true,
+    "nearest": [
+     "boulder",
+     3.93,
+     3.26,
+     -0.2
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.92,
+    "y": 0.56,
+    "r": 0.16,
+    "ev": 47.8,
+    "match": false,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     1.43
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 6.02,
+    "y": 4.32,
+    "r": 0.14,
+    "ev": 27.2,
+    "match": true,
+    "nearest": [
+     "boulder",
+     6.16,
+     4.41,
+     -0.03
+    ]
+   }
+  ]
+ },
+ "est": {
+  "frames": 1194,
+  "skipped_turning": 142,
+  "skipped_in_place": 0,
+  "duct_drops": [
+   [
+    1.41,
+    0.49
+   ],
+   [
+    1.52,
+    3.96
+   ]
+  ],
+  "n": 4,
+  "matched": 3,
+  "false": 1,
+  "missed": [
+   [
+    "boulder",
+    6.16,
+    4.41
+   ],
+   [
+    "boulder",
+    4.89,
+    3.86
+   ],
+   [
+    "boulder",
+    4.42,
+    2.45
+   ],
+   [
+    "boulder",
+    1.37,
+    2.84
+   ],
+   [
+    "boulder",
+    1.86,
+    4.62
+   ],
+   [
+    "crater",
+    2.86,
+    3.88
+   ],
+   [
+    "crater",
+    4.25,
+    4.69
+   ],
+   [
+    "crater",
+    0.81,
+    4.1
+   ]
+  ],
+  "hazards": [
+   {
+    "kind": "crater",
+    "x": 5.78,
+    "y": 2.37,
+    "r": 0.38,
+    "ev": 525.4,
+    "match": true,
+    "nearest": [
+     "crater",
+     5.56,
+     2.69,
+     0.16
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.07,
+    "y": 0.64,
+    "r": 0.25,
+    "ev": 128.3,
+    "match": false,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     2.05
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 5.02,
+    "y": 1.79,
+    "r": 0.17,
+    "ev": 70.3,
+    "match": true,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     -0.2
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.97,
+    "y": 3.19,
+    "r": 0.18,
+    "ev": 64.4,
+    "match": true,
+    "nearest": [
+     "boulder",
+     3.93,
+     3.26,
+     -0.18
+    ]
+   }
+  ]
+ },
+ "est_still": {
+  "frames": 935,
+  "skipped_turning": 142,
+  "skipped_in_place": 259,
+  "duct_drops": [
+   [
+    1.42,
+    0.42
+   ],
+   [
+    1.49,
+    3.98
+   ]
+  ],
+  "n": 6,
+  "matched": 3,
+  "false": 3,
+  "missed": [
+   [
+    "boulder",
+    6.16,
+    4.41
+   ],
+   [
+    "boulder",
+    4.42,
+    2.45
+   ],
+   [
+    "boulder",
+    1.37,
+    2.84
+   ],
+   [
+    "boulder",
+    1.86,
+    4.62
+   ],
+   [
+    "crater",
+    2.86,
+    3.88
+   ],
+   [
+    "crater",
+    5.56,
+    2.69
+   ],
+   [
+    "crater",
+    4.25,
+    4.69
+   ],
+   [
+    "crater",
+    0.81,
+    4.1
+   ]
+  ],
+  "hazards": [
+   {
+    "kind": "crater",
+    "x": 6.46,
+    "y": 0.84,
+    "r": 0.21,
+    "ev": 142.1,
+    "match": false,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     1.47
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.99,
+    "y": 3.18,
+    "r": 0.2,
+    "ev": 82.6,
+    "match": true,
+    "nearest": [
+     "boulder",
+     3.93,
+     3.26,
+     -0.17
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 5.02,
+    "y": 1.78,
+    "r": 0.16,
+    "ev": 76.2,
+    "match": true,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     -0.21
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.12,
+    "y": 0.76,
+    "r": 0.16,
+    "ev": 44.1,
+    "match": false,
+    "nearest": [
+     "boulder",
+     4.42,
+     2.45,
+     1.95
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 4.81,
+    "y": 3.75,
+    "r": 0.15,
+    "ev": 38.4,
+    "match": true,
+    "nearest": [
+     "boulder",
+     4.89,
+     3.86,
+     -0.11
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.54,
+    "y": 0.79,
+    "r": 0.14,
+    "ev": 26.9,
+    "match": false,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     1.58
+    ]
+   }
+  ]
+ },
+ "gt_still": {
+  "frames": 1127,
+  "skipped_turning": 141,
+  "skipped_in_place": 69,
+  "duct_drops": [
+   [
+    0.87,
+    3.87
+   ],
+   [
+    3.07,
+    4.31
+   ]
+  ],
+  "n": 7,
+  "matched": 4,
+  "false": 3,
+  "missed": [
+   [
+    "boulder",
+    4.42,
+    2.45
+   ],
+   [
+    "boulder",
+    1.37,
+    2.84
+   ],
+   [
+    "boulder",
+    1.86,
+    4.62
+   ],
+   [
+    "crater",
+    2.86,
+    3.88
+   ],
+   [
+    "crater",
+    5.56,
+    2.69
+   ],
+   [
+    "crater",
+    4.25,
+    4.69
+   ],
+   [
+    "crater",
+    0.81,
+    4.1
+   ]
+  ],
+  "hazards": [
+   {
+    "kind": "boulder",
+    "x": 1.47,
+    "y": 0.53,
+    "r": 0.39,
+    "ev": 391.3,
+    "match": false,
+    "nearest": [
+     "boulder",
+     1.37,
+     2.84,
+     2.05
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.03,
+    "y": 0.67,
+    "r": 0.26,
+    "ev": 150.0,
+    "match": false,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     2.07
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 5.02,
+    "y": 1.8,
+    "r": 0.17,
+    "ev": 73.8,
+    "match": true,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     -0.2
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.98,
+    "y": 3.22,
+    "r": 0.17,
+    "ev": 73.1,
+    "match": true,
+    "nearest": [
+     "boulder",
+     3.93,
+     3.26,
+     -0.2
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 4.82,
+    "y": 3.75,
+    "r": 0.14,
+    "ev": 42.5,
+    "match": true,
+    "nearest": [
+     "boulder",
+     4.89,
+     3.86,
+     -0.11
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 3.92,
+    "y": 0.56,
+    "r": 0.16,
+    "ev": 37.8,
+    "match": false,
+    "nearest": [
+     "boulder",
+     5.05,
+     1.79,
+     1.43
+    ]
+   },
+   {
+    "kind": "boulder",
+    "x": 6.02,
+    "y": 4.31,
+    "r": 0.14,
+    "ev": 28.1,
+    "match": true,
+    "nearest": [
+     "boulder",
+     6.16,
+     4.41,
+     -0.03
+    ]
+   }
+  ]
+ }
+}
