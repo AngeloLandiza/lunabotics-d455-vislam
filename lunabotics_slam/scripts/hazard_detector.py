@@ -41,6 +41,8 @@ class HazardDetector(Node):
         p('publish_s', 1.0)
         p('arena_frame', 'arena')
         p('base_frame', 'base_link')
+        p('turn_max', 0.3)                  # rad/s: frames taken while turning faster are skipped
+        p('pose_wait', 0.3)                 # s: a frame newer than the last pose waits this long for a later pose
         g = lambda k: self.get_parameter(k).value  # noqa: E731
         self.arena_frame = g('arena_frame')
         self.ext = ar.Extrinsics(self, g('base_frame'))
@@ -49,8 +51,10 @@ class HazardDetector(Node):
         self.K = None
         self.n_depth = 0
         self.busy_s = []
+        self.pending = []                   # frames waiting for a pose after their stamp
+        self.n_turning = 0
         latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
-        self.create_subscription(PoseStamped, g('pose_topic'), self.poses.add, 50)
+        self.create_subscription(PoseStamped, g('pose_topic'), self.on_pose, 50)
         self.create_subscription(PointCloud2, g('cloud_topic'), self.on_cloud, 2)
         if g('use_depth'):
             self.create_subscription(Image, g('depth_topic'), self.on_depth, 2)
@@ -65,8 +69,29 @@ class HazardDetector(Node):
     def on_info(self, msg):
         self.K = np.array(msg.k, float).reshape(3, 3)
 
+    def on_pose(self, msg):
+        self.poses.add(msg)
+        if self.pending:
+            todo, self.pending = self.pending, []
+            for f in todo:
+                self._frame(*f)
+
     def _frame(self, P_sensor, frame, stamp, kind, sigma):
-        pose = self.poses.at(ar.stamp_s(stamp))
+        """Place a frame with the pose interpolated at its stamp. Frames newer than the last pose wait for the next
+        one (holding the last pose made the cloud lag the robot's turn: arena.sh run 5 smeared boulders 0.2-0.5 m on
+        the localizer pose), and frames taken while turning faster than turn_max are skipped (the L1 frame is not
+        deskewed, and the yaw error is largest in fast turns)."""
+        t = ar.stamp_s(stamp)
+        last = self.poses.latest()
+        if last is not None and t > last:
+            if t - last < self.get_parameter('pose_wait').value:
+                self.pending.append((P_sensor, frame, stamp, kind, sigma))
+            return
+        rate = self.poses.yaw_rate(t)
+        if rate is not None and abs(rate) > self.get_parameter('turn_max').value:
+            self.n_turning += 1
+            return
+        pose = self.poses.at(t)
         T_bs = self.ext.get(frame)
         if pose is None or T_bs is None or len(P_sensor) == 0:
             return
@@ -137,7 +162,8 @@ class HazardDetector(Node):
         self.pub_g.publish(g)
         if self.busy_s:
             self.get_logger().info(f'{len(objs)} hazards ({sum(o["kind"] == "boulder" for o in objs)} boulders), '
-                                   f'{len(self.map.shallow)} shallow crater blobs dropped; {self.map.frames} frames, {1000 * np.mean(self.busy_s):.0f} ms per frame',
+                                   f'{len(self.map.shallow)} shallow crater blobs dropped; {self.n_turning} frames skipped while turning; '
+                                   f'{self.map.frames} frames, {1000 * np.mean(self.busy_s):.0f} ms per frame',
                                    throttle_duration_sec=10.0)
             self.busy_s = []
 

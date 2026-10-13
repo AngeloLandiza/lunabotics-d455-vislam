@@ -146,6 +146,17 @@ class PoseHistory:
         return np.array([a[0] + f * (b[0] - a[0]), a[1] + f * (b[1] - a[1]), ac.wrap(yaw)])
 
 
+    def latest(self):
+        return self.h[-1][0] if self.h else None
+
+    def yaw_rate(self, t, half=0.1):
+        """Mean yaw rate (rad/s) over the 2 * half before t, or None if the history does not cover it."""
+        a, b = self.at(t - 2 * half, max_gap=0.0), self.at(t, max_gap=0.0)
+        if a is None or b is None:
+            return None
+        return ac.wrap(b[2] - a[2]) / (2 * half)
+
+
 def xyz_cloud(P, frame, stamp):
     """(N, 3) points as a PointCloud2 with float32 x, y, z."""
     from sensor_msgs.msg import PointCloud2, PointField

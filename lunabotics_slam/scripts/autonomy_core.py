@@ -737,30 +737,43 @@ def escape_move(w, pose, max_d, step=0.05):
     return float(best)
 
 
-def relocate_goal(kind, g, hazards, max_move=0.8, step=0.05):
-    """A nearby goal the robot can reach and turn at: dig goals move to the nearest free pose in the dig box (same
-    heading), dump goals to the other dump spots along the berm. None if there is none."""
+def dump_spots(w):
+    """Dump poses beside the berm: arena2d's spots along its start-side (north) edge facing it, then spots at its
+    west end facing +x. In Angelo's arena the north edge borders the obstacle zone (arena.sh seed 0: boulders 0.2-0.5 m
+    apart there, no route), while the west end is reached along the y = 0 wall from the start zone."""
+    fp = v(a2.PARAMS, 'footprint')
+    clear = v(a2.PARAMS, 'dump_clear')
+    x0, x1, y0, y1 = w.berm
+    north = [(x, y1 + clear + fp[1], -math.pi / 2) for x in v(a2.PARAMS, 'dump_x')]
+    west = [(x0 - clear - fp[1], y, 0.0) for y in np.linspace(y0 + 0.15, y1 - 0.15, 3)]
+    return north + west
+
+
+def relocate_goal(kind, g, hazards, robot=None, step=0.1, n_plan=6):
+    """A goal near g the robot can reach and turn at, or None. Dig goals: free poses anywhere in the dig box (g's
+    heading, else the four axis headings), nearest first; dump goals: the other dump_spots, nearest first. With robot
+    given, the first n_plan candidates are planned from the robot's pose and only a reachable one is returned
+    (arena.sh seed 0: every dig spot within 0.8 m of goal 1 was blocked, and the north dump spots had no route)."""
     w = make_world(hazards)
     if kind == 'dump':
-        fp = v(a2.PARAMS, 'footprint')
-        y = w.berm[3] + v(a2.PARAMS, 'dump_clear') + fp[1]
-        for x in sorted(v(a2.PARAMS, 'dump_x'), key=lambda x: abs(x - g[0])):
-            c = (x, y, g[2])
-            if abs(x - g[0]) > 1e-6 and a2.clearance(w, c, berm=False) > 0.10:
-                return c
-        return None
-    x0, x1, y0, y1 = v(a2.PARAMS, 'dig_box')
-    best = None
-    for r in np.arange(step, max_move + 1e-9, step):
-        for a in np.linspace(0, 2 * np.pi, max(int(2 * np.pi * r / step), 8), endpoint=False):
-            c = (g[0] + r * math.cos(a), g[1] + r * math.sin(a), g[2])
-            if not (x0 <= c[0] <= x1 and y0 <= c[1] <= y1):
-                continue
-            if a2.clearance(w, c) > 0.15 and a2.turn_clearance(w, c[:2]) > 0.05:
-                best = c
-                break
-        if best:
-            return best
+        cands = [c for c in dump_spots(w) if math.hypot(c[0] - g[0], c[1] - g[1]) > 1e-6
+                 and a2.clearance(w, c, berm=False) > 0.10]
+    else:
+        x0, x1, y0, y1 = v(a2.PARAMS, 'dig_box')
+        cands = []
+        for x in np.arange(x0, x1 + 1e-9, step):
+            for y in np.arange(y0, y1 + 1e-9, step):
+                for h in (g[2], 0.0, math.pi / 2, math.pi, -math.pi / 2):
+                    c = (float(x), float(y), float(h))
+                    if a2.clearance(w, c) > 0.15 and a2.turn_clearance(w, c[:2]) > 0.05:
+                        cands.append(c)
+                        break
+    cands.sort(key=lambda c: math.hypot(c[0] - g[0], c[1] - g[1]))
+    if robot is None:
+        return cands[0] if cands else None
+    for c in cands[:n_plan]:
+        if Leg(hazards, robot, c).ok:
+            return c
     return None
 
 
@@ -889,7 +902,7 @@ class MissionRunner:
             else:
                 self.log.append((t, f'goal {self.k + 1} {kind}: no route ({self.leg.info["fail"]})'))
                 if self.tries == 2:
-                    g2 = relocate_goal(kind, g, hazards)
+                    g2 = relocate_goal(kind, g, hazards, self.r)
                     if g2 is not None:
                         self.goals[self.k] = (kind, g2)
                         self.log.append((t, f'goal {self.k + 1} {kind}: moved to x {g2[0]:.2f} y {g2[1]:.2f}'))
