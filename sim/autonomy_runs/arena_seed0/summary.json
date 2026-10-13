@@ -215,6 +215,23 @@
    "largest_radius_m": 0.48,
    "detector_ms": null,
    "note": "best localizer so far (p95 14 cm); goal 1 skipped after 541 deg of pivots (budget), goal 2 after 2 retrace stalls; 5 retrace stalls, 4 settle pauses, 15.3 rad in place; 3 big false boulders along the south duct (y 0.41-0.56, r 0.25-0.48) block the berm corridor"
+  },
+  {
+   "run": 14,
+   "commit": "78b1825",
+   "ended": "mission done: 6 of 6 goals handled (3 digs reached, 3 dumps skipped: no route)",
+   "goals_reached": 3,
+   "goals_skipped": 3,
+   "loc_xy_median_cm": 4.4,
+   "loc_xy_max_cm": 33.1,
+   "true_path_m": 15.7,
+   "hazards": 18,
+   "matched": 4,
+   "missed": 6,
+   "false": 14,
+   "largest_radius_m": 0.41,
+   "detector_ms": null,
+   "note": "first run to finish all goals; all three digs at the moved west spot (1.54-1.61, 4.03-4.26); every dump skipped with no route through a field of 14 false boulders at x 2.3-5.1 (r 0.14-0.32); the big south-duct false boulders of run 13 are gone; localizer p95 28 cm; 2 retrace stalls, 1 pivot-budget move (364 deg), 6 settle pauses, 32.5 rad in place"
   }
  ]
 }
