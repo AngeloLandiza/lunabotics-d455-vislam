@@ -232,6 +232,23 @@
    "largest_radius_m": 0.41,
    "detector_ms": null,
    "note": "first run to finish all goals; all three digs at the moved west spot (1.54-1.61, 4.03-4.26); every dump skipped with no route through a field of 14 false boulders at x 2.3-5.1 (r 0.14-0.32); the big south-duct false boulders of run 13 are gone; localizer p95 28 cm; 2 retrace stalls, 1 pivot-budget move (364 deg), 6 settle pauses, 32.5 rad in place"
+  },
+  {
+   "run": 15,
+   "commit": "b039076",
+   "ended": "STUCK: no progress for 30 s (goal 3), wedged between the west berm poles",
+   "goals_reached": 2,
+   "goals_skipped": 0,
+   "loc_xy_median_cm": 1.6,
+   "loc_xy_max_cm": 89.4,
+   "true_path_m": 11.0,
+   "hazards": 8,
+   "matched": 4,
+   "missed": 6,
+   "false": 4,
+   "largest_radius_m": 0.28,
+   "detector_ms": null,
+   "note": "first dump ever (berm at x 4.47 y 1.19) after dig 1 at (1.64, 2.28); tilt-placed L1 cleared the corridor; localizer fell 80 cm behind on a 0.7 m/s drive to the berm (t 75-79 s), so the rover overshot between the berm poles at x 4.28 and then could not pivot (35 s of 1.67 rad/s commanded, no yaw change); 1 settle pause"
   }
  ]
 }

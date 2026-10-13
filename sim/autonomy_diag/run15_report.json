@@ -1,0 +1,164 @@
+{
+ "localizer": {
+  "samples": 114,
+  "median_cm": 1.5514974771302572,
+  "p95_cm": 86.91832378653288,
+  "max_cm": 89.43279137052392
+ },
+ "true_path_m": 11.02241724080396,
+ "held_back": [],
+ "digs": [
+  [
+   51.08,
+   1.636,
+   2.283,
+   0.25,
+   0.05
+  ],
+  [
+   83.73,
+   4.469,
+   1.194,
+   0.25,
+   -0.05
+  ]
+ ],
+ "missed": [
+  [
+   "boulder",
+   5.05,
+   1.79
+  ],
+  [
+   "boulder",
+   4.89,
+   3.86
+  ],
+  [
+   "boulder",
+   4.42,
+   2.45
+  ],
+  [
+   "crater",
+   2.86,
+   3.88
+  ],
+  [
+   "crater",
+   5.56,
+   2.69
+  ],
+  [
+   "crater",
+   4.25,
+   4.69
+  ]
+ ],
+ "hazards": [
+  {
+   "kind": "boulder",
+   "x": 6.19,
+   "y": 4.25,
+   "r": 0.28,
+   "ev": 232.9,
+   "nearest": "boulder",
+   "nearest_xy": [
+    6.16,
+    4.41
+   ],
+   "edge_m": -0.04
+  },
+  {
+   "kind": "boulder",
+   "x": 3.91,
+   "y": 3.25,
+   "r": 0.23,
+   "ev": 151.2,
+   "nearest": "boulder",
+   "nearest_xy": [
+    3.93,
+    3.26
+   ],
+   "edge_m": -0.25
+  },
+  {
+   "kind": "boulder",
+   "x": 2.73,
+   "y": 2.64,
+   "r": 0.19,
+   "ev": 111.4,
+   "nearest": "crater",
+   "nearest_xy": [
+    2.86,
+    3.88
+   ],
+   "edge_m": 1.02
+  },
+  {
+   "kind": "boulder",
+   "x": 1.37,
+   "y": 2.83,
+   "r": 0.22,
+   "ev": 92.7,
+   "nearest": "boulder",
+   "nearest_xy": [
+    1.37,
+    2.84
+   ],
+   "edge_m": -0.25
+  },
+  {
+   "kind": "boulder",
+   "x": 1.89,
+   "y": 4.59,
+   "r": 0.17,
+   "ev": 80.7,
+   "nearest": "boulder",
+   "nearest_xy": [
+    1.86,
+    4.62
+   ],
+   "edge_m": -0.15
+  },
+  {
+   "kind": "boulder",
+   "x": 5.27,
+   "y": 4.6,
+   "r": 0.18,
+   "ev": 78.8,
+   "nearest": "boulder",
+   "nearest_xy": [
+    4.89,
+    3.86
+   ],
+   "edge_m": 0.57
+  },
+  {
+   "kind": "boulder",
+   "x": 4.18,
+   "y": 2.03,
+   "r": 0.15,
+   "ev": 64.3,
+   "nearest": "boulder",
+   "nearest_xy": [
+    4.42,
+    2.45
+   ],
+   "edge_m": 0.3
+  },
+  {
+   "kind": "boulder",
+   "x": 0.72,
+   "y": 3.66,
+   "r": 0.19,
+   "ev": 53.0,
+   "nearest": "crater",
+   "nearest_xy": [
+    0.81,
+    4.1
+   ],
+   "edge_m": 0.23
+  }
+ ]
+}
