@@ -113,6 +113,23 @@
    "largest_radius_m": 0.27,
    "detector_ms": 16,
    "note": "drove 3.6 m to (0.54, 3.38), 0.3 m from the first dig spot, then boxed in by the real crater (0.81,4.10) and boulder (1.37,2.84) at 0.75-1.0 m; 70 fast-turn frames skipped, 4 shallow crater blobs dropped"
+  },
+  {
+   "run": 7,
+   "commit": "b68a574",
+   "ended": "STUCK after 5 of 6 goals handled (goals 4 and 5 skipped in a row)",
+   "goals_reached": 3,
+   "goals_skipped": 2,
+   "loc_xy_median_cm": 8.3,
+   "loc_xy_max_cm": 47.4,
+   "true_path_m": 17.5,
+   "hazards": 15,
+   "matched": 8,
+   "missed": 3,
+   "false": 5,
+   "largest_radius_m": 0.44,
+   "detector_ms": 22,
+   "note": "first goals reached: dig at (1.60,1.88), dump moved to (3.67,1.20) (west of the berm box), dig at (2.50,1.83); retrace moves 1.25 / 0.43 / 0.18 m; goal 4 dump at (6.06,1.96) skipped, goal 5 dig skipped; 630 fast-turn frames skipped; false boulders along y~0.5 by the south duct; 2 craters at the dump site"
   }
  ]
 }
