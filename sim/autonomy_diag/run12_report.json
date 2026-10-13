@@ -1,0 +1,154 @@
+{
+ "localizer": {
+  "samples": 179,
+  "median_cm": 4.426762779790592,
+  "p95_cm": 50.39346978844775,
+  "max_cm": 51.1114548340041
+ },
+ "true_path_m": 11.738176807649971,
+ "held_back": [],
+ "digs": [
+  [
+   96.16,
+   1.426,
+   4.088,
+   0.25,
+   0.05
+  ]
+ ],
+ "missed": [
+  [
+   "boulder",
+   6.16,
+   4.41
+  ],
+  [
+   "boulder",
+   3.93,
+   3.26
+  ],
+  [
+   "boulder",
+   1.37,
+   2.84
+  ],
+  [
+   "boulder",
+   1.86,
+   4.62
+  ],
+  [
+   "crater",
+   2.86,
+   3.88
+  ],
+  [
+   "crater",
+   5.56,
+   2.69
+  ],
+  [
+   "crater",
+   4.25,
+   4.69
+  ],
+  [
+   "crater",
+   0.81,
+   4.1
+  ]
+ ],
+ "hazards": [
+  {
+   "kind": "boulder",
+   "x": 3.09,
+   "y": 2.43,
+   "r": 0.32,
+   "ev": 375.7,
+   "nearest": "boulder",
+   "nearest_xy": [
+    3.93,
+    3.26
+   ],
+   "edge_m": 0.91
+  },
+  {
+   "kind": "boulder",
+   "x": 4.89,
+   "y": 3.93,
+   "r": 0.25,
+   "ev": 205.4,
+   "nearest": "boulder",
+   "nearest_xy": [
+    4.89,
+    3.86
+   ],
+   "edge_m": -0.19
+  },
+  {
+   "kind": "boulder",
+   "x": 4.89,
+   "y": 1.79,
+   "r": 0.17,
+   "ev": 87.2,
+   "nearest": "boulder",
+   "nearest_xy": [
+    5.05,
+    1.79
+   ],
+   "edge_m": -0.08
+  },
+  {
+   "kind": "boulder",
+   "x": 0.56,
+   "y": 4.49,
+   "r": 0.18,
+   "ev": 45.1,
+   "nearest": "crater",
+   "nearest_xy": [
+    0.81,
+    4.1
+   ],
+   "edge_m": 0.25
+  },
+  {
+   "kind": "boulder",
+   "x": 4.44,
+   "y": 2.31,
+   "r": 0.15,
+   "ev": 30.0,
+   "nearest": "boulder",
+   "nearest_xy": [
+    4.42,
+    2.45
+   ],
+   "edge_m": -0.05
+  },
+  {
+   "kind": "boulder",
+   "x": 4.74,
+   "y": 2.6,
+   "r": 0.15,
+   "ev": 28.8,
+   "nearest": "boulder",
+   "nearest_xy": [
+    4.42,
+    2.45
+   ],
+   "edge_m": 0.16
+  },
+  {
+   "kind": "boulder",
+   "x": 3.15,
+   "y": 0.54,
+   "r": 0.17,
+   "ev": 26.2,
+   "nearest": "boulder",
+   "nearest_xy": [
+    5.05,
+    1.79
+   ],
+   "edge_m": 2.04
+  }
+ ]
+}

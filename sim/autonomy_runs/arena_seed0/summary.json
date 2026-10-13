@@ -181,6 +181,23 @@
    "largest_radius_m": 0.4,
    "detector_ms": null,
    "note": "first run to handle every goal; digs at (1.54,3.58), (2.50,2.16), (1.45,3.57); no wheel-held-back episodes (ramped drive); localizer < 10 cm until t 430 s, then 1.4 m after the second dig near (1.7-2.3, 2.1-2.7); dumps skipped with false boulders around the berm"
+  },
+  {
+   "run": 12,
+   "commit": "ba793c7",
+   "ended": "STUCK: no progress for 30 s (2 of 6 goals handled)",
+   "goals_reached": 1,
+   "goals_skipped": 1,
+   "loc_xy_median_cm": 4.4,
+   "loc_xy_max_cm": 51.1,
+   "true_path_m": 11.7,
+   "hazards": 7,
+   "matched": 3,
+   "missed": 8,
+   "false": 3,
+   "largest_radius_m": 0.32,
+   "detector_ms": null,
+   "note": "pivot settle pauses (5) and 17.6 rad of in-place turning; dig at (1.43,4.09); stuck on goal 3 while turning in place over the real crater (0.81,4.10): a 52 deg pivot slid base_link 0.38 m, the estimate stayed, then the heading command dithered +-0.1-0.4 rad/s with v = 0 for 20 s"
   }
  ]
 }
