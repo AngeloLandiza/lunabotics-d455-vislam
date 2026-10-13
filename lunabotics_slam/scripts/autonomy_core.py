@@ -110,9 +110,10 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'sweep_shrink': pr.P(0.10, 'm', 'Assumed', 'the footprint is shrunk by this before marking ground as driven '
                          'over, so a few cm of pose error does not erase a real hazard beside the track (run 7 '
                          'localizer: 8 cm median error)'),
-    'turn_scrub': pr.P(0.12, 'm per sqrt(rad)', 'Inferred', 'sideways position random walk while turning (skid-steer '
+    'turn_scrub': pr.P(0.20, 'm per sqrt(rad)', 'Inferred', 'sideways position random walk while turning (skid-steer '
                        'scrub): arena.sh run 10 bag, a 2.32 rad tag-search pivot moved the true base_link 0.28 m with '
-                       'v about 0 (0.09 m of it the icr_offset arm, the rest scrub): 0.12 x sqrt(2.32) = 0.18 m'),
+                       'v about 0. arena.sh pivot test and run 11: about 0.2 m of path per rad in every 0.5 s window, wandering in direction '
+                       '(run 11, a 3.16 rad pivot: 0.68 m of path, 0.32 m net = 0.18 x sqrt(3.16)); was 0.12'),
     'icr_offset': pr.P(0.0475, 'm', 'Inferred', 'base_link ahead of the wheel centroid the robot pivots about (run 10 '
                        'bag analysis of the team URDF in arena.sh)'),
     'slip_gate': pr.P(0.10, 'm/s', 'Assumed', 'calibrated encoder speed this far above the IMU-consistent speed '
@@ -137,6 +138,12 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'enc_over_cmd': pr.P(0.05, 'm/s', 'Inferred', 'encoder speed more than this above the commanded speed is not '
                          'distance travelled (run 11 replay: next to the fresh hole the estimate moved 26 cm in 1 s '
                          'while the rover moved 3.5 cm)'),
+    'pivot_settle': pr.P((1.0, 2.5), 'rad, s', 'Inferred', 'after this much turning in place the mission holds still '
+                         'this long so the localizer can take wall fixes: arena.sh pivot test, base_link slides about '
+                         '0.2 m per rad of in-place turn on flat bed, ruts and beside a hole alike, unseen by encoders '
+                         'and IMU (sim/autonomy_diag/*pivots*.json)'),
+    'pivot_budget': pr.P(3 * math.pi, 'rad', 'Assumed', 'in-place turning allowed per goal before the goal is moved or '
+                         'skipped (run 11: about 600 deg of pivots in 30 s by the fresh hole while replanning goal 4)'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -1157,6 +1164,10 @@ class MissionRunner:
         self.trail = []                     # xy every 5 cm while driving, for backing out the way the robot came
         self.reached = {}                   # kind -> goals reached, tried first when a goal of that kind is moved
         self.back = None                    # (points to reverse through, end index) while retracing
+        self.spun = 0.0                     # in-place turn since the last settle pause, rad
+        self.spun_goal = 0.0                # in-place turn for the current goal, rad
+        self.yaw_prev = None
+        self.settle_until = None
         self.log = []                       # (t, message) for the node to print
 
     def _go(self, state, t):
@@ -1164,6 +1175,10 @@ class MissionRunner:
 
     def _still(self):
         return abs(self.r.vl) + abs(self.r.vr) < 0.02
+
+    def _still_xy(self, pose):
+        """Turning in place: the commanded wheel speeds are opposite (forward speed under 3 cm/s)."""
+        return abs(self.r.vl + self.r.vr) / 2 < 0.03 and abs(self.r.vl - self.r.vr) > 0.02
 
     @property
     def goal(self):
@@ -1177,6 +1192,8 @@ class MissionRunner:
         if self.state == 'stuck':
             return self._cmd(0.0, 0.0, dt) + (None,)
         kind, g = self.goals[self.k]
+        if getattr(self, 'k_spun', None) != self.k:
+            self.k_spun, self.spun_goal = self.k, 0.0
         xy = np.asarray(pose[:2], float)
         if self.moved_at is None or np.hypot(*(xy - self.moved_at[1])) >= self.stuck_m or self.state == 'work':
             self.moved_at = (t, xy.copy())
@@ -1224,6 +1241,34 @@ class MissionRunner:
                         return self._stuck(t, 'two goals in a row skipped')
                 self.t_state = t
                 return self._cmd(0.0, 0.0, dt) + (None,)
+        if self.yaw_prev is not None and self._still_xy(pose):
+            turn = abs(wrap(float(pose[2]) - self.yaw_prev))
+            self.spun += turn
+            self.spun_goal += turn
+        self.yaw_prev = float(pose[2])
+        if self.state in ('drive', 'retrace') and self.spun_goal > val('pivot_budget'):
+            self.log.append((t, f'goal {self.k + 1} {kind}: turned {math.degrees(self.spun_goal):.0f} deg in place, '
+                                'moving the goal'))
+            self.spun_goal = 0.0
+            g2 = relocate_goal(kind, g, hazards, self.r, prefer=self.reached.get(kind, []))
+            if g2 is None or np.hypot(*(np.asarray(g2[:2]) - g[:2])) < 0.05:
+                self.log.append((t, f'goal {self.k + 1} {kind}: skipped'))
+                self.k, self.tries = self.k + 1, 0
+                self.skips_in_row += 1
+                if self.skips_in_row >= 2:
+                    return self._stuck(t, 'two goals in a row skipped')
+            else:
+                self.goals[self.k] = (kind, g2)
+            self._go('stop', t)
+            return self._cmd(0.0, 0.0, dt) + (None,)
+        if self.state == 'drive' and self.settle_until is None and self.spun > val('pivot_settle')[0]:
+            self.settle_until = t + val('pivot_settle')[1]  # let the localizer take wall fixes after the slide
+            self.spun = 0.0
+        if self.settle_until is not None:
+            if t < self.settle_until:
+                self.t_state += dt                          # the route controller's clock stops while settling
+                return self._cmd(0.0, 0.0, dt) + (None,)
+            self.settle_until = None
         if self.state == 'drive':
             q = np.asarray(pose, float)
             if not self.trail or math.hypot(*(xy - self.trail[-1][:2])) >= 0.05 or \
