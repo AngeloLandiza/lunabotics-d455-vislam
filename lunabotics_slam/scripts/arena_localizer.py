@@ -21,7 +21,7 @@ import math
 
 import numpy as np
 import rclpy
-from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, TransformStamped
+from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, TransformStamped, Twist
 from nav_msgs.msg import Odometry
 from rclpy.node import Node
 from sensor_msgs.msg import Imu, PointCloud2
@@ -48,6 +48,7 @@ class ArenaLocalizer(Node):
         p('base_frame', 'base_link')
         p('tf_child', 'autonomy_base')  # TF arena -> this frame for RViz; empty = no TF
         p('walls', True)
+        p('cmd_topic', '/cmd_vel')      # encoder speed capped near the commanded speed; empty = off
         p('slip_guard', True)           # IMU check on the encoder speed (autonomy_core.SlipGuard): run 10 replay 11 -> 3.8 cm median
         g = lambda k: self.get_parameter(k).value  # noqa: E731
         self.arena_frame, self.tf_child = g('arena_frame'), g('tf_child')
@@ -56,6 +57,7 @@ class ArenaLocalizer(Node):
         self.slip = ac.SlipGuard(scale=g('wheel_scale')) if g('slip_guard') else None
         self.v_wheel = 0.0
         self.t_wheel = None
+        self.cmd = None                 # (receive time, |v| commanded)
         self.calib = []
         self.bias = None
         self.t_calib0 = None
@@ -70,6 +72,8 @@ class ArenaLocalizer(Node):
         if g('walls'):
             self.create_subscription(PointCloud2, g('cloud_topic'), self.on_cloud, 5)
         self.create_subscription(PoseWithCovarianceStamped, g('tag_topic'), self.on_tag, 10)
+        if g('cmd_topic'):
+            self.create_subscription(Twist, g('cmd_topic'), self.on_cmd, 10)
         if g('lidar_odom_topic'):
             self.create_subscription(Odometry, g('lidar_odom_topic'), self.on_lidar_odom, 50)
         self.pub = self.create_publisher(PoseStamped, '/autonomy/pose', 20)
@@ -88,7 +92,12 @@ class ArenaLocalizer(Node):
             dv = 1.5 * ac.v(ac.a2.PARAMS, 'a_wheel_max') * (t - self.t_wheel)
             if abs(v) > abs(self.v_wheel) + dv:          # rises only: a drop (stop, spin ending) passes straight through
                 v = math.copysign(abs(self.v_wheel) + dv, v)
+        v = ac.cmd_cap(v, self.cmd, t)
         self.v_wheel, self.t_wheel = v, t
+
+    def on_cmd(self, msg):
+        # Twist has no stamp: time it by the latest encoder message (same clock as the stamps we compare against)
+        self.cmd = (self.t_wheel if self.t_wheel is not None else 0.0, abs(msg.linear.x))
 
     def on_imu(self, msg):
         t = ar.stamp_s(msg.header.stamp)

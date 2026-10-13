@@ -134,6 +134,9 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'wall_confirm_sd': pr.P(0.10, 'm', 'Inferred', 'above this position sd a wall fit is used only once relock_n fits '
                             'in a row agree (run 11 replay: one accepted fit at sd 31 cm took sd to 2 cm while 45 cm '
                             'off, then later fits from the same wrong solution were accepted)'),
+    'enc_over_cmd': pr.P(0.05, 'm/s', 'Inferred', 'encoder speed more than this above the commanded speed is not '
+                         'distance travelled (run 11 replay: next to the fresh hole the estimate moved 26 cm in 1 s '
+                         'while the rover moved 3.5 cm)'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -431,6 +434,16 @@ def _P(name):
     return v(drift.PARAMS, name)
 
 
+def cmd_cap(v, cmd, t, fresh=0.5):
+    """Encoder speed limited to the commanded speed + enc_over_cmd while a command is fresh: the wheels turning
+    faster than they were told is them spinning against something (run 11, wheels against the fresh hole's rim).
+    cmd: (time, |v| commanded) or None."""
+    if cmd is None or t - cmd[0] > fresh:
+        return v
+    lim = cmd[1] + val('enc_over_cmd')
+    return math.copysign(min(abs(v), lim), v)
+
+
 class SlipGuard:
     """Catches the wheels turning while the body is held back (arena.sh run 10: encoder 0.3-0.6 m/s, body 0.08-0.28),
     which only the IMU can see.
@@ -692,9 +705,11 @@ class WallFilter:
             # unsure where we are: start the ICP from a grid of seeds and keep the best-supported solution; two
             # well-supported solutions apart is an aliased fit (one wall in view slides along or onto the wrong face)
             sols = []
-            for dx in (-sd, 0.0, sd):
-                for dy in (-sd, 0.0, sd):
-                    p_, lam_, n_ = wall_icp(Pl, self.x + o + [dx, dy, 0.0], Lw, Ww)
+            k = 2 if sd > 0.3 else 1                # lost by more than 30 cm: a 5 x 5 grid out to 2 sd
+            step = min(sd, 0.4)
+            for i in range(-k, k + 1):
+                for j in range(-k, k + 1):
+                    p_, lam_, n_ = wall_icp(Pl, self.x + o + [i * step, j * step, 0.0], Lw, Ww)
                     if ok(lam_, n_):
                         sols.append((n_, p_, lam_))
             if not sols:
@@ -702,8 +717,13 @@ class WallFilter:
                 return 'weak'
             sols.sort(key=lambda r: -r[0])
             n_used, pose, lam = sols[0]
-            if any(np.hypot(*(p_[:2] - pose[:2])) > 0.1 and n_ >= val('wall_multi_ratio') * n_used
-                   for n_, p_, _ in sols[1:]):
+            # distinct = apart in the directions the walls constrain: with one wall in view, solutions that differ
+            # only along it are the same fit (the update ignores that direction anyway, through Rw)
+            r_, J_ = localize.wall_residuals(Pl, pose, Lw, Ww)
+            nr = (np.abs(r_) < localize.HUBER * 2) & (r_ > -val('wall_behind'))
+            Hn = J_[nr].T @ J_[nr] / max(nr.sum(), 1)
+            far = lambda p_: math.sqrt(max(float(_dv(p_, pose) @ Hn @ _dv(p_, pose)), 0.0)) > 0.1  # noqa: E731
+            if any(far(p_) and n_ >= val('wall_multi_ratio') * n_used for n_, p_, _ in sols[1:]):
                 self.stats['wall_ambiguous'] += 1
                 return 'ambiguous'
         else:
@@ -785,6 +805,12 @@ def wall_icp(P, pose0, L, W, iters=30):
     near = (np.abs(r) < localize.HUBER * 2) & (r > -behind)
     H = J[near].T @ J[near] / max(near.sum(), 1)
     return pose, float(np.linalg.eigvalsh(H[:2, :2]).min()) if near.sum() >= 3 else None, int(near.sum())
+
+
+def _dv(a, b):
+    d = np.asarray(a, float) - b
+    d[2] = wrap(d[2])
+    return d
 
 
 def _se2(x, y, a):

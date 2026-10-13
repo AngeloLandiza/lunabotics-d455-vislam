@@ -7,6 +7,8 @@ load(bag) -> dict with
   clouds list of (t, (N, 3) points in the cloud frame);      cloud_frame
   tags   (n, 4)  t, x, y, yaw of /autonomy/tag_fix
   est    (n, 4)  t, x, y, yaw of /autonomy/pose (the live localizer)
+  cmd    (n, 3)  t, v, w of /cmd_vel; Twist has no stamp, so its bag receive time is mapped onto the stamp clock
+                 through the /wheel/odom messages' receive times
   T_base {frame: 4x4 base_link-from-frame} from /tf_static (the sim publishes camera_link -> everything, base_link
          included, so base-from-X = inv(cam-from-base) @ cam-from-X)
 Needs ROS 2 Humble (rosbag2_py, rclpy) on the path.
@@ -54,12 +56,13 @@ def load(bag, topics=None):
     r.open(rosbag2_py.StorageOptions(uri=bag, storage_id='sqlite3'), rosbag2_py.ConverterOptions('cdr', 'cdr'))
     types = {t.name: t.type for t in r.get_all_topics_and_types()}
     want = topics or ['/ground_truth/base_pose', '/wheel/odom', '/camera/imu', '/l1/points', '/autonomy/tag_fix',
-                      '/autonomy/pose', '/tf_static']
+                      '/autonomy/pose', '/tf_static', '/cmd_vel']
     r.set_filter(rosbag2_py.StorageFilter(topics=[t for t in want if t in types]))
     cls = {t: get_message(types[t]) for t in want if t in types}
-    out = {'gt': [], 'wheel': [], 'imu': [], 'clouds': [], 'tags': [], 'est': [], 'imu_frame': None,
+    out = {'gt': [], 'wheel': [], 'imu': [], 'clouds': [], 'tags': [], 'est': [], 'cmd': [], 'imu_frame': None,
            'cloud_frame': None}
     cam_from = {}
+    wheel_recv = []                                  # (bag receive time, header stamp) to put /cmd_vel on the stamp clock
     while r.has_next():
         topic, data, _ = r.read_next()
         m = deserialize_message(data, cls[topic])
@@ -69,6 +72,7 @@ def load(bag, topics=None):
             out['est'].append((st(m.header), m.pose.position.x, m.pose.position.y, yaw_q(m.pose.orientation)))
         elif topic == '/wheel/odom':
             out['wheel'].append((st(m.header), m.twist.twist.linear.x))
+            wheel_recv.append((_ * 1e-9, st(m.header)))
         elif topic == '/camera/imu':
             w, a = m.angular_velocity, m.linear_acceleration
             out['imu'].append((st(m.header), w.x, w.y, w.z, a.x, a.y, a.z))
@@ -79,12 +83,17 @@ def load(bag, topics=None):
         elif topic == '/autonomy/tag_fix':
             p = m.pose.pose
             out['tags'].append((st(m.header), p.position.x, p.position.y, yaw_q(p.orientation)))
+        elif topic == '/cmd_vel':                    # Twist has no stamp: the bag's receive time
+            out['cmd'].append((_ * 1e-9, m.linear.x, m.angular.z))
         elif topic == '/tf_static':
             for tf in m.transforms:
                 if tf.header.frame_id == 'camera_link':
                     cam_from[tf.child_frame_id] = T_of(tf.transform)
-    for k in ('gt', 'wheel', 'imu', 'tags', 'est'):
+    for k in ('gt', 'wheel', 'imu', 'tags', 'est', 'cmd'):
         out[k] = np.array(out[k]) if out[k] else np.zeros((0, 4))
+    if len(out['cmd']) and len(wheel_recv) > 1:
+        wr = np.array(wheel_recv)
+        out['cmd'][:, 0] = np.interp(out['cmd'][:, 0], wr[:, 0], wr[:, 1])
     if 'base_link' in cam_from:
         base_from_cam = np.linalg.inv(cam_from['base_link'])
         out['T_base'] = {f: base_from_cam @ T for f, T in cam_from.items()}

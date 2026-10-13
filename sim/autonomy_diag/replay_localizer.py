@@ -25,17 +25,17 @@ sys.path.insert(0, HERE)
 import autonomy_core as ac          # noqa: E402
 import bag_io                       # noqa: E402
 
-VARIANTS = {'now': {'cap': 'rise', 'slip': True},
-            'confirm_only': {'cap': 'rise', 'slip': True, 'wall_multi_sd': 99.0},
-            'before_wall_checks': {'cap': 'rise', 'slip': True, 'wall_multi_sd': 99.0, 'wall_confirm_sd': 99.0}}
+VARIANTS = {'now': {'cap': 'rise', 'slip': True, 'cmd': True},
+            'no_cmd_cap': {'cap': 'rise', 'slip': True}}
 
 
-def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, slip=False):
+def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, slip=False, cmd=False):
     import dataclasses
     overrides = dict(overrides)
     wheel_scale = overrides.pop('wheel_scale', wheel_scale)
     cap = overrides.pop('cap', cap)      # the node's parameter, not an autonomy_core one
     slip = overrides.pop('slip', slip)   # arena_localizer slip_guard
+    use_cmd = overrides.pop('cmd', cmd)  # arena_localizer cmd_topic (encoder capped near the command)
     saved = {k: ac.PARAMS[k] for k in overrides}
     for k, v in overrides.items():
         ac.PARAMS[k] = dataclasses.replace(ac.PARAMS[k], value=v)
@@ -45,7 +45,9 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, sli
         R_imu = d['T_base'][d['imu_frame']][:3, :3]
         T_cl = d['T_base'][d['cloud_frame']]
         ev = ([(t, 0, i) for i, t in enumerate(d['wheel'][:, 0])] + [(t, 1, i) for i, t in enumerate(d['imu'][:, 0])]
-              + [(t, 2, i) for i, t in enumerate(d['tags'][:, 0])] + [(c[0], 3, i) for i, c in enumerate(d['clouds'])])
+              + [(t, 2, i) for i, t in enumerate(d['tags'][:, 0])] + [(c[0], 3, i) for i, c in enumerate(d['clouds'])]
+              + ([(t, 4, i) for i, t in enumerate(d['cmd'][:, 0])] if use_cmd and len(d.get('cmd', [])) else []))
+        cmd_now = None
         ev.sort()
         # bias: the live node's standstill estimate (its log line 'gyro bias ... deg/s') when the bag starts after it;
         # otherwise estimated here, which is wrong if the robot already pivots (wheel speed 0) inside the window
@@ -63,7 +65,10 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, sli
                         v = float(np.sign(v) * min(abs(v), abs(v_wheel) + dv)) # (spin ending) passes straight through
                     else:
                         v = float(np.clip(v, v_wheel - dv, v_wheel + dv))
+                v = ac.cmd_cap(v, cmd_now, t)
                 v_wheel, t_wheel = v, t
+            elif kind == 4:
+                cmd_now = (t, abs(d['cmd'][i, 1]))
             elif kind == 1:
                 wz = float((R_imu @ d['imu'][i, 1:4])[2])
                 if bias is None:
