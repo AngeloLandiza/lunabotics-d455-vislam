@@ -25,8 +25,11 @@ sys.path.insert(0, HERE)
 import autonomy_core as ac          # noqa: E402
 import bag_io                       # noqa: E402
 
-VARIANTS = {'now': {'cap': 'rise', 'slip': True, 'cmd': True},
-            'no_cmd_cap': {'cap': 'rise', 'slip': True}}
+BASE = {'cap': 'rise', 'slip': True, 'cmd': True}
+VARIANTS = {'now': BASE}
+if os.environ.get('SWEEP'):     # SWEEP=1: turn_scrub x wall_confirm_sd grid
+    VARIANTS = {f'scrub{s_}_confirm{c_}': {**BASE, 'turn_scrub': s_, 'wall_confirm_sd': c_}
+                for s_ in (0.12, 0.20) for c_ in (0.10, 0.20, 0.30)}
 
 
 def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, slip=False, cmd=False):
