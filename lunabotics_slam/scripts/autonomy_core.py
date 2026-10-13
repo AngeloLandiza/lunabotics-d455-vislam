@@ -144,7 +144,7 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
                          'this long so the localizer can take wall fixes: arena.sh pivot test, base_link slides about '
                          '0.2 m per rad of in-place turn on flat bed, ruts and beside a hole alike, unseen by encoders '
                          'and IMU (sim/autonomy_diag/*pivots*.json)'),
-    'pivot_budget': pr.P(3 * math.pi, 'rad', 'Assumed', 'in-place turning allowed per goal before the goal is moved or '
+    'pivot_budget': pr.P(2 * math.pi, 'rad', 'Assumed', 'in-place turning allowed per goal before the goal is moved or '
                          'skipped (run 11: about 600 deg of pivots in 30 s by the fresh hole while replanning goal 4)'),
     'wall_inside': pr.P(0.20, 'm', 'Inferred', 'a wall fit that puts base_link closer than this to a wall face (or '
                         'beyond it) is not used: the body is wider than that (run 12 replay confirmed a pose 27 cm '
@@ -152,6 +152,12 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'retrace_stall_s': pr.P(8.0, 's', 'Assumed', 'a retrace that reaches no new trail pose for this long ends, and the '
                             'mission plans again (run 12: 20 s of turning back and forth with v = 0 at a pose estimate '
                             '50 cm off, then STUCK)'),
+    'wall_touch': pr.P(0.15, 'm', 'Inferred', 'a detection whose disc reaches this close to a duct face is the duct, '
+                       'not an obstacle (arena.sh run 13: false boulders r 0.45-0.48 centred 0.41-0.44 m off the south '
+                       'duct, just past wall_margin; no seed 0 obstacle lies within 1.5 m of the south duct)'),
+    'dig_open': pr.P(0.15, 'm', 'Assumed', 'dig spots with less turning clearance than this are tried after the open '
+                     'ones, and a dig goal this tight is moved before the first attempt (run 13: 541 deg of pivots and '
+                     '3 stalled back-outs at the seed 0 goal by the west wall)'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -314,8 +320,11 @@ class HazardMap:
         for sensor in ('lidar', 'd455'):
             lp, ln = self.lp[sensor], self.ln[sensor]
             for d in detect.clusters(lp > 0, ln > 0, self.grid, lp, ln, detect.l_decide(sensor)):
-                if min(d['x'], d['y'], self.size[0] - d['x'], self.size[1] - d['y']) < val('wall_margin'):
+                edge = min(d['x'], d['y'], self.size[0] - d['x'], self.size[1] - d['y'])
+                if edge < val('wall_margin'):
                     continue
+                if edge - math.sqrt(d['cells'] * cell * cell / math.pi) < val('wall_touch'):
+                    continue                                    # the disc reaches the duct: the duct itself
                 if math.hypot(d['x'] - cx, d['y'] - cy) < cr + val('column_margin'):
                     continue
                 if any(math.hypot(d['x'] - px, d['y'] - py) < val('pole_margin') for px, py in A27.POLES):
@@ -1020,12 +1029,16 @@ def relocate_goal(kind, g, hazards, robot=None, step=0.1, n_plan=6, prefer=()):
         cands = []
         for x in np.arange(x0, x1 + 1e-9, step):
             for y in np.arange(y0, y1 + 1e-9, step):
+                tc = a2.turn_clearance(w, (float(x), float(y)))
                 for h in (g[2], 0.0, math.pi / 2, math.pi, -math.pi / 2):
                     c = (float(x), float(y), float(h))
-                    if a2.clearance(w, c) > 0.15 and a2.turn_clearance(w, c[:2]) > 0.05:
-                        cands.append(c)
+                    if a2.clearance(w, c) > 0.15 and tc > 0.05:
+                        cands.append(c + (tc,))
                         break
-    cands.sort(key=lambda c: math.hypot(c[0] - g[0], c[1] - g[1]))
+    # open spots first: a tight one costs pivots in place, and every pivot slides the rover (run 13)
+    cands.sort(key=lambda c: math.hypot(c[0] - g[0], c[1] - g[1])
+               + (2.0 if kind != 'dump' and c[3] < val('dig_open') else 0.0))
+    cands = [c[:3] for c in cands]
     # spots the robot already reached for this kind come first: they had a route before (run 7: the second dump was
     # moved to an unreachable north spot instead of the west-end spot the first dump had used)
     cands = [tuple(c) for c in prefer if math.hypot(c[0] - g[0], c[1] - g[1]) > 1e-6
@@ -1214,6 +1227,16 @@ class MissionRunner:
         if self.state == 'plan':
             if t - self.t_state < (self.retry_s if self.tries else 0.0):
                 return self._cmd(0.0, 0.0, dt) + (None,)
+            if kind == 'dig' and self.tries == 0 and not getattr(self, 'checked_open', None) == self.k:
+                self.checked_open = self.k
+                tc = a2.turn_clearance(make_world(hazards), g[:2])
+                if tc < val('dig_open'):
+                    g2 = relocate_goal(kind, g, hazards, self.r, prefer=self.reached.get(kind, []))
+                    if g2 is not None:
+                        self.goals[self.k] = (kind, g2)
+                        g = g2
+                        self.log.append((t, f'goal {self.k + 1} {kind}: tight spot (turn clearance {tc:.2f} m), '
+                                            f'moved to x {g2[0]:.2f} y {g2[1]:.2f}'))
             self.leg = Leg(hazards, self.r, g)
             self.tries += 1
             if self.leg.ok:
