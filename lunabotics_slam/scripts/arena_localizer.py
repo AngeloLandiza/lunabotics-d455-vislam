@@ -48,7 +48,7 @@ class ArenaLocalizer(Node):
         p('base_frame', 'base_link')
         p('tf_child', 'autonomy_base')  # TF arena -> this frame for RViz; empty = no TF
         p('walls', True)
-        p('slip_guard', False)          # IMU check on the encoder speed (autonomy_core.SlipGuard); on after replays
+        p('slip_guard', True)           # IMU check on the encoder speed (autonomy_core.SlipGuard): run 10 replay 11 -> 3.8 cm median
         g = lambda k: self.get_parameter(k).value  # noqa: E731
         self.arena_frame, self.tf_child = g('arena_frame'), g('tf_child')
         self.ext = ar.Extrinsics(self, g('base_frame'))

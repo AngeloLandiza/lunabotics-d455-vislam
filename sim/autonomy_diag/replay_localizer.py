@@ -25,8 +25,9 @@ sys.path.insert(0, HERE)
 import autonomy_core as ac          # noqa: E402
 import bag_io                       # noqa: E402
 
-VARIANTS = {'now': {'cap': 'rise'}, 'slip_guard': {'cap': 'rise', 'slip': True},
-            'slip_guard_nocap': {'cap': False, 'slip': True}}
+VARIANTS = {'now': {'cap': 'rise', 'slip': True},
+            'confirm_only': {'cap': 'rise', 'slip': True, 'wall_multi_sd': 99.0},
+            'before_wall_checks': {'cap': 'rise', 'slip': True, 'wall_multi_sd': 99.0, 'wall_confirm_sd': 99.0}}
 
 
 def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, slip=False):

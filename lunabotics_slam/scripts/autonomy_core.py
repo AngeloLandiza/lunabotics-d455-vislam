@@ -125,6 +125,15 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'slip_bias_rw': pr.P(0.05, 'm/s^2 per sqrt(s)', 'Assumed', 'drift of the forward accelerometer offset, mostly '
                          'tilt change on the berm and crater rims'),
     'slip_enc_sd': pr.P(0.03, 'm/s', 'Assumed', 'calibrated encoder speed noise when the wheels grip'),
+    'wall_multi_sd': pr.P(0.08, 'm', 'Inferred', 'above this position sd the wall ICP is also started from a 3 x 3 '
+                          'grid of seeds one sd apart; a second solution with nearly as much wall support means the '
+                          'fit is ambiguous and is not used (arena.sh run 11 replay: at sd 31 cm after a pivot by the '
+                          'fresh hole, the ICP from the estimate slid 0.45 m in x and was accepted)'),
+    'wall_multi_ratio': pr.P(0.85, '', 'Assumed', 'a distinct solution (over 0.1 m away) with at least this fraction '
+                             'of the best one\'s wall points makes the fit ambiguous'),
+    'wall_confirm_sd': pr.P(0.10, 'm', 'Inferred', 'above this position sd a wall fit is used only once relock_n fits '
+                            'in a row agree (run 11 replay: one accepted fit at sd 31 cm took sd to 2 cm while 45 cm '
+                            'off, then later fits from the same wrong solution were accepted)'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -520,8 +529,9 @@ class WallFilter:
         self.buf = []
         self.rejected = []
         self.win = None                     # (x_w0, P_w0, t_w0, dist, steps, dt_sum)
+        self.pending = []                   # wall-fit innovations waiting for agreement while the estimate is loose
         self.stats = {'wall_tries': 0, 'wall_weak': 0, 'wall_fixes': 0, 'wall_gated': 0, 'wall_relocks': 0,
-                      'windows': 0, 'win_gated': 0}
+                      'wall_ambiguous': 0, 'wall_pending': 0, 'wall_confirmed': 0, 'windows': 0, 'win_gated': 0}
 
     # -- state
     def init(self, pose, t, sig=None):
@@ -532,7 +542,7 @@ class WallFilter:
         self.t_q, self.d_q = t, 0.0
         self.hist = [(t, *self.x)]
         self.win = (self.x.copy(), self.Pc.copy(), t, 0.0, 0.0)
-        self.buf, self.rejected = [], []
+        self.buf, self.rejected, self.pending = [], [], []
 
     @property
     def ready(self):
@@ -663,7 +673,7 @@ class WallFilter:
         self.buf.append(np.stack([x + c * q[:, 0] - s * q[:, 1], y + s * q[:, 0] + c * q[:, 1]], -1))
 
     def wall_fix(self):
-        """Returns 'fix', 'relock', 'gated', 'weak', 'few' or None (nothing buffered)."""
+        """Returns 'fix', 'relock', 'confirmed', 'gated', 'weak', 'ambiguous', 'pending', 'few' or None (nothing buffered)."""
         if self.x is None or not self.buf:
             return None
         pts = np.concatenate(self.buf)
@@ -676,10 +686,31 @@ class WallFilter:
         # localize.icp has the walls at 0 and (L, W): shift by the wall offset and back
         o = np.array([self.off, self.off, 0.0])
         Lw, Ww = self.L + 2 * self.off, self.W + 2 * self.off
-        pose, lam, n_used = wall_icp(Pl, self.x + o, Lw, Ww)
-        if not (lam is not None and lam > val('wall_lam_use') and n_used >= _P('wall_min_pts')):
-            self.stats['wall_weak'] += 1
-            return 'weak'
+        sd = math.sqrt(max(np.linalg.eigvalsh(self.Pc[:2, :2]).max(), 0.0))
+        ok = lambda lam, n: lam is not None and lam > val('wall_lam_use') and n >= _P('wall_min_pts')  # noqa: E731
+        if sd > val('wall_multi_sd'):
+            # unsure where we are: start the ICP from a grid of seeds and keep the best-supported solution; two
+            # well-supported solutions apart is an aliased fit (one wall in view slides along or onto the wrong face)
+            sols = []
+            for dx in (-sd, 0.0, sd):
+                for dy in (-sd, 0.0, sd):
+                    p_, lam_, n_ = wall_icp(Pl, self.x + o + [dx, dy, 0.0], Lw, Ww)
+                    if ok(lam_, n_):
+                        sols.append((n_, p_, lam_))
+            if not sols:
+                self.stats['wall_weak'] += 1
+                return 'weak'
+            sols.sort(key=lambda r: -r[0])
+            n_used, pose, lam = sols[0]
+            if any(np.hypot(*(p_[:2] - pose[:2])) > 0.1 and n_ >= val('wall_multi_ratio') * n_used
+                   for n_, p_, _ in sols[1:]):
+                self.stats['wall_ambiguous'] += 1
+                return 'ambiguous'
+        else:
+            pose, lam, n_used = wall_icp(Pl, self.x + o, Lw, Ww)
+            if not ok(lam, n_used):
+                self.stats['wall_weak'] += 1
+                return 'weak'
         rr, Jw = localize.wall_residuals(Pl, pose, Lw, Ww)
         pose = pose - o
         near = np.abs(rr) < 0.1
@@ -690,7 +721,24 @@ class WallFilter:
         S = self.Pc + Rw
         gate = _P('gate_chi2')
         relock = False
-        if z @ np.linalg.solve(S, z) >= gate:
+        if sd > val('wall_confirm_sd'):
+            # a single fit may not pull a loose estimate in: wait for relock_n fits in a row that agree
+            self.pending.append(z)
+            zs = np.array(self.pending[-_P('relock_n'):])
+            tol_xy, tol_a = _P('relock_tol')
+            if not (len(zs) == _P('relock_n') and np.ptp(zs[:, 0]) < tol_xy and np.ptp(zs[:, 1]) < tol_xy
+                    and np.ptp(zs[:, 2]) < math.radians(tol_a)):
+                self.stats['wall_pending'] += 1
+                return 'pending'
+            self.pending = []
+            if z @ np.linalg.solve(S, z) >= gate:
+                self.Pc = self.Pc + np.diag(z ** 2)
+                S = self.Pc + Rw
+            relock = 'confirmed'
+            self.stats['wall_confirmed'] += 1
+        else:
+            self.pending = []
+        if not relock and z @ np.linalg.solve(S, z) >= gate:
             self.rejected.append(z)
             zs = np.array(self.rejected[-_P('relock_n'):])
             tol_xy, tol_a = _P('relock_tol')
@@ -698,9 +746,9 @@ class WallFilter:
                     and np.ptp(zs[:, 2]) < math.radians(tol_a)):
                 self.Pc = self.Pc + np.diag(z ** 2)
                 S = self.Pc + Rw
-                relock = True
+                relock = 'relock'
                 self.stats['wall_relocks'] += 1
-        else:
+        elif not relock:
             self.rejected = []
         if relock or z @ np.linalg.solve(S, z) < gate:
             self.rejected = []
@@ -711,7 +759,7 @@ class WallFilter:
             self.stats['wall_fixes'] += 1
             if self.hist:
                 self.hist[-1] = (self.hist[-1][0], *self.x)
-            return 'relock' if relock else 'fix'
+            return relock or 'fix'
         self.stats['wall_gated'] += 1
         return 'gated'
 
