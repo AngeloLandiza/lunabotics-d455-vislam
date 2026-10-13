@@ -340,7 +340,32 @@ def test_closed(seeds=(3000, 3001, 3002), level='nominal', legs=3):
     return rows
 
 
+def test_slip():
+    rng = np.random.default_rng(1)
+    for slip in (True, False):
+        g = ac.SlipGuard(scale=0.84)
+        dt, v, th, errs, flags = 0.005, 0.0, 0.0, [], []
+        for k in range(int(20 / dt)):
+            t = k * dt
+            enc_true = min(0.3, 0.5 * t)
+            body = 0.12 if slip and 10 < t < 11 else enc_true
+            a_body, v = (body - v) / dt, body
+            thp, th = th, 0.15 * math.sin(2 * math.pi * t / 2)          # pitching over terrain
+            a = np.array([a_body + 9.81 * math.sin(th), 0, 9.81 * math.cos(th)]) + rng.normal(0, 0.2, 3)
+            w = np.array([0, -(th - thp) / dt, 0]) + rng.normal(0, 0.003, 3)
+            out = 0.84 * g.step(t, w, a, enc_true / 0.84 + rng.normal(0, 0.02))
+            errs.append(abs(out - body))
+            flags.append(g.slipping)
+        T = np.arange(len(errs)) * dt
+        errs, flags = np.array(errs), np.array(flags)
+        assert flags[(T < 9.9) | (T > 11.3)].sum() == 0
+        if slip:
+            assert g.episodes == 1 and errs[(T > 10.05) & (T < 11)].mean() < 0.03
+        else:
+            assert g.episodes == 0
+
+
 if __name__ == '__main__':
-    which = sys.argv[1:] or ['tags', 'detector', 'filter', 'planner']
+    which = sys.argv[1:] or ['tags', 'detector', 'filter', 'planner', 'slip']
     for name in which:
         globals()['test_' + name]()

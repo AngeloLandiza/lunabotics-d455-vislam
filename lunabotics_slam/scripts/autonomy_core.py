@@ -115,6 +115,16 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
                        'v about 0 (0.09 m of it the icr_offset arm, the rest scrub): 0.12 x sqrt(2.32) = 0.18 m'),
     'icr_offset': pr.P(0.0475, 'm', 'Inferred', 'base_link ahead of the wheel centroid the robot pivots about (run 10 '
                        'bag analysis of the team URDF in arena.sh)'),
+    'slip_gate': pr.P(0.10, 'm/s', 'Assumed', 'calibrated encoder speed this far above the IMU-consistent speed '
+                      'means the wheels are turning faster than the body moves (arena.sh run 10 bag: 0.3-0.6 m/s '
+                      'encoder rise while the body moved 0.08-0.28 m/s at t 54.5-55.5 s)'),
+    'slip_max_s': pr.P(3.0, 's', 'Assumed', 'longest slip episode trusted to the IMU alone before the encoder is '
+                       'taken again (an accelerometer integrates to speed error quickly)'),
+    'slip_acc_sd': pr.P(0.3, 'm/s^2', 'Assumed', 'forward accelerometer noise and tilt error after gravity removal '
+                        '(D455 BMI055 on a vibrating rover)'),
+    'slip_bias_rw': pr.P(0.05, 'm/s^2 per sqrt(s)', 'Assumed', 'drift of the forward accelerometer offset, mostly '
+                         'tilt change on the berm and crater rims'),
+    'slip_enc_sd': pr.P(0.03, 'm/s', 'Assumed', 'calibrated encoder speed noise when the wheels grip'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -410,6 +420,78 @@ def d455_sigma_r(z, cosang):
 
 def _P(name):
     return v(drift.PARAMS, name)
+
+
+class SlipGuard:
+    """Catches the wheels turning while the body is held back (arena.sh run 10: encoder 0.3-0.6 m/s, body 0.08-0.28),
+    which only the IMU can see.
+
+    gravity()  tracks the gravity direction in base_link: gyro propagation, pulled slowly toward the measured
+               specific force (a complementary filter), so forward acceleration survives pitching on the berm
+    step()     2-state Kalman filter [v, b]: v integrates forward acceleration minus offset b; corrected by the
+               calibrated encoder speed when they agree. When the encoder runs more than slip_gate above the filter
+               speed it is slipping: the filter speed is used instead, up to slip_max_s, then the encoder is taken
+               again. A falling encoder (stop, spin ending) is always taken: stopped wheels mean a stopped rover.
+    """
+
+    G = 9.81
+
+    def __init__(self, scale=1.0, tau=2.0):
+        self.scale, self.tau = scale, tau   # tau: gravity pull-in time constant, longer than any drive ramp
+        self.g = None                      # gravity reaction (what the accelerometer reads at rest) in base_link
+        self.x = np.zeros(2)
+        self.P = np.diag([0.01, 0.1])
+        self.t = None
+        self.t_slip0 = None
+        self.slipping = False
+        self.episodes = 0
+        self.slip_s = 0.0
+
+    def gravity(self, w, a, dt):
+        a = np.asarray(a, float)
+        if self.g is None:
+            self.g = a * (self.G / max(np.linalg.norm(a), 1e-6))
+            return
+        self.g = self.g - np.cross(np.asarray(w, float), self.g) * dt     # body-frame vector under body rotation w
+        n = np.linalg.norm(a)
+        if abs(n - self.G) < 1.0:                                        # near 1 g: mostly gravity, use it
+            self.g += min(1.0, dt / self.tau) * (a * (self.G / n) - self.g)
+        self.g *= self.G / np.linalg.norm(self.g)
+
+    def step(self, t, w, a, v_enc):
+        """w, a: gyro (rad/s) and accelerometer (m/s^2) in base_link; v_enc: raw encoder speed. Returns the raw-encoder
+        speed to predict with (WallFilter applies the scale)."""
+        if self.t is None or t <= self.t or t - self.t > 0.5:
+            self.t = t
+            self.gravity(w, a, 0.0)
+            self.x[:] = (self.scale * v_enc, self.x[1])
+            return v_enc
+        dt = t - self.t
+        self.t = t
+        self.gravity(w, a, dt)
+        acc = float(np.asarray(a, float)[0] - self.g[0])
+        F = np.array([[1.0, -dt], [0.0, 1.0]])
+        self.x = np.array([self.x[0] + (acc - self.x[1]) * dt, self.x[1]])
+        q = np.diag([val('slip_acc_sd') ** 2 * dt ** 2, val('slip_bias_rw') ** 2 * dt])
+        self.P = F @ self.P @ F.T + q
+        z = self.scale * v_enc
+        over = abs(z) - abs(self.x[0]) > val('slip_gate') and (z * self.x[0] >= 0 or abs(self.x[0]) < 0.02)
+        if over and (self.t_slip0 is None or t - self.t_slip0 < val('slip_max_s')):
+            if self.t_slip0 is None:
+                self.t_slip0 = t
+                self.episodes += 1
+            self.slipping = True
+            self.slip_s += dt
+            return self.x[0] / self.scale
+        if not over:
+            self.t_slip0 = None
+        self.slipping = False
+        H = np.array([1.0, 0.0])
+        S = self.P[0, 0] + val('slip_enc_sd') ** 2
+        K = self.P @ H / S
+        self.x = self.x + K * (z - self.x[0])
+        self.P = (np.eye(2) - np.outer(K, H)) @ self.P
+        return v_enc
 
 
 class WallFilter:

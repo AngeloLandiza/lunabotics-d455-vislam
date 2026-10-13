@@ -25,19 +25,22 @@ sys.path.insert(0, HERE)
 import autonomy_core as ac          # noqa: E402
 import bag_io                       # noqa: E402
 
-VARIANTS = {'now': {}, 'no_cap': {'cap': False}, 'rise_only': {'cap': 'rise'}}
+VARIANTS = {'now': {'cap': 'rise'}, 'slip_guard': {'cap': 'rise', 'slip': True},
+            'slip_guard_nocap': {'cap': False, 'slip': True}}
 
 
-def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True):
+def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, slip=False):
     import dataclasses
     overrides = dict(overrides)
     wheel_scale = overrides.pop('wheel_scale', wheel_scale)
     cap = overrides.pop('cap', cap)      # the node's parameter, not an autonomy_core one
+    slip = overrides.pop('slip', slip)   # arena_localizer slip_guard
     saved = {k: ac.PARAMS[k] for k in overrides}
     for k, v in overrides.items():
         ac.PARAMS[k] = dataclasses.replace(ac.PARAMS[k], value=v)
     try:
         f = ac.WallFilter(scale=wheel_scale)
+        sg = ac.SlipGuard(scale=wheel_scale) if slip else None
         R_imu = d['T_base'][d['imu_frame']][:3, :3]
         T_cl = d['T_base'][d['cloud_frame']]
         ev = ([(t, 0, i) for i, t in enumerate(d['wheel'][:, 0])] + [(t, 1, i) for i, t in enumerate(d['imu'][:, 0])]
@@ -73,9 +76,14 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True):
                     if t - t_c0 >= calib_s:
                         bias = float(np.mean(calib))
                     continue
+                v_use = v_wheel
+                if sg is not None:
+                    wb = R_imu @ d['imu'][i, 1:4]
+                    wb[2] -= bias
+                    v_use = sg.step(t, wb, R_imu @ d['imu'][i, 4:7], v_wheel)
                 if not f.ready:
                     continue
-                f.predict(v_wheel, wz - bias, t)
+                f.predict(v_use, wz - bias, t)
                 track.append((t, *f.x))
                 t_last = t_last if t_last is not None else t
                 if t - t_last >= every:
@@ -101,6 +109,8 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True):
                 Pb = P @ T_cl[:3, :3].T + T_cl[:3, 3]
                 f.add_wall_points(Pb[~ac.body_mask(Pb)], t)
         track = np.array(track)
+        if sg is not None:
+            counts['slip episodes'], counts['slip s'] = sg.episodes, round(sg.slip_s, 2)
         return track, counts
     finally:
         for k, v in saved.items():

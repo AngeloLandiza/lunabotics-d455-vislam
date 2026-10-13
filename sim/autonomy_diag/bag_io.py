@@ -3,7 +3,7 @@
 load(bag) -> dict with
   gt     (n, 4)  t, x, y, yaw of /ground_truth/base_pose (arena frame)
   wheel  (n, 2)  t, encoder forward speed (/wheel/odom twist.linear.x)
-  imu    (n, 4)  t, gyro x, y, z in the IMU message frame;  imu_frame
+  imu    (n, 7)  t, gyro x, y, z, accel x, y, z in the IMU message frame;  imu_frame
   clouds list of (t, (N, 3) points in the cloud frame);      cloud_frame
   tags   (n, 4)  t, x, y, yaw of /autonomy/tag_fix
   est    (n, 4)  t, x, y, yaw of /autonomy/pose (the live localizer)
@@ -70,8 +70,8 @@ def load(bag, topics=None):
         elif topic == '/wheel/odom':
             out['wheel'].append((st(m.header), m.twist.twist.linear.x))
         elif topic == '/camera/imu':
-            w = m.angular_velocity
-            out['imu'].append((st(m.header), w.x, w.y, w.z))
+            w, a = m.angular_velocity, m.linear_acceleration
+            out['imu'].append((st(m.header), w.x, w.y, w.z, a.x, a.y, a.z))
             out['imu_frame'] = m.header.frame_id
         elif topic == '/l1/points':
             out['clouds'].append((st(m.header), cloud_xyz(m)))
