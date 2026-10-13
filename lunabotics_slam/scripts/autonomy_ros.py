@@ -77,6 +77,21 @@ def quat_from_yaw(a):
     return 0.0, 0.0, math.sin(a / 2), math.cos(a / 2)
 
 
+def quat_from_rpy(r, p, y):
+    """(x, y, z, w) for R = Rz(y) Ry(p) Rx(r)."""
+    cr, sr, cp, sp, cy, sy = (math.cos(r / 2), math.sin(r / 2), math.cos(p / 2), math.sin(p / 2), math.cos(y / 2),
+                              math.sin(y / 2))
+    return (sr * cp * cy - cr * sp * sy, cr * sp * cy + sr * cp * sy, cr * cp * sy - sr * sp * cy,
+            cr * cp * cy + sr * sp * sy)
+
+
+def rp_of(q):
+    """(roll, pitch) of a quaternion (x, y, z, w), ZYX."""
+    x, y, z, w = q
+    return (math.atan2(2 * (w * x + y * z), 1 - 2 * (x * x + y * y)),
+            math.asin(max(-1.0, min(1.0, 2 * (w * y - z * x)))))
+
+
 class Extrinsics:
     """Cached base_link -> sensor-frame transforms (static)."""
 
@@ -122,13 +137,22 @@ class PoseHistory:
 
     def __init__(self, n=400):
         self.h = []
+        self.tilts = []
         self.n = n
 
     def add(self, msg):
         p, q = msg.pose.position, msg.pose.orientation
         self.h.append((stamp_s(msg.header.stamp), p.x, p.y, ac.yaw_of((q.x, q.y, q.z, q.w))))
+        self.tilts.append(rp_of((q.x, q.y, q.z, q.w)))
         if len(self.h) > self.n:
-            self.h = self.h[-self.n // 2:]
+            self.h, self.tilts = self.h[-self.n // 2:], self.tilts[-self.n // 2:]
+
+    def tilt_at(self, t):
+        """(roll, pitch) of the pose nearest t (0, 0 if none): the localizer publishes them from the IMU."""
+        if not self.h:
+            return 0.0, 0.0
+        ts = np.array([e[0] for e in self.h])
+        return self.tilts[int(np.argmin(np.abs(ts - t)))]
 
     def at(self, t, max_gap=0.3):
         """Pose interpolated at t, or None if t is outside the history by more than max_gap."""

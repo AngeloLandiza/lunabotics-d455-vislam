@@ -200,10 +200,14 @@ def rot_z(a):
     return np.array([[c, -s, 0], [s, c, 0], [0, 0, 1.0]])
 
 
-def base_T(x, y, yaw, z=None):
-    """4x4 pose of base_link in the arena (planar robot; base_link at base_height)."""
+def base_T(x, y, yaw, z=None, roll=0.0, pitch=0.0):
+    """4x4 pose of base_link in the arena (base_link at base_height). roll / pitch from the IMU's gravity: placing a
+    3-3.5 m L1 return with yaw only while the rover was tilted 1-3 deg put it 5-12 cm high (arena.sh run 14, a false
+    boulder on the route to the berm)."""
     T = np.eye(4)
-    T[:3, :3] = rot_z(yaw)
+    cr, sr, cp, sp = math.cos(roll), math.sin(roll), math.cos(pitch), math.sin(pitch)
+    T[:3, :3] = rot_z(yaw) @ np.array([[cp, 0, sp], [0, 1, 0], [-sp, 0, cp]]) @ np.array([[1, 0, 0], [0, cr, -sr],
+                                                                                            [0, sr, cr]])
     T[:3, 3] = (x, y, val('base_height') if z is None else z)
     return T
 
@@ -513,6 +517,14 @@ class SlipGuard:
         if abs(n - self.G) < 1.0:                                        # near 1 g: mostly gravity, use it
             self.g += min(1.0, dt / self.tau) * (a * (self.G / n) - self.g)
         self.g *= self.G / np.linalg.norm(self.g)
+
+    def tilt(self):
+        """(roll, pitch) of base_link from the tracked gravity (ZYX convention: a resting accelerometer reads
+        g (-sin p, sin r cos p, cos r cos p)), or (0, 0) before any IMU sample."""
+        if self.g is None:
+            return 0.0, 0.0
+        gx, gy, gz = self.g
+        return math.atan2(gy, gz), math.atan2(-gx, math.hypot(gy, gz))
 
     def step(self, t, w, a, v_enc):
         """w, a: gyro (rad/s) and accelerometer (m/s^2) in base_link; v_enc: raw encoder speed. Returns the raw-encoder

@@ -55,6 +55,8 @@ class ArenaLocalizer(Node):
         self.ext = ar.Extrinsics(self, g('base_frame'))
         self.f = ac.WallFilter(scale=g('wheel_scale'))
         self.slip = ac.SlipGuard(scale=g('wheel_scale')) if g('slip_guard') else None
+        self.grav = self.slip or ac.SlipGuard()      # gravity direction -> roll / pitch, published for the detector
+        self.t_imu = None
         self.v_wheel = 0.0
         self.t_wheel = None
         self.cmd = None                 # (receive time, |v| commanded)
@@ -124,9 +126,13 @@ class ArenaLocalizer(Node):
                     self.get_logger().info(f'initial pose from the parameter: {np.round(self.pending_init, 3)}')
             return
         v = self.v_wheel
+        wb[2] -= self.bias
+        ab = T[:3, :3] @ np.array([a.x, a.y, a.z])
         if self.slip is not None:
-            wb[2] -= self.bias
-            v = self.slip.step(t, wb, T[:3, :3] @ np.array([a.x, a.y, a.z]), self.v_wheel)
+            v = self.slip.step(t, wb, ab, self.v_wheel)
+        else:
+            self.grav.gravity(wb, ab, 0.0 if self.t_imu is None else min(max(t - self.t_imu, 0.0), 0.5))
+        self.t_imu = t
         if not self.f.ready:
             return
         self.f.predict(v, wz - self.bias, t)
@@ -185,10 +191,12 @@ class ArenaLocalizer(Node):
     # ---------------------------------------------------------------- outputs
     def publish(self, stamp):
         x, y, a = self.f.x
-        qx, qy, qz, qw = ar.quat_from_yaw(a)
+        roll, pitch = self.grav.tilt()
+        qx, qy, qz, qw = ar.quat_from_rpy(roll, pitch, a)
         ps = PoseStamped()
         ps.header.stamp, ps.header.frame_id = stamp, self.arena_frame
         ps.pose.position.x, ps.pose.position.y, ps.pose.position.z = float(x), float(y), ac.val('base_height')
+        ps.pose.orientation.x, ps.pose.orientation.y = qx, qy
         ps.pose.orientation.z, ps.pose.orientation.w = qz, qw
         self.pub.publish(ps)
         od = Odometry()
@@ -205,6 +213,7 @@ class ArenaLocalizer(Node):
             tf.child_frame_id = self.tf_child
             tf.transform.translation.x, tf.transform.translation.y = float(x), float(y)
             tf.transform.translation.z = ac.val('base_height')
+            tf.transform.rotation.x, tf.transform.rotation.y = qx, qy
             tf.transform.rotation.z, tf.transform.rotation.w = qz, qw
             self.tfb.sendTransform(tf)
 

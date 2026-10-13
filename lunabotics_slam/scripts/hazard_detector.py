@@ -104,7 +104,8 @@ class HazardDetector(Node):
         t0 = time.time()
         Pb = ac.apply_T(T_bs, P_sensor)
         keep = ~ac.body_mask(Pb)
-        T_ab = ac.base_T(*pose)
+        roll, pitch = self.poses.tilt_at(t)
+        T_ab = ac.base_T(*pose, roll=roll, pitch=pitch)
         Pa = ac.apply_T(T_ab, Pb[keep])
         origin = ac.apply_T(T_ab, T_bs[:3, 3][None])[0]
         sig = sigma[keep] if np.ndim(sigma) else sigma

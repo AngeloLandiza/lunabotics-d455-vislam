@@ -5,8 +5,8 @@ body points masked, the cloud placed with the pose at its stamp, frames skipped 
 exceeds turn_max, the footprint marked as driven over every 3 cm. Pose variants:
   gt        /ground_truth/base_pose: what the map would be with a perfect localizer
   est       /autonomy/pose (the live localizer): should reproduce the live map
-  est_still est, and frames also skipped while turning in place (|v| < 0.03 m/s, |w| > 0.1 rad/s on the estimate):
-            in-place pivots slide the rover about 0.2 m/rad unseen (pivot test), so their frames land smeared
+  *_tilt    the same with roll / pitch from the IMU's gravity (arena_localizer publishes them in /autonomy/pose and
+            hazard_detector uses them): yaw-only placement of 3+ m returns put a 0.1 m false bump on the berm route
 Every variant starts where the live detector did, at the first /autonomy/pose (14.6 s in run 14): the L1 frames before
 it (rover at the start facing the west wall for the tag turn) place the bed ~0.3 m high and spoil the first ground fit,
 which left the gt map nearly empty (run 14: 2 hazards, 10 of 13 obstacles missed).
@@ -35,7 +35,19 @@ def rate_and_speed(P, t, half=0.1):
     return ac.wrap(b[2] - a[2]) / dt, math.hypot(*(b[:2] - a[:2])) / dt
 
 
-def replay(d, P, turn_max=0.3, still_skip=False, t0=None):
+def imu_tilt(d):
+    """(t, roll, pitch) at the IMU rate from the accelerometer + gyro, as arena_localizer publishes them."""
+    R = d['T_base'][d['imu_frame']][:3, :3]
+    g, out, tp = ac.SlipGuard(), [], None
+    for row in d['imu']:
+        t = row[0]
+        g.gravity(R @ row[1:4], R @ row[4:7], 0.0 if tp is None else min(max(t - tp, 0.0), 0.5))
+        tp = t
+        out.append((t, *g.tilt()))
+    return np.array(out)
+
+
+def replay(d, P, turn_max=0.3, still_skip=False, t0=None, tilt=None):
     m = ac.HazardMap()
     T_bs = d['T_base'][d['cloud_frame']]
     last_swept = None
@@ -64,7 +76,11 @@ def replay(d, P, turn_max=0.3, still_skip=False, t0=None):
             continue
         Pb = ac.apply_T(T_bs, cloud)
         keep = ~ac.body_mask(Pb)
-        T_ab = ac.base_T(*pose)
+        if tilt is not None:
+            k = min(int(np.searchsorted(tilt[:, 0], t)), len(tilt) - 1)
+            T_ab = ac.base_T(*pose, roll=tilt[k, 1], pitch=tilt[k, 2])
+        else:
+            T_ab = ac.base_T(*pose)
         Pa = ac.apply_T(T_ab, Pb[keep])
         origin = ac.apply_T(T_ab, T_bs[:3, 3][None])[0]
         m.add(ac.make_scan(origin, Pa, ac.val('l1_sigma'), 'l1'))
@@ -91,13 +107,14 @@ def score(objs, truth):
 
 def main():
     bag, seed = os.path.expanduser(sys.argv[1]), int(sys.argv[2])
-    d = bag_io.load(bag, ['/ground_truth/base_pose', '/autonomy/pose', '/l1/points', '/tf_static'])
+    d = bag_io.load(bag, ['/ground_truth/base_pose', '/autonomy/pose', '/l1/points', '/tf_static', '/camera/imu'])
+    tl = imu_tilt(d)
     B, C = ac.A27.layout(seed)[0], ac.A27.layout(seed)[1]
     truth = [('boulder', o.x, o.y, o.diameter / 2) for o in B] + [('crater', o.x, o.y, o.diameter / 2) for o in C]
     out = {}
-    for name, P, still in (('gt', d['gt'], False), ('est', d['est'], False), ('est_still', d['est'], True),
-                           ('gt_still', d['gt'], True)):
-        objs, info = replay(d, P, still_skip=still, t0=d['est'][0, 0])
+    for name, P, tilt in (('gt', d['gt'], None), ('est', d['est'], None), ('gt_tilt', d['gt'], tl),
+                          ('est_tilt', d['est'], tl)):
+        objs, info = replay(d, P, tilt=tilt, t0=d['est'][0, 0])
         out[name] = {**info, **score(objs, truth)}
         print(name, {k: v for k, v in out[name].items() if k != 'hazards'})
     if len(sys.argv) > 3:
