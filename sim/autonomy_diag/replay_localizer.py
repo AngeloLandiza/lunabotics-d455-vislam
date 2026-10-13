@@ -75,7 +75,7 @@ def replay(d, overrides, wheel_scale=0.95, calib_s=2.0):
                     f.init(z, t)
                     continue
                 if x0 <= f.x[0] <= x1 and y0 <= f.x[1] <= y1 and abs(v_wheel) < 0.005:
-                    ok = f.pose_update(z)
+                    ok = f.pose_update(z, trust=True)
                     k = 'tag ' + ('used' if ok else 'gated')
                     counts[k] = counts.get(k, 0) + 1
             else:

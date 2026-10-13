@@ -110,9 +110,16 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'sweep_shrink': pr.P(0.10, 'm', 'Assumed', 'the footprint is shrunk by this before marking ground as driven '
                          'over, so a few cm of pose error does not erase a real hazard beside the track (run 7 '
                          'localizer: 8 cm median error)'),
-    'turn_scrub': pr.P(0.03, 'm per sqrt(rad)', 'Assumed', 'sideways position random walk while turning (skid-steer '
-                       'scrub on BP-1); 7.5 cm sd after a full pivot. Not measured: the filter had no turning term and '
-                       'went overconfident in arena.sh run 8 (many pivots and back-outs)'),
+    'turn_scrub': pr.P(0.12, 'm per sqrt(rad)', 'Inferred', 'sideways position random walk while turning (skid-steer '
+                       'scrub): arena.sh run 10 bag, a 2.32 rad tag-search pivot moved the true base_link 0.28 m with '
+                       'v about 0 (0.09 m of it the icr_offset arm, the rest scrub): 0.12 x sqrt(2.32) = 0.18 m'),
+    'icr_offset': pr.P(0.0475, 'm', 'Inferred', 'base_link ahead of the wheel centroid the robot pivots about (run 10 '
+                       'bag analysis of the team URDF in arena.sh)'),
+    'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
+                      'taken (tags 1.1 cm median in the Isaac check)'),
+    'wall_gate': pr.P(0.2, 'm', 'Inferred', 'wall-fit points within this of a wall face (localize.icp used 0.5)'),
+    'wall_behind': pr.P(0.05, 'm', 'Inferred', 'points more than this behind a wall face are not wall points (run 10: '
+                        'enclosure rail 8 cm behind the face)'),
     'pose_sd_min': pr.P((0.015, 0.3), 'm, deg', 'Assumed', 'floor on the filter sd, so tag and wall fixes keep '
                         'passing the gate (run 8: sd 0.7 cm / 0.17 deg claimed, 20 cm median error)'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
@@ -412,10 +419,11 @@ class WallFilter:
                       relock_n refused fits that agree
     """
 
-    def __init__(self, scale=1.0, size=None, wall_offset=None, band=None):
+    def __init__(self, scale=1.0, size=None, wall_offset=None, band=None, icr_offset=None):
         """size: interior (L, W); wall_offset: how far outside the interior the wall faces stand; band: wall-point
         heights above the bed. Defaults: Angelo's arena (6.88 x 5.0, walls behind the ducts, 0.22-0.44 m)."""
         self.scale = scale
+        self.icr = val('icr_offset') if icr_offset is None else icr_offset
         self.L, self.W = size or (ARENA_L, ARENA_W)
         self.off = val('wall_offset') if wall_offset is None else wall_offset
         self.band = band or val('wall_band')
@@ -462,7 +470,10 @@ class WallFilter:
             return
         vv = self.scale * v_wheel
         am = self.x[2] + w_gyro * dt / 2
-        self.x = self.x + [vv * math.cos(am) * dt, vv * math.sin(am) * dt, w_gyro * dt]
+        # the robot turns about the wheel centroid, icr_offset behind base_link: base_link swings on that arm
+        lx, da = self.icr, w_gyro * dt
+        arm = [lx * (math.cos(self.x[2] + da) - math.cos(self.x[2])), lx * (math.sin(self.x[2] + da) - math.sin(self.x[2]))]
+        self.x = self.x + [vv * math.cos(am) * dt + arm[0], vv * math.sin(am) * dt + arm[1], da]
         self.x[2] = wrap(self.x[2])
         # covariance: drift.py's window form. Slip and the scale error are correlated over a window (fuse_every), so
         # the distance part grows with the square of the distance driven in the window, and the gyro bias part with
@@ -528,14 +539,20 @@ class WallFilter:
         self.win = (self.x.copy(), self.Pc.copy(), self.t, 0.0, 0.0)
 
     # -- absolute pose (start-zone tags)
-    def pose_update(self, z_pose, sig=None):
-        """An absolute (x, y, yaw) fix with per-axis sigmas (m, deg; default tag_sigma), chi-square gated."""
+    def pose_update(self, z_pose, sig=None, trust=False):
+        """An absolute (x, y, yaw) fix with per-axis sigmas (m, deg; default tag_sigma), chi-square gated. trust: the
+        fix is known good (start-zone tags while standing): accepted whenever it lies within tag_trust of the estimate,
+        the covariance first opened to the innovation. arena.sh run 10: tag-search pivots moved base_link 0.28 m that
+        dead reckoning did not see, and the next tag fixes were gated out; the estimate never recovered."""
         if self.x is None:
             return False
         sx, sa = sig or _P('tag_sigma')
         R = np.diag([sx ** 2, sx ** 2, math.radians(sa) ** 2])
         z = np.asarray(z_pose, float) - self.x
         z[2] = wrap(z[2])
+        tm, td = val('tag_trust')
+        if trust and math.hypot(z[0], z[1]) < tm and abs(z[2]) < math.radians(td):
+            self.Pc = self.Pc + np.diag(z ** 2)
         S = self.Pc + R
         if z @ np.linalg.solve(S, z) >= _P('gate_chi2'):
             return False
@@ -573,7 +590,7 @@ class WallFilter:
         # localize.icp has the walls at 0 and (L, W): shift by the wall offset and back
         o = np.array([self.off, self.off, 0.0])
         Lw, Ww = self.L + 2 * self.off, self.W + 2 * self.off
-        pose, lam, n_used = localize.icp(Pl, self.x + o, Lw, Ww)
+        pose, lam, n_used = wall_icp(Pl, self.x + o, Lw, Ww)
         if not (lam is not None and lam > _P('wall_lam_min') and n_used >= _P('wall_min_pts')):
             self.stats['wall_weak'] += 1
             return 'weak'
@@ -611,6 +628,29 @@ class WallFilter:
             return 'relock' if relock else 'fix'
         self.stats['wall_gated'] += 1
         return 'gated'
+
+
+def wall_icp(P, pose0, L, W, iters=30):
+    """localize.icp with a tighter gate: points within wall_gate of a wall face and not more than wall_behind behind
+    it. arena.sh run 10 (fits seeded at the true pose): the enclosure frame rail 8 cm behind the wall face, the duct
+    foot and the hall beyond the glass were inside localize.icp's 0.5 m gate and tilted fits by up to 6 deg."""
+    gate, behind = val('wall_gate'), val('wall_behind')
+    pose = np.array(pose0, float)
+    for _ in range(iters):
+        r, J = localize.wall_residuals(P, pose, L, W)
+        near = (np.abs(r) < gate) & (r > -behind)
+        if near.sum() < 10:
+            return pose, None, int(near.sum())
+        r, J = r[near], J[near]
+        w = np.where(np.abs(r) <= localize.HUBER, 1.0, localize.HUBER / np.abs(r))
+        step = -np.linalg.solve((J * w[:, None]).T @ J + 1e-9 * np.eye(3), (J * w[:, None]).T @ r)
+        pose += step
+        if np.abs(step[:2]).max() < 1e-4 and abs(step[2]) < 1e-5:
+            break
+    r, J = localize.wall_residuals(P, pose, L, W)
+    near = (np.abs(r) < localize.HUBER * 2) & (r > -behind)
+    H = J[near].T @ J[near] / max(near.sum(), 1)
+    return pose, float(np.linalg.eigvalsh(H[:2, :2]).min()) if near.sum() >= 3 else None, int(near.sum())
 
 
 def _se2(x, y, a):

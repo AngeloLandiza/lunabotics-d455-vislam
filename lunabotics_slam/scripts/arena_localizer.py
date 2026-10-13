@@ -126,7 +126,7 @@ class ArenaLocalizer(Node):
             return
         x0, x1, y0, y1 = ac.v(ac.pr.ARENA, 'start_zone')
         if x0 <= self.f.x[0] <= x1 and y0 <= self.f.x[1] <= y1 and abs(self.v_wheel) < 0.005:
-            ok = self.f.pose_update(z)
+            ok = self.f.pose_update(z, trust=True)
             self.counts['tag ' + ('used' if ok else 'gated')] = self.counts.get('tag ' + ('used' if ok else 'gated'),
                                                                                 0) + 1
 
