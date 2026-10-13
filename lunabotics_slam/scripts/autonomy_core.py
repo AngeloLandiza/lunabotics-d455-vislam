@@ -110,10 +110,11 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'sweep_shrink': pr.P(0.10, 'm', 'Assumed', 'the footprint is shrunk by this before marking ground as driven '
                          'over, so a few cm of pose error does not erase a real hazard beside the track (run 7 '
                          'localizer: 8 cm median error)'),
-    'turn_scrub': pr.P(0.20, 'm per sqrt(rad)', 'Inferred', 'sideways position random walk while turning (skid-steer '
+    'turn_scrub': pr.P(0.12, 'm per sqrt(rad)', 'Inferred', 'sideways position random walk while turning (skid-steer '
                        'scrub): arena.sh run 10 bag, a 2.32 rad tag-search pivot moved the true base_link 0.28 m with '
                        'v about 0. arena.sh pivot test and run 11: about 0.2 m of path per rad in every 0.5 s window, wandering in direction '
-                       '(run 11, a 3.16 rad pivot: 0.68 m of path, 0.32 m net = 0.18 x sqrt(3.16)); was 0.12'),
+                       '(run 11, a 3.16 rad pivot: 0.68 m of path, 0.32 m net = 0.18 x sqrt(3.16)). 0.20 was tried: replays of runs 10-12 got worse (run 11 '
+                       'max 147 -> 364 cm) because more fits waited for confirmation; the pauses after pivots do the rest'),
     'icr_offset': pr.P(0.0475, 'm', 'Inferred', 'base_link ahead of the wheel centroid the robot pivots about (run 10 '
                        'bag analysis of the team URDF in arena.sh)'),
     'slip_gate': pr.P(0.10, 'm/s', 'Assumed', 'calibrated encoder speed this far above the IMU-consistent speed '
@@ -132,9 +133,10 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
                           'fresh hole, the ICP from the estimate slid 0.45 m in x and was accepted)'),
     'wall_multi_ratio': pr.P(0.85, '', 'Assumed', 'a distinct solution (over 0.1 m away) with at least this fraction '
                              'of the best one\'s wall points makes the fit ambiguous'),
-    'wall_confirm_sd': pr.P(0.10, 'm', 'Inferred', 'above this position sd a wall fit is used only once relock_n fits '
+    'wall_confirm_sd': pr.P(0.25, 'm', 'Inferred', 'above this position sd a wall fit is used only once relock_n fits '
                             'in a row agree (run 11 replay: one accepted fit at sd 31 cm took sd to 2 cm while 45 cm '
-                            'off, then later fits from the same wrong solution were accepted)'),
+                            'off, then later fits from the same wrong solution were accepted). Sweep on runs 10-12 replays: 0.20-0.30 '
+                            'beat 0.10 on all three (run 11 max 147 -> 64 cm)'),
     'enc_over_cmd': pr.P(0.05, 'm/s', 'Inferred', 'encoder speed more than this above the commanded speed is not '
                          'distance travelled (run 11 replay: next to the fresh hole the estimate moved 26 cm in 1 s '
                          'while the rover moved 3.5 cm)'),
@@ -144,6 +146,12 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
                          'and IMU (sim/autonomy_diag/*pivots*.json)'),
     'pivot_budget': pr.P(3 * math.pi, 'rad', 'Assumed', 'in-place turning allowed per goal before the goal is moved or '
                          'skipped (run 11: about 600 deg of pivots in 30 s by the fresh hole while replanning goal 4)'),
+    'wall_inside': pr.P(0.20, 'm', 'Inferred', 'a wall fit that puts base_link closer than this to a wall face (or '
+                        'beyond it) is not used: the body is wider than that (run 12 replay confirmed a pose 27 cm '
+                        'behind the west duct face)'),
+    'retrace_stall_s': pr.P(8.0, 's', 'Assumed', 'a retrace that reaches no new trail pose for this long ends, and the '
+                            'mission plans again (run 12: 20 s of turning back and forth with v = 0 at a pose estimate '
+                            '50 cm off, then STUCK)'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -551,7 +559,7 @@ class WallFilter:
         self.win = None                     # (x_w0, P_w0, t_w0, dist, steps, dt_sum)
         self.pending = []                   # wall-fit innovations waiting for agreement while the estimate is loose
         self.stats = {'wall_tries': 0, 'wall_weak': 0, 'wall_fixes': 0, 'wall_gated': 0, 'wall_relocks': 0,
-                      'wall_ambiguous': 0, 'wall_pending': 0, 'wall_confirmed': 0, 'windows': 0, 'win_gated': 0}
+                      'wall_ambiguous': 0, 'wall_pending': 0, 'wall_confirmed': 0, 'wall_outside': 0, 'windows': 0, 'win_gated': 0}
 
     # -- state
     def init(self, pose, t, sig=None):
@@ -693,7 +701,7 @@ class WallFilter:
         self.buf.append(np.stack([x + c * q[:, 0] - s * q[:, 1], y + s * q[:, 0] + c * q[:, 1]], -1))
 
     def wall_fix(self):
-        """Returns 'fix', 'relock', 'confirmed', 'gated', 'weak', 'ambiguous', 'pending', 'few' or None (nothing buffered)."""
+        """Returns 'fix', 'relock', 'confirmed', 'gated', 'weak', 'ambiguous', 'pending', 'outside', 'few' or None (nothing buffered)."""
         if self.x is None or not self.buf:
             return None
         pts = np.concatenate(self.buf)
@@ -740,6 +748,10 @@ class WallFilter:
                 return 'weak'
         rr, Jw = localize.wall_residuals(Pl, pose, Lw, Ww)
         pose = pose - o
+        m_in = val('wall_inside')
+        if not (m_in <= pose[0] <= self.L - m_in and m_in <= pose[1] <= self.W - m_in):
+            self.stats['wall_outside'] += 1             # impossible pose: an aliased fit
+            return 'outside'
         near = np.abs(rr) < 0.1
         H = Jw[near].T @ Jw[near]
         Rw = 10 * _P('wall_sigma') ** 2 * np.linalg.inv(H + 1e-6 * np.eye(3))
@@ -1292,9 +1304,18 @@ class MissionRunner:
             return self._cmd(0.0, 0.0, dt) + (None,)
         if self.state == 'retrace':
             cv, cw, done = reverse_pursuit(pose, self.back, self.back_state)
-            if done or t - self.t_state > 4 * path_len(self.back[:, :2]) / 0.12 + 20.0:
+            k_now = self.back_state.get('k', 1)
+            if self.back_state.get('k_seen') != k_now:
+                self.back_state['k_seen'], self.back_state['t_k'] = k_now, t
+            stalled = t - self.back_state['t_k'] > val('retrace_stall_s')
+            if stalled and not done:
+                self.log.append((t, f'goal {self.k + 1} {kind}: backing out stalled at trail pose {k_now}, planning again'))
+                self.back_state['k'] = len(self.back)       # treat as finished: trims the trail it did back along
+                self.back_state['k_done'] = k_now
+            if done or stalled or t - self.t_state > 4 * path_len(self.back[:, :2]) / 0.12 + 20.0:
                 if self._still():
-                    self.trail = self.trail[:max(len(self.trail) - (len(self.back) - 1), 0)]
+                    used = self.back_state.get('k_done', len(self.back)) - 1
+                    self.trail = self.trail[:max(len(self.trail) - used, 0)]
                     self.back = None
                     self._go('plan', t - self.retry_s)
                 return self._cmd(0.0, 0.0, dt) + (None,)
