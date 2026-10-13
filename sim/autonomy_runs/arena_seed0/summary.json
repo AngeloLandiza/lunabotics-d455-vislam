@@ -198,6 +198,23 @@
    "largest_radius_m": 0.32,
    "detector_ms": null,
    "note": "pivot settle pauses (5) and 17.6 rad of in-place turning; dig at (1.43,4.09); stuck on goal 3 while turning in place over the real crater (0.81,4.10): a 52 deg pivot slid base_link 0.38 m, the estimate stayed, then the heading command dithered +-0.1-0.4 rad/s with v = 0 for 20 s"
+  },
+  {
+   "run": 13,
+   "commit": "dceb744",
+   "ended": "STUCK: two goals in a row skipped (goals 1, 2)",
+   "goals_reached": 0,
+   "goals_skipped": 2,
+   "loc_xy_median_cm": 2.4,
+   "loc_xy_max_cm": 26.1,
+   "true_path_m": 11.7,
+   "hazards": 7,
+   "matched": 4,
+   "missed": 7,
+   "false": 3,
+   "largest_radius_m": 0.48,
+   "detector_ms": null,
+   "note": "best localizer so far (p95 14 cm); goal 1 skipped after 541 deg of pivots (budget), goal 2 after 2 retrace stalls; 5 retrace stalls, 4 settle pauses, 15.3 rad in place; 3 big false boulders along the south duct (y 0.41-0.56, r 0.25-0.48) block the berm corridor"
   }
  ]
 }
