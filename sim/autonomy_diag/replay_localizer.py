@@ -25,13 +25,14 @@ sys.path.insert(0, HERE)
 import autonomy_core as ac          # noqa: E402
 import bag_io                       # noqa: E402
 
-VARIANTS = {'now': {}, 'lam_use_015': {'wall_lam_use': 0.15}, 'wheel095': {'wheel_scale': 0.95}}
+VARIANTS = {'now': {}, 'no_cap': {'cap': False}, 'rise_only': {'cap': 'rise'}}
 
 
-def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None):
+def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True):
     import dataclasses
     overrides = dict(overrides)
-    wheel_scale = overrides.pop('wheel_scale', wheel_scale)      # the node's parameter, not an autonomy_core one
+    wheel_scale = overrides.pop('wheel_scale', wheel_scale)
+    cap = overrides.pop('cap', cap)      # the node's parameter, not an autonomy_core one
     saved = {k: ac.PARAMS[k] for k in overrides}
     for k, v in overrides.items():
         ac.PARAMS[k] = dataclasses.replace(ac.PARAMS[k], value=v)
@@ -50,7 +51,14 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None):
         every = ac.drift.v(ac.drift.PARAMS, 'wall_every')
         for t, kind, i in ev:
             if kind == 0:
-                v_wheel, t_wheel = d['wheel'][i, 1], t
+                v = d['wheel'][i, 1]
+                if cap and t_wheel is not None and t > t_wheel:            # arena_localizer 6030536: the body cannot
+                    dv = 1.5 * ac.v(ac.a2.PARAMS, 'a_wheel_max') * (t - t_wheel)   # speed up faster than the drive ramp
+                    if cap == 'rise':                                       # limit only growth in |v|; a drop
+                        v = float(np.sign(v) * min(abs(v), abs(v_wheel) + dv)) # (spin ending) passes straight through
+                    else:
+                        v = float(np.clip(v, v_wheel - dv, v_wheel + dv))
+                v_wheel, t_wheel = v, t
             elif kind == 1:
                 wz = float((R_imu @ d['imu'][i, 1:4])[2])
                 if bias is None:

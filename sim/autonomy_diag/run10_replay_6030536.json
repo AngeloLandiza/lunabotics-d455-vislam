@@ -1,0 +1,54 @@
+{
+ "live": {
+  "samples": 68,
+  "median_cm": 37.73783721040262,
+  "p95_cm": 99.7950018409522,
+  "max_cm": 100.42270325177785
+ },
+ "now": {
+  "samples": 68,
+  "median_cm": 10.952474337516602,
+  "p95_cm": 105.88884594132185,
+  "max_cm": 106.54289713855331,
+  "counts": {
+   "tag used": 39,
+   "weak": 28,
+   "gated": 13,
+   "fix": 24,
+   "relock": 2
+  },
+  "overrides": {}
+ },
+ "no_cap": {
+  "samples": 68,
+  "median_cm": 11.088917468700677,
+  "p95_cm": 79.68517895038329,
+  "max_cm": 80.12126329584883,
+  "counts": {
+   "tag used": 39,
+   "weak": 28,
+   "gated": 12,
+   "fix": 25,
+   "relock": 2
+  },
+  "overrides": {
+   "cap": false
+  }
+ },
+ "rise_only": {
+  "samples": 68,
+  "median_cm": 10.952296158543792,
+  "p95_cm": 80.30252562567787,
+  "max_cm": 80.78077311399517,
+  "counts": {
+   "tag used": 39,
+   "weak": 28,
+   "gated": 12,
+   "fix": 25,
+   "relock": 2
+  },
+  "overrides": {
+   "cap": "rise"
+  }
+ }
+}
