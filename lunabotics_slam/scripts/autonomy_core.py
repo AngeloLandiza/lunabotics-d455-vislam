@@ -103,6 +103,10 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'boulder_clear': pr.P(0.20, 'm', 'Assumed', 'cells this close to boulder evidence are left out of the crater '
                           'depth test: arena.sh seed 0 had a false crater 0.13 m from a boulder edge with 7 cells 6 cm '
                           'below the ground fit'),
+    'boulder_shadow': pr.P(0.30, 'm', 'Assumed', 'a crater disc whose edge lies this close to boulder evidence must '
+                           'pass the wide crater_depth rule (the first pair): the false crater on the far side of a '
+                           'boulder in the arena.sh seed 0 bag had 5-6 cells 5 cm down but at most 7 at 3 cm (true '
+                           'crater 11-14). A real crater there is mostly inside the boulder\'s planning inflation anyway'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
     'tag_ids': pr.P((0, 1), '', 'Assumed', 'tag on the y = 0 wall, tag on the x = 0 wall'),
     'tag_xy': pr.P(((1.0, -A27.DUCT_D, 90.0), (-A27.DUCT_D, 1.0, 0.0)), 'm, m, deg facing', 'Assumed',
@@ -310,7 +314,13 @@ class HazardMap:
         ring_m = ok & (d2 > (r + c) ** 2) & (d2 <= (r + c + ring) ** 2)
         ref = np.median(mean[ring_m]) if ring_m.sum() >= 8 else self.g[i0:i1, j0:j1]
         drop = np.where(ok & (d2 <= r * r), ref - mean, -np.inf)
-        return any(int((drop >= d).sum()) >= n for d, n in val('crater_depth'))
+        rules = val('crater_depth')
+        strong = np.zeros(n.shape, bool)    # boulder cells proper (saturated evidence), not stray hits on a crater rim
+        for s in ('lidar', 'd455'):
+            strong |= self.lp[s][i0:i1, j0:j1] >= v(pr.DETECT, 'l_max') - 0.5
+        if strong.any() and np.sqrt(d2[strong].min()) < r + val('boulder_shadow'):
+            rules = rules[:1]               # beside a boulder: the wide rule only
+        return any(int((drop >= d).sum()) >= n for d, n in rules)
 
     def occupancy(self):
         """int8 grid (nx, ny): 100 where either sensor's evidence is positive, 0 where seen, -1 unseen."""
