@@ -149,7 +149,7 @@ def test_detector(seeds=(3000, 3001, 3002, 3003), ds=0.1):
     return rows
 
 
-def test_filter(seeds=(3000, 3002), level='nominal'):
+def test_filter(seeds=(3000, 3002), level='nominal', cls=None):
     drift = ac.drift
     a2 = ac.a2
     out = []
@@ -166,7 +166,7 @@ def test_filter(seeds=(3000, 3002), level='nominal'):
         n_sd = np.radians(drift.v(drift.PARAMS, 'gyro_noise')) * np.sqrt(1.0 / dt)
         gyro = log[:, 6] + bias + rng.normal(0, n_sd, len(log))
         v_wheel = (log[:, 4] + log[:, 5]) / 2
-        f = ac.WallFilter(icr_offset=0.0, scale=scale, size=(arena.L, arena.W), wall_offset=0.0, band=drift.v(drift.PARAMS, 'wall_band'))
+        f = (cls or ac.WallFilter)(icr_offset=0.0, scale=scale, size=(arena.L, arena.W), wall_offset=0.0, band=drift.v(drift.PARAMS, 'wall_band'))
         f.init(start, log[0, 0])
         est = np.zeros((len(log), 3))
         est[0] = start
@@ -267,7 +267,7 @@ def test_closed(seeds=(3000, 3001, 3002), level='nominal', legs=3):
         sx, sa = drift.v(drift.PARAMS, 'tag_sigma')
         bias = np.radians(rng.normal(0, drift.v(drift.PARAMS, 'gyro_bias')))
         n_sd = np.radians(drift.v(drift.PARAMS, 'gyro_noise')) * np.sqrt(1.0 / a2.SIM_DT)
-        f = ac.WallFilter(icr_offset=0.0, scale=scale, size=(arena.L, arena.W), wall_offset=0.0, band=drift.v(drift.PARAMS, 'wall_band'))
+        f = (cls or ac.WallFilter)(icr_offset=0.0, scale=scale, size=(arena.L, arena.W), wall_offset=0.0, band=drift.v(drift.PARAMS, 'wall_band'))
         f.init(np.asarray(start) + [rng.normal(0, sx), rng.normal(0, sx), np.radians(rng.normal(0, sa))], 0.0)
         hm = ac.HazardMap(size=(arena.L, arena.W))
         model = ac.RobotModel(mult=a2.SLIP_LEVELS[level][2])

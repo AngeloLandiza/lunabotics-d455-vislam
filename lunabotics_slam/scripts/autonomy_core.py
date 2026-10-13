@@ -120,10 +120,10 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'slip_gate': pr.P(0.10, 'm/s', 'Assumed', 'calibrated encoder speed this far above the IMU-consistent speed '
                       'means the wheels are turning faster than the body moves (arena.sh run 10 bag: 0.3-0.6 m/s '
                       'encoder rise while the body moved 0.08-0.28 m/s at t 54.5-55.5 s)'),
-    'slip_gate_rel': pr.P(0.35, '', 'Inferred', 'and at least this fraction of the encoder speed (run 15: at 0.6-0.7 m/s '
+    'slip_gate_rel': pr.P(0.25, '', 'Inferred', 'and at least this fraction of the encoder speed (SLIPSWEEP replays of runs 10, 11, 15, 16: 0.25 with no persistence keeps run 10 at p95 16 cm and run 15 at 12 cm; 0.35 or any persistence >= 0.2 loses run 10, 0 or 0.2 raises run 15. Run 15: at 0.6-0.7 m/s '
                           'the integrated IMU speed drifted 0.1-0.2 below a correct encoder, a false slip fed 0.09 m/s '
                           'for 2 s and left the pose 80 cm behind; run 10 slip: encoder 0.3-0.6 vs body 0.08-0.28)'),
-    'slip_persist': pr.P(0.5, 's', 'Assumed', 'the gap must last this long before the IMU speed is used'),
+    'slip_persist': pr.P(0.0, 's', 'Inferred', 'the gap must last this long before the IMU speed is used (sweep: 0.2-0.5 s let run 10\'s held-back body through, p95 19-42 cm)'),
     'slip_max_s': pr.P(3.0, 's', 'Assumed', 'longest slip episode trusted to the IMU alone before the encoder is '
                        'taken again (an accelerometer integrates to speed error quickly)'),
     'slip_acc_sd': pr.P(0.3, 'm/s^2', 'Assumed', 'forward accelerometer noise and tilt error after gravity removal '
@@ -165,6 +165,24 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'pinned_s': pr.P(3.0, 's', 'Assumed', 'turning in place commanded this long with under 0.1 rad of yaw change '
                      'means the rover is pinned: back straight out (run 15: wedged between the west berm poles, 35 s '
                      'of a 1.67 rad/s pivot command at a constant true yaw until STUCK)'),
+    'pf_n': pr.P(400, 'particles', 'Assumed', 'particle filter size (ParticleWallFilter)'),
+    'pf_pivot_slide': pr.P(0.20, 'm per rad', 'Inferred', 'spread of the per-particle turning centre: the sim pivot '
+                           'slides base_link about 0.2 m per rad of in-place turn, wandering in direction '
+                           '(sim/autonomy_diag/*pivots*.json); each particle carries its own turning centre, so the '
+                           'wall fits pick the one that explains the slide'),
+    'pf_scale_sd': pr.P(0.05, '', 'Assumed', 'per-particle wheel-scale spread around wheel_scale (BP-1 slip varies)'),
+    'pf_slip_rate': pr.P(0.3, '1/s', 'Assumed', 'rate at which a particle switches to a held-back body (wheel scale '
+                         'drawn from 0-1, decaying back over 2 s): run 10, encoder 0.3-0.6 m/s with the body at '
+                         '0.08-0.28'),
+    'pf_hit_sd': pr.P(0.04, 'm', 'Assumed', 'wall-point distance sd in the particle weight (wall_sigma 2 cm plus '
+                      'the deskew error of 1 s of buffered points)'),
+    'pf_pts_eff': pr.P(30.0, 'points', 'Assumed', 'the wall points of one fix count as this many independent ones '
+                       '(neighbouring returns share errors; without tempering one fix collapses the cloud)'),
+    'pf_inject': pr.P(0.10, '', 'Assumed', 'fraction of particles replaced by draws around a wall-ICP solution '
+                      'when a fix finds the cloud degenerate (effective size under 5 %)'),
+    'arrive_check': pr.P((2.5, 0.15, 15.0), 's, m, deg', 'Assumed', 'on arrival the mission holds still this long '
+                         '(two or more wall fixes, which catch a pivot slide the encoders and IMU miss), then works '
+                         'only if the fixed pose is within this of the goal; otherwise it approaches again'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -851,6 +869,210 @@ class WallFilter:
         return 'gated'
 
 
+class ParticleWallFilter(WallFilter):
+    """WallFilter's interface (init, predict, pose_update, add_wall_points, wall_fix, x, Pc, pose_at) with a particle
+    cloud in place of the gated EKF. Replaces the patches the EKF needed on arena.sh runs 10-15 (multi-seed ICP,
+    ambiguity test, confirmation, relock, wall_inside): several wall solutions stay alive as particle groups until
+    later fits pick one, and poses outside the arena get no weight.
+
+    Each particle carries pose, wheel scale and a turning centre (body frame): the sim's skid-steer pivot slides
+    base_link about 0.2 m per rad (unseen by encoders and IMU) and the wheels can turn while the body is held back
+    (run 10); particles that guessed right survive the next wall fixes.
+    """
+
+    def __init__(self, *a, n=None, seed=0, **k):
+        super().__init__(*a, **k)
+        self.n = int(n or val('pf_n'))
+        self.rng = np.random.default_rng(seed)
+        self.p = None                       # (n, 3) poses
+        self.wts = None
+        self.k_ = None                      # per-particle wheel scale multiplier (1 = calibrated)
+        self.slip = None                    # per-particle held-back factor, 1 = gripping, decays back to 1
+        self.c = None                       # (n, 2) turning centre in base_link
+        self.stats.update({'resamples': 0, 'injected': 0, 'ess_min': 1.0})
+
+    def _summary(self):
+        w = self.wts
+        m = w @ self.p[:, :2]
+        a = math.atan2(w @ np.sin(self.p[:, 2]), w @ np.cos(self.p[:, 2]))
+        d = self.p - [m[0], m[1], a]
+        d[:, 2] = (d[:, 2] + math.pi) % (2 * math.pi) - math.pi
+        self.x = np.array([m[0], m[1], a])
+        self.Pc = self._floor((d * w[:, None]).T @ d)
+
+    def _draw(self, pose, P, n):
+        out = self.rng.multivariate_normal(np.asarray(pose, float), P, n)
+        out[:, 2] = (out[:, 2] + math.pi) % (2 * math.pi) - math.pi
+        return out
+
+    def init(self, pose, t, sig=None):
+        super().init(pose, t, sig)
+        n = self.n
+        self.p = self._draw(pose, self.Pc, n)
+        self.wts = np.full(n, 1.0 / n)
+        self.k_ = 1.0 + self.rng.normal(0, val('pf_scale_sd'), n)
+        self.slip = np.ones(n)
+        self.c = np.stack([np.full(n, -self.icr), np.zeros(n)], -1) + self.rng.normal(0, val('pf_pivot_slide'), (n, 2))
+        self._summary()
+
+    def predict(self, v_wheel, w_gyro, t):
+        if self.p is None:
+            return
+        dt = t - self.t
+        if dt <= 0 or dt > 0.5:
+            self.t = t
+            return
+        n = self.n
+        # held-back bodies: some particles switch to a slip factor in [0, 1] that recovers over 2 s
+        hit = self.rng.random(n) < val('pf_slip_rate') * dt
+        self.slip[hit] = self.rng.random(hit.sum())
+        self.slip += (1.0 - self.slip) * min(1.0, dt / 2.0)
+        self.k_ += self.rng.normal(0, 0.01 * math.sqrt(dt), n) + (1.0 - self.k_) * dt / 60.0
+        vv = self.scale * v_wheel * self.k_ * self.slip + self.rng.normal(0, 0.01, n)
+        da = w_gyro * dt + self.rng.normal(0, math.radians(_P('gyro_noise')) * math.sqrt(dt) + 0.01 * abs(w_gyro) * dt, n)
+        a0 = self.p[:, 2]
+        am = a0 + da / 2
+        # rotation about the particle's turning centre c (base_link frame): base_link moves by R(a0)(R(da) - I)(-c)
+        cx, cy = self.c[:, 0], self.c[:, 1]
+        cd, sd_ = np.cos(da) - 1.0, np.sin(da)
+        bx, by = -(cd * cx - sd_ * cy), -(sd_ * cx + cd * cy)
+        ca, sa = np.cos(a0), np.sin(a0)
+        self.p[:, 0] += vv * np.cos(am) * dt + ca * bx - sa * by
+        self.p[:, 1] += vv * np.sin(am) * dt + sa * bx + ca * by
+        self.p[:, 2] = (a0 + da + math.pi) % (2 * math.pi) - math.pi
+        # the turning centre wanders (run 11: slide direction changes within a pivot)
+        self.c += self.rng.normal(0, 0.5 * val('pf_pivot_slide') * math.sqrt(abs(w_gyro) * dt), (n, 2))
+        self.t = t
+        self._summary()
+        self.hist.append((t, *self.x))
+        if len(self.hist) > 4000:
+            self.hist = self.hist[-2000:]
+
+    def _resample(self, force=False):
+        ess = 1.0 / float(np.sum(self.wts ** 2)) / self.n
+        self.stats['ess_min'] = min(self.stats['ess_min'], round(ess, 3))
+        if not force and ess > 0.5:
+            return
+        self.stats['resamples'] += 1
+        u = (self.rng.random() + np.arange(self.n)) / self.n
+        idx = np.minimum(np.searchsorted(np.cumsum(self.wts), u), self.n - 1)
+        self.p, self.k_, self.slip, self.c = self.p[idx], self.k_[idx], self.slip[idx], self.c[idx]
+        # roughening, so duplicates spread
+        self.p += self.rng.normal(0, [0.005, 0.005, math.radians(0.1)], self.p.shape)
+        self.wts = np.full(self.n, 1.0 / self.n)
+
+    def _weigh(self, logl):
+        logl = logl - logl.max()
+        w = self.wts * np.exp(logl)
+        s = w.sum()
+        if not np.isfinite(s) or s <= 0:
+            return False
+        self.wts = w / s
+        return True
+
+    def _inside_logl(self, P):
+        m = val('wall_inside')
+        out = np.minimum.reduce([P[:, 0] - m, self.L - m - P[:, 0], P[:, 1] - m, self.W - m - P[:, 1]])
+        return np.where(out < 0, -0.5 * (out / 0.03) ** 2, 0.0)
+
+    def pose_update(self, z_pose, sig=None, trust=False):
+        if self.p is None:
+            return False
+        sx, sa = sig or _P('tag_sigma')
+        z = np.asarray(z_pose, float)
+        d = z - self.p
+        d[:, 2] = (d[:, 2] + math.pi) % (2 * math.pi) - math.pi
+        sxe, sae = math.hypot(sx, 0.01), math.radians(sa) + math.radians(0.3)
+        logl = -0.5 * ((d[:, 0] / sxe) ** 2 + (d[:, 1] / sxe) ** 2 + (d[:, 2] / sae) ** 2)
+        tm, td = val('tag_trust')
+        zx = z - self.x
+        zx[2] = wrap(zx[2])
+        if logl.max() < -12.0:              # no particle near the fix
+            if not (trust and math.hypot(zx[0], zx[1]) < tm and abs(zx[2]) < math.radians(td)):
+                return False
+            k = self.n // 2                 # a known-good fix: put half the cloud on it
+            idx = np.argsort(logl)[:k]
+            self.p[idx] = self._draw(z, np.diag([sxe ** 2, sxe ** 2, sae ** 2]), k)
+            self.wts[idx] = 1.0 / self.n
+            self.wts /= self.wts.sum()
+            self.stats['injected'] += k
+            logl = -0.5 * (((z - self.p)[:, :2] / sxe) ** 2).sum(1)
+        self._weigh(logl)
+        self._resample()
+        self._summary()
+        return True
+
+    def _wall_logl(self, Pl):
+        """Log weight of each particle for wall points Pl (in the frame of the current mean pose)."""
+        off, sd = self.off, val('pf_hit_sd')
+        ca, sa = np.cos(self.p[:, 2])[:, None], np.sin(self.p[:, 2])[:, None]
+        X = self.p[:, :1] + ca * Pl[None, :, 0] - sa * Pl[None, :, 1]
+        Y = self.p[:, 1:2] + sa * Pl[None, :, 0] + ca * Pl[None, :, 1]
+        d = np.minimum.reduce([X + off, self.L + off - X, Y + off, self.W + off - Y])   # < 0: behind a wall face
+        # a return is a wall hit (Gaussian) or something else (column, boulder, hall): a floor
+        e = np.minimum(np.abs(d), 3 * sd)
+        lp = np.log(np.exp(-0.5 * (e / sd) ** 2) + 0.05)
+        return lp.sum(1) * min(1.0, val('pf_pts_eff') / Pl.shape[0]), (np.abs(d) < 2 * sd).mean(1)
+
+    def wall_fix(self):
+        """Point-likelihood weighting keeps rival wall solutions alive as particle groups (no ambiguity test needed);
+        then wall ICP from the best particle refines the winning group with an ensemble Kalman update, which a few
+        hundred particles alone cannot (sandbox test: 2-27 cm leg-end error from weighting only, under 1 cm with ICP)."""
+        if self.p is None or not self.buf:
+            return None
+        pts = np.concatenate(self.buf)
+        self.buf = []
+        Xi = np.linalg.inv(_se2(*self.x))
+        Pl = pts @ Xi[:2, :2].T + Xi[:2, 2]
+        if len(Pl) < _P('wall_min_pts'):
+            return 'few'
+        self.stats['wall_tries'] += 1
+        Ps = Pl[self.rng.choice(len(Pl), 300, replace=False)] if len(Pl) > 300 else Pl
+        logl, hit = self._wall_logl(Ps)
+        logl = logl + self._inside_logl(self.p)
+        if hit.max() < 0.2:
+            self.stats['wall_weak'] += 1
+            return 'weak'
+        self._weigh(logl)
+        self._resample()
+        # ICP from the best particle; the fit is in the frame of the current mean (Pl), so seed with the best particle
+        # expressed there: the ICP solves for the pose that puts Pl on the walls
+        best = self.p[int(np.argmax(logl))]
+        o = np.array([self.off, self.off, 0.0])
+        Lw, Ww = self.L + 2 * self.off, self.W + 2 * self.off
+        pose, lam, n_ = wall_icp(Pl, best + o, Lw, Ww)
+        r = 'weighted'
+        if lam is not None and lam > val('wall_lam_use') and n_ >= _P('wall_min_pts'):
+            rr, Jw = localize.wall_residuals(Pl, pose, Lw, Ww)
+            pose = pose - o
+            near = np.abs(rr) < 0.1
+            Rw = 10 * _P('wall_sigma') ** 2 * np.linalg.inv(Jw[near].T @ Jw[near] + 1e-6 * np.eye(3))
+            Rw = 0.5 * (Rw + Rw.T)
+            # the fit moves the mean frame: particle i's ICP equivalent is z composed with (x_i relative to the mean)
+            self._summary()
+            z = pose - self.x
+            z[2] = wrap(z[2])
+            S = self.Pc + Rw
+            m_in = val('wall_inside')
+            inside = m_in <= pose[0] <= self.L - m_in and m_in <= pose[1] <= self.W - m_in
+            if inside and z @ np.linalg.solve(S, z) < 4 * _P('gate_chi2'):
+                d = self.p - self.x
+                d[:, 2] = (d[:, 2] + math.pi) % (2 * math.pi) - math.pi
+                C = d.T @ d / self.n + 1e-8 * np.eye(3)
+                K = C @ np.linalg.inv(C + Rw)
+                eps = self.rng.multivariate_normal(np.zeros(3), Rw, self.n)
+                innov = (pose + eps) - self.p
+                innov[:, 2] = (innov[:, 2] + math.pi) % (2 * math.pi) - math.pi
+                self.p = self.p + innov @ K.T
+                self.p[:, 2] = (self.p[:, 2] + math.pi) % (2 * math.pi) - math.pi
+                r = 'fix'
+        self._summary()
+        self.stats['wall_fixes'] += r == 'fix'
+        if self.hist:
+            self.hist[-1] = (self.hist[-1][0], *self.x)
+        return r
+
+
 def wall_icp(P, pose0, L, W, iters=30):
     """localize.icp with a tighter gate: points within wall_gate of a wall face and not more than wall_behind behind
     it. arena.sh run 10 (fits seeded at the true pose): the enclosure frame rail 8 cm behind the wall face, the duct
@@ -1203,6 +1425,8 @@ class MissionRunner:
     move     after a second failure: the goal itself may sit too close to a detected hazard (detected discs come out a
              few cm larger than the true ones), so a dig goal moves to the nearest free pose in the dig box and a dump
              goal to the next dump spot (relocate_goal); then plan again
+    check    at the end of a Leg: hold still arrive_check s so the localizer takes wall fixes, then work if the fixed
+             pose is still on the goal, else plan again (twice at most)
     work     at a dig or dump goal: hold still for dig_time / dump_time; the event is reported once on arrival
     done     all goals handled
     stuck    two goals in a row skipped, or the robot has not moved stuck_m in stuck_s while it should be driving:
@@ -1233,6 +1457,7 @@ class MissionRunner:
         self.yaw_prev = None
         self.settle_until = None
         self.pin = None                     # (t, yaw) when the current in-place turn began
+        self.rechecks = 0                   # re-approaches after the arrival check found the fixed pose off the goal
         self.log = []                       # (t, message) for the node to print
 
     def _go(self, state, t):
@@ -1366,12 +1591,27 @@ class MissionRunner:
             else:
                 cv, cw, done = self.leg(np.asarray(pose, float), t - self.t_state)
                 if done:
-                    self.skips_in_row = 0
-                    self.log.append((t, f'goal {self.k + 1} {kind}: arrived'))
-                    self.reached.setdefault(kind, []).append(tuple(g))
-                    self._go('work', t)
-                    return self._cmd(0.0, 0.0, dt) + ((kind, g),)
+                    self._go('check', t)                    # stop and let the localizer fix before working
+                    return self._cmd(0.0, 0.0, dt) + (None,)
                 return self._cmd(cv, cw, dt) + (None,)
+        if self.state == 'check':
+            hold, tol_xy, tol_a = val('arrive_check')
+            if t - self.t_state < hold or not self._still():
+                return self._cmd(0.0, 0.0, dt) + (None,)
+            off = float(np.hypot(*(np.asarray(pose[:2]) - g[:2])))
+            off_a = abs(wrap(float(pose[2]) - g[2])) if len(g) > 2 else 0.0
+            if (off > tol_xy or off_a > math.radians(tol_a)) and self.rechecks < 2:
+                self.rechecks += 1
+                self.log.append((t, f'goal {self.k + 1} {kind}: fixed pose {100 * off:.0f} cm / '
+                                    f'{math.degrees(off_a):.0f} deg off the goal after stopping, approaching again'))
+                self._go('plan', t - self.retry_s)
+                return self._cmd(0.0, 0.0, dt) + (None,)
+            self.rechecks = 0
+            self.skips_in_row = 0
+            self.log.append((t, f'goal {self.k + 1} {kind}: arrived ({100 * off:.0f} cm off after the fix)'))
+            self.reached.setdefault(kind, []).append(tuple(g))
+            self._go('work', t)
+            return self._cmd(0.0, 0.0, dt) + ((kind, g),)
         if self.state == 'stop':
             if self._still():
                 self._go('plan', t)

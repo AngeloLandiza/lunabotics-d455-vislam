@@ -5,6 +5,7 @@ initialises, later tag fixes while standing in the start zone update, prediction
 speed (x wheel_scale) and the gyro yaw rate in base_link, L1 wall-band points buffered per cloud, a wall fix every
 wall_every s. Variants change autonomy_core PARAMS before each replay:
   now          as committed (wheel_scale 0.84)
+  pf, pf_slip  ParticleWallFilter, without / with the slip guard
   lam_use_015  wall_lam_use = 0.15 (only well-conditioned wall fits)
   wheel095     wheel_scale = 0.95 (before 71ca022)
 Reports xy error vs /ground_truth/base_pose (sampled at 1 Hz) and the fix / gated / relock / weak counts.
@@ -26,7 +27,9 @@ import autonomy_core as ac          # noqa: E402
 import bag_io                       # noqa: E402
 
 BASE = {'cap': 'rise', 'slip': True, 'cmd': True}
-VARIANTS = {'now': BASE}
+VARIANTS = {'now': BASE,                                    # EKF (WallFilter) as committed
+            'pf': {**BASE, 'slip': False, 'pf': True},      # particle filter, which models held-back bodies itself
+            'pf_slip': {**BASE, 'pf': True}}                # particle filter fed the slip guard's speed
 if os.environ.get('SWEEP'):     # SWEEP=1: turn_scrub x wall_confirm_sd grid
     VARIANTS = {f'scrub{s_}_confirm{c_}': {**BASE, 'turn_scrub': s_, 'wall_confirm_sd': c_}
                 for s_ in (0.12, 0.20) for c_ in (0.10, 0.20, 0.30)}
@@ -48,11 +51,12 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, sli
     cap = overrides.pop('cap', cap)      # the node's parameter, not an autonomy_core one
     slip = overrides.pop('slip', slip)   # arena_localizer slip_guard
     use_cmd = overrides.pop('cmd', cmd)  # arena_localizer cmd_topic (encoder capped near the command)
+    pf = overrides.pop('pf', False)      # arena_localizer filter:=pf (ParticleWallFilter)
     saved = {k: ac.PARAMS[k] for k in overrides}
     for k, v in overrides.items():
         ac.PARAMS[k] = dataclasses.replace(ac.PARAMS[k], value=v)
     try:
-        f = ac.WallFilter(scale=wheel_scale)
+        f = (ac.ParticleWallFilter if pf else ac.WallFilter)(scale=wheel_scale)
         sg = ac.SlipGuard(scale=wheel_scale) if slip else None
         R_imu = d['T_base'][d['imu_frame']][:3, :3]
         T_cl = d['T_base'][d['cloud_frame']]

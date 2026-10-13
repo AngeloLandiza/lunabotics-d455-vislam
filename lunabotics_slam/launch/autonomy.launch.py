@@ -45,10 +45,12 @@ def generate_launch_description():
                               description='ask the sim to dig / dump on arrival (/arena/dig)'),
         DeclareLaunchArgument('wheel_scale', default_value='0.84',
                               description='encoder distance scale (arena.sh run 10 bag: true / encoder speed 0.84)'),
+        DeclareLaunchArgument('filter', default_value='ekf', description='localizer: ekf (WallFilter) or pf (particles)'),
         DeclareLaunchArgument('use_depth', default_value='true', description='D455 depth in the detector too'),
         DeclareLaunchArgument('rviz', default_value='true'),
         node('start_tags.py'),
-        node('arena_localizer.py', ['wheel_scale:=', LaunchConfiguration('wheel_scale')]),
+        node('arena_localizer.py', ['wheel_scale:=', LaunchConfiguration('wheel_scale')],
+             ['filter:=', LaunchConfiguration('filter')]),
         node('hazard_detector.py', pose, ['use_depth:=', LaunchConfiguration('use_depth')]),
         mission,
         # the mission ends (done, or stuck) -> the whole run ends

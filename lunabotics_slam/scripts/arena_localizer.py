@@ -49,11 +49,12 @@ class ArenaLocalizer(Node):
         p('tf_child', 'autonomy_base')  # TF arena -> this frame for RViz; empty = no TF
         p('walls', True)
         p('cmd_topic', '/cmd_vel')      # encoder speed capped near the commanded speed; empty = off
+        p('filter', 'ekf')              # 'ekf' (WallFilter) or 'pf' (ParticleWallFilter, models pivot slide and slip itself)
         p('slip_guard', True)           # IMU check on the encoder speed (autonomy_core.SlipGuard): run 10 replay 11 -> 3.8 cm median
         g = lambda k: self.get_parameter(k).value  # noqa: E731
         self.arena_frame, self.tf_child = g('arena_frame'), g('tf_child')
         self.ext = ar.Extrinsics(self, g('base_frame'))
-        self.f = ac.WallFilter(scale=g('wheel_scale'))
+        self.f = (ac.ParticleWallFilter if g('filter') == 'pf' else ac.WallFilter)(scale=g('wheel_scale'))
         self.slip = ac.SlipGuard(scale=g('wheel_scale')) if g('slip_guard') else None
         self.grav = self.slip or ac.SlipGuard()      # gravity direction -> roll / pitch, published for the detector
         self.t_imu = None
