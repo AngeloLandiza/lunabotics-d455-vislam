@@ -694,6 +694,8 @@
     const recs = by("records");
     if (recs.length) body.append(recordsBlock(recs));
     for (const it of by("autonomy_runs")) body.append(autonomyRunsBlock(it));
+    const locReplay = by("localizer_replay");
+    if (locReplay.length) body.append(localizerReplaySection(locReplay));
     if (errs.length) {
       body.append(el("div", { class: "card" }, el("h3", { text: "Files that could not be read" }),
         el("ul", null, errs.map((x) => el("li", null, code(x.path), ` — ${x.error}`)))));
@@ -1081,6 +1083,55 @@
     card.append(el("div", { class: "table-wrap" }, el("table", null,
       el("thead", null, el("tr", null, ["Run", "Commit", "Ended", "Goals reached/skipped", "Localizer xy median/max (cm)", "True path (m)", "Hazards matched/missed/false", "Largest radius (m)", "Detector ms", "Note"].map((h) => el("th", { class: h === "Run" || h === "Commit" || h === "Ended" || h === "Note" ? "" : "num", text: h })))),
       el("tbody", null, rows))));
+    card.append(sourceLine(it.path, it.mtime));
+    return card;
+  }
+
+  function localizerReplaySection(items) {
+    const wrap = el("div", null);
+    wrap.append(el("div", { class: "section-head" }, el("h2", { text: "Localizer replays (sim/autonomy_diag)" }),
+      el("span", { class: "sub", text: "diagnostics from localizer variants, newest files first" })));
+    const newest = (a, b) => (b.mtime || 0) - (a.mtime || 0);
+    for (const it of [...items].sort(newest)) wrap.append(localizerReplayBlock(it));
+    return wrap;
+  }
+
+  function localizerReplayBlock(it) {
+    const c = it.content || {};
+    const card = el("div", { class: "card" });
+    const rows = [];
+
+    // Build table rows: one per variant
+    for (const [variant_name, variant_data] of Object.entries(c)) {
+      if (!variant_data || typeof variant_data !== "object") continue;
+
+      // Format counts as compact "k: v" list
+      const counts = variant_data.counts || {};
+      const countsStr = Object.entries(counts)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join(", ") || DASH;
+
+      // Count worsening_fixes
+      const n_fixes = (Array.isArray(variant_data.worsening_fixes) ? variant_data.worsening_fixes.length : 0);
+
+      rows.push(el("tr", null,
+        el("td", { text: variant_name }),
+        el("td", { class: "num", text: fmt(variant_data.median_cm, 2) }),
+        el("td", { class: "num", text: fmt(variant_data.p95_cm, 2) }),
+        el("td", { class: "num", text: fmt(variant_data.max_cm, 2) }),
+        el("td", { class: "small", text: countsStr }),
+        el("td", { class: "num", text: n_fixes > 0 ? String(n_fixes) : DASH })));
+    }
+
+    card.append(el("div", { class: "section-head" },
+      el("h3", null, pathNode(it.path)),
+      el("span", { class: "sub", text: `modified ${when(it.mtime)}` })));
+
+    if (rows.length) {
+      card.append(el("div", { class: "table-wrap" }, el("table", null,
+        el("thead", null, el("tr", null, ["Variant", "Median (cm)", "P95 (cm)", "Max (cm)", "Counts", "Worsening fixes"].map((h) => el("th", { class: h === "Variant" || h === "Counts" ? "" : "num", text: h })))),
+        el("tbody", null, rows))));
+    }
     card.append(sourceLine(it.path, it.mtime));
     return card;
   }

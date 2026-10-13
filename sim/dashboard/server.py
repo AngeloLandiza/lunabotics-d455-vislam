@@ -31,6 +31,7 @@ SUMMARIES = os.path.join(SANDBOX, "summaries")
 FIDUCIAL_RESULTS = os.path.join(REPO, "sim", "fiducial", "results")
 ODOMETRY_RESULTS = os.path.join(REPO, "sim", "odometry", "results")
 AUTONOMY_RUNS = os.path.join(REPO, "sim", "autonomy_runs")
+AUTONOMY_DIAG = os.path.join(REPO, "sim", "autonomy_diag")
 RESEARCH_INDEX = os.path.join(DASH, "research_index.json")
 STATIC = {"/": ("index.html", "text/html; charset=utf-8"),
           "/index.html": ("index.html", "text/html; charset=utf-8"),
@@ -407,6 +408,20 @@ def parse_result(path, kind):
         return {"meta": meta}
     with open(path, encoding="utf-8") as f:
         data = json.load(f)
+    if kind == "localizer_replay":
+        # Strip events lists (replace with count) and limit worsening_fixes to first 10
+        result = {}
+        for variant_name, variant_data in data.items():
+            if not isinstance(variant_data, dict):
+                result[variant_name] = variant_data
+                continue
+            v = dict(variant_data)
+            if "events" in v:
+                v["n_events"] = len(v.pop("events"))
+            if "worsening_fixes" in v and isinstance(v["worsening_fixes"], list):
+                v["worsening_fixes"] = v["worsening_fixes"][:10]
+            result[variant_name] = v
+        return result
     if kind == "odometry_drift":
         if not isinstance(data, dict):
             raise ValueError("expected a JSON object with meta and summary")
@@ -436,13 +451,17 @@ def result_roots():
         roots.append(ODOMETRY_RESULTS)
     if os.path.isdir(AUTONOMY_RUNS):
         roots.append(AUTONOMY_RUNS)
+    if os.path.isdir(AUTONOMY_DIAG):
+        roots.append(AUTONOMY_DIAG)
     return roots
 
 
 def result_kind(dirpath, name):
     """Kind of a result file by its name; summary.json is generic, so it counts only in a folder whose name says what it is:
     isaac_tags* (fiducial tag table), drift_* (odometry drift, sim/odometry), isaac_vo* (Isaac visual odometry, format not fixed yet),
-    or autonomy_runs (arena.sh runs in sim/autonomy_runs)."""
+    autonomy_runs (arena.sh runs in sim/autonomy_runs), or run*_replay*.json (localizer replay diagnostics in sim/autonomy_diag)."""
+    if re.match(r"run\d*_replay.*\.json$", name):
+        return "localizer_replay"
     if name == "summary.json":
         folder = os.path.basename(dirpath)
         parent_folder = os.path.basename(os.path.dirname(dirpath))
