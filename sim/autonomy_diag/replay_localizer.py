@@ -49,6 +49,7 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, sli
         # bias: the live node's standstill estimate (its log line 'gyro bias ... deg/s') when the bag starts after it;
         # otherwise estimated here, which is wrong if the robot already pivots (wheel speed 0) inside the window
         v_wheel, t_wheel, calib, t_c0, t_last, counts, track = 0.0, None, [], None, None, {}, []
+        events = []                     # each wall fix with the true error before and after (bag ground truth)
         bias = None if bias is None else math.radians(bias)
         x0, x1, y0, y1 = ac.v(ac.pr.ARENA, 'start_zone')
         every = ac.drift.v(ac.drift.PARAMS, 'wall_every')
@@ -88,9 +89,15 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, sli
                 t_last = t_last if t_last is not None else t
                 if t - t_last >= every:
                     t_last = t
+                    x_before = f.x.copy()
                     r = f.wall_fix()
                     if r:
                         counts[r] = counts.get(r, 0) + 1
+                        g = bag_io.interp_pose(d['gt'], np.array([t]))[0]
+                        events.append({'t': round(t, 2), 'kind': r, 'err_before_cm': round(100 * float(np.hypot(
+                            *(x_before[:2] - g[:2]))), 1), 'err_after_cm': round(100 * float(np.hypot(*(f.x[:2] - g[:2]))), 1),
+                            'est': np.round(f.x, 3).tolist(), 'gt': np.round(g[:3], 3).tolist(),
+                            'sd_cm': round(100 * float(np.sqrt(f.Pc[0, 0] + f.Pc[1, 1])), 1)})
             elif kind == 2:
                 if bias is None:
                     continue
@@ -111,6 +118,7 @@ def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None, cap=True, sli
         track = np.array(track)
         if sg is not None:
             counts['slip episodes'], counts['slip s'] = sg.episodes, round(sg.slip_s, 2)
+        counts['events'] = events
         return track, counts
     finally:
         for k, v in saved.items():
@@ -137,9 +145,11 @@ def main():
         print('live /autonomy/pose:', out['live'])
     for name, ov in VARIANTS.items():
         track, counts = replay(d, ov, bias=bias)
-        out[name] = {**score(track, d['gt']), 'counts': counts, 'overrides': {k: list(v) if isinstance(v, tuple) else v
+        events = counts.pop('events')
+        bad = [e for e in events if e['err_after_cm'] > e['err_before_cm'] + 5]
+        out[name] = {**score(track, d['gt']), 'counts': counts, 'events': events, 'worsening_fixes': bad, 'overrides': {k: list(v) if isinstance(v, tuple) else v
                                                                                for k, v in ov.items()}}
-        print(name, out[name])
+        print(name, {k: v for k, v in out[name].items() if k != 'events'})
     if len(sys.argv) > 2:
         json.dump(out, open(sys.argv[2], 'w'), indent=1)
 
