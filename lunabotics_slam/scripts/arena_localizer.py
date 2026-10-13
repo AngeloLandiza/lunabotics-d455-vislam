@@ -84,7 +84,8 @@ class ArenaLocalizer(Node):
         v = msg.twist.twist.linear.x
         if self.t_wheel is not None and t > self.t_wheel:
             dv = 1.5 * ac.v(ac.a2.PARAMS, 'a_wheel_max') * (t - self.t_wheel)
-            v = float(np.clip(v, self.v_wheel - dv, self.v_wheel + dv))
+            if abs(v) > abs(self.v_wheel) + dv:          # rises only: a drop (stop, spin ending) passes straight through
+                v = math.copysign(abs(self.v_wheel) + dv, v)
         self.v_wheel, self.t_wheel = v, t
 
     def on_imu(self, msg):
