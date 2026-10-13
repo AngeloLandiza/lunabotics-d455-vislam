@@ -696,6 +696,8 @@
     for (const it of by("autonomy_runs")) body.append(autonomyRunsBlock(it));
     const locReplay = by("localizer_replay");
     if (locReplay.length) body.append(localizerReplaySection(locReplay));
+    const pivots = by("pivot_icr");
+    if (pivots.length) body.append(pivotTestsSection(pivots));
     if (errs.length) {
       body.append(el("div", { class: "card" }, el("h3", { text: "Files that could not be read" }),
         el("ul", null, errs.map((x) => el("li", null, code(x.path), ` — ${x.error}`)))));
@@ -1130,6 +1132,60 @@
     if (rows.length) {
       card.append(el("div", { class: "table-wrap" }, el("table", null,
         el("thead", null, el("tr", null, ["Variant", "Median (cm)", "P95 (cm)", "Max (cm)", "Counts", "Worsening fixes"].map((h) => el("th", { class: h === "Variant" || h === "Counts" ? "" : "num", text: h })))),
+        el("tbody", null, rows))));
+    }
+    card.append(sourceLine(it.path, it.mtime));
+    return card;
+  }
+
+  function pivotTestsSection(items) {
+    const wrap = el("div", null);
+    wrap.append(el("div", { class: "section-head" }, el("h2", { text: "Pivot tests: where the rover turns about (sim/autonomy_diag)" }),
+      el("span", { class: "sub", text: "diagnostics from pivot maneuvers, newest files first" })));
+    const newest = (a, b) => (b.mtime || 0) - (a.mtime || 0);
+    for (const it of [...items].sort(newest)) wrap.append(pivotTestsBlock(it));
+    return wrap;
+  }
+
+  function pivotTestsBlock(it) {
+    const c = it.content || {};
+    const card = el("div", { class: "card" });
+    const rows = [];
+
+    // Extract filename from path
+    const filename = it.path.split("/").pop();
+
+    // Build single row for this file
+    const windows = c.windows ?? DASH;
+    const n_pivots = c.n_pivots ?? DASH;
+    const n_big_pivots = (Array.isArray(c.big_pivots) ? c.big_pivots.length : 0) || DASH;
+    const total_turn = c.total_turn_rad ?? null;
+    const true_path = c.total_true_path_cm ?? null;
+    const swing = c.cm_per_rad ?? null;
+    const model_err = c.total_model_err_cm ?? null;
+    const imu_err = c.total_imu_err_cm ?? null;
+    const per_window = c.per_window_err_cm || {};
+    const model_median = per_window.model_median ?? null;
+    const imu_median = per_window.imu_median ?? null;
+
+    rows.push(el("tr", null,
+      el("td", { class: "small" }, pathNode(filename)),
+      el("td", { class: "num", text: String(windows) }),
+      el("td", { class: "num", text: String(n_big_pivots) }),
+      el("td", { class: "num", text: fmt(total_turn, 2) }),
+      el("td", { class: "num", text: fmt(true_path, 1) }),
+      el("td", { class: "num", text: fmt(swing, 1) }),
+      el("td", { class: "num", text: fmt(model_err, 1) }),
+      el("td", { class: "num", text: fmt(imu_err, 1) }),
+      el("td", { class: "num", text: `${fmt(model_median, 1)} / ${fmt(imu_median, 1)}` })));
+
+    card.append(el("div", { class: "section-head" },
+      el("h3", null, pathNode(filename)),
+      el("span", { class: "sub", text: `modified ${when(it.mtime)}` })));
+
+    if (rows.length) {
+      card.append(el("div", { class: "table-wrap" }, el("table", null,
+        el("thead", null, el("tr", null, ["File", "Pivot windows", "Pivots > 0.5 rad", "Total turn (rad)", "True path (cm)", "Swing (cm/rad)", "Model err (cm)", "IMU err (cm)", "per-window model/IMU median (cm)"].map((h) => el("th", { class: h === "File" ? "" : "num", text: h })))),
         el("tbody", null, rows))));
     }
     card.append(sourceLine(it.path, it.mtime));

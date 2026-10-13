@@ -422,6 +422,25 @@ def parse_result(path, kind):
                 v["worsening_fixes"] = v["worsening_fixes"][:10]
             result[variant_name] = v
         return result
+    if kind == "pivot_icr":
+        # Parse pivot test data: keep per_window_err_cm and windows, summarize pivots
+        result = {
+            "windows": data.get("windows"),
+            "per_window_err_cm": data.get("per_window_err_cm"),
+        }
+        pivots = data.get("pivots", [])
+        # Filter pivots with |turn_rad| > 0.5
+        big_pivots = [p for p in pivots if isinstance(p, dict) and abs(p.get("turn_rad", 0)) > 0.5]
+        result["n_pivots"] = len(pivots)
+        if big_pivots:
+            result["total_turn_rad"] = sum(abs(p.get("turn_rad", 0)) for p in big_pivots)
+            result["total_true_path_cm"] = sum(p.get("true_path_cm", 0) for p in big_pivots)
+            result["total_model_err_cm"] = sum(p.get("model_err_cm", 0) for p in big_pivots)
+            result["total_imu_err_cm"] = sum(p.get("imu_err_cm", 0) for p in big_pivots)
+            result["cm_per_rad"] = result["total_true_path_cm"] / result["total_turn_rad"] if result["total_turn_rad"] != 0 else None
+            # Trim big_pivots to at most 20 entries
+            result["big_pivots"] = big_pivots[:20]
+        return result
     if kind == "odometry_drift":
         if not isinstance(data, dict):
             raise ValueError("expected a JSON object with meta and summary")
@@ -462,6 +481,8 @@ def result_kind(dirpath, name):
     autonomy_runs (arena.sh runs in sim/autonomy_runs), or run*_replay*.json (localizer replay diagnostics in sim/autonomy_diag)."""
     if re.match(r"run\d*_replay.*\.json$", name):
         return "localizer_replay"
+    if re.match(r".*_pivots\.json$", name):
+        return "pivot_icr"
     if name == "summary.json":
         folder = os.path.basename(dirpath)
         parent_folder = os.path.basename(os.path.dirname(dirpath))
