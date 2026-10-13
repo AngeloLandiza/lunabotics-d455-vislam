@@ -4,9 +4,9 @@ Same event logic as lunabotics_slam/scripts/arena_localizer.py: gyro bias from c
 initialises, later tag fixes while standing in the start zone update, prediction at the IMU rate from the encoder
 speed (x wheel_scale) and the gyro yaw rate in base_link, L1 wall-band points buffered per cloud, a wall fix every
 wall_every s. Variants change autonomy_core PARAMS before each replay:
-  now        as committed
-  no_scrub   turn_scrub = 0 (sd floor only)
-  runs1_7    turn_scrub = 0 and pose_sd_min = (0, 0)
+  now          as committed (wheel_scale 0.84)
+  lam_use_015  wall_lam_use = 0.15 (only well-conditioned wall fits)
+  wheel095     wheel_scale = 0.95 (before 71ca022)
 Reports xy error vs /ground_truth/base_pose (sampled at 1 Hz) and the fix / gated / relock / weak counts.
 
 Usage: python3 sim/autonomy_diag/replay_localizer.py ~/bags/run10 [out.json] [gyro bias deg/s from the live log]
@@ -25,11 +25,13 @@ sys.path.insert(0, HERE)
 import autonomy_core as ac          # noqa: E402
 import bag_io                       # noqa: E402
 
-VARIANTS = {'now': {}, 'icr0': {'icr_offset': 0.0}, 'scrub006': {'turn_scrub': 0.06}}
+VARIANTS = {'now': {}, 'lam_use_015': {'wall_lam_use': 0.15}, 'wheel095': {'wheel_scale': 0.95}}
 
 
-def replay(d, overrides, wheel_scale=0.95, calib_s=2.0, bias=None):
+def replay(d, overrides, wheel_scale=0.84, calib_s=2.0, bias=None):
     import dataclasses
+    overrides = dict(overrides)
+    wheel_scale = overrides.pop('wheel_scale', wheel_scale)      # the node's parameter, not an autonomy_core one
     saved = {k: ac.PARAMS[k] for k in overrides}
     for k, v in overrides.items():
         ac.PARAMS[k] = dataclasses.replace(ac.PARAMS[k], value=v)
@@ -53,6 +55,9 @@ def replay(d, overrides, wheel_scale=0.95, calib_s=2.0, bias=None):
                 wz = float((R_imu @ d['imu'][i, 1:4])[2])
                 if bias is None:
                     if t_wheel is None or abs(v_wheel) > 0.005:
+                        calib, t_c0 = [], None
+                        continue
+                    if abs(math.degrees(wz)) >= 2.0:                     # arena_localizer 71ca022: still gyro too
                         calib, t_c0 = [], None
                         continue
                     t_c0 = t_c0 or t

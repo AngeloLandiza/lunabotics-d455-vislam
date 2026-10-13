@@ -1,0 +1,53 @@
+{
+ "live": {
+  "samples": 68,
+  "median_cm": 37.73783721040262,
+  "p95_cm": 99.7950018409522,
+  "max_cm": 100.42270325177785
+ },
+ "now": {
+  "samples": 68,
+  "median_cm": 11.088917468700677,
+  "p95_cm": 79.68517895038329,
+  "max_cm": 80.12126329584883,
+  "counts": {
+   "tag used": 39,
+   "weak": 28,
+   "gated": 12,
+   "fix": 25,
+   "relock": 2
+  },
+  "overrides": {}
+ },
+ "lam_use_015": {
+  "samples": 68,
+  "median_cm": 14.935283578302494,
+  "p95_cm": 79.68527636192478,
+  "max_cm": 80.12135868325817,
+  "counts": {
+   "tag used": 39,
+   "weak": 54,
+   "gated": 4,
+   "fix": 9
+  },
+  "overrides": {
+   "wall_lam_use": 0.15
+  }
+ },
+ "wheel095": {
+  "samples": 68,
+  "median_cm": 13.92910017634803,
+  "p95_cm": 98.59781559289772,
+  "max_cm": 99.14640907344695,
+  "counts": {
+   "tag used": 39,
+   "weak": 28,
+   "gated": 11,
+   "fix": 27,
+   "relock": 1
+  },
+  "overrides": {
+   "wheel_scale": 0.95
+  }
+ }
+}
