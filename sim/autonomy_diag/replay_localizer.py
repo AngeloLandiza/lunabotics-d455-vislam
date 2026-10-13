@@ -30,6 +30,10 @@ VARIANTS = {'now': BASE}
 if os.environ.get('SWEEP'):     # SWEEP=1: turn_scrub x wall_confirm_sd grid
     VARIANTS = {f'scrub{s_}_confirm{c_}': {**BASE, 'turn_scrub': s_, 'wall_confirm_sd': c_}
                 for s_ in (0.12, 0.20) for c_ in (0.10, 0.20, 0.30)}
+if os.environ.get('SLIPSWEEP'):  # SLIPSWEEP=1: slip guard gate (relative part x persistence) grid
+    VARIANTS = {'no_slip': {**BASE, 'slip': False}}
+    VARIANTS.update({f'rel{r_}_persist{p_}': {**BASE, 'slip_gate_rel': r_, 'slip_persist': p_}
+                     for r_ in (0.0, 0.2, 0.25, 0.35) for p_ in (0.0, 0.2, 0.3, 0.5)})
 if os.environ.get('ODO'):       # ODO=1: which odometry piece under-reads at speed (run 15: estimate at half the
     VARIANTS = {'now': BASE,    # true speed at 0.65 m/s)
                 'no_slip': {**BASE, 'slip': False}, 'no_cmd': {**BASE, 'cmd': False}, 'no_cap': {**BASE, 'cap': False},
