@@ -96,6 +96,23 @@
    "largest_radius_m": 0.44,
    "detector_ms": null,
    "note": "crater fix passed 3 bag replays (truth pose); on the localizer pose: false boulders beside the real ones at (1.37,2.84) and (2.86,3.88); goal 1 route blocked by a new hazard, goal 2 no route at any level"
+  },
+  {
+   "run": 6,
+   "commit": "a2ccd10",
+   "ended": "STUCK: two goals in a row skipped (automatic stop)",
+   "goals_reached": 0,
+   "goals_skipped": 2,
+   "loc_xy_median_cm": 2.1,
+   "loc_xy_max_cm": 41.7,
+   "true_path_m": 3.64,
+   "hazards": 6,
+   "matched": 5,
+   "missed": 6,
+   "false": 1,
+   "largest_radius_m": 0.27,
+   "detector_ms": 16,
+   "note": "drove 3.6 m to (0.54, 3.38), 0.3 m from the first dig spot, then boxed in by the real crater (0.81,4.10) and boulder (1.37,2.84) at 0.75-1.0 m; 70 fast-turn frames skipped, 4 shallow crater blobs dropped"
   }
  ]
 }
