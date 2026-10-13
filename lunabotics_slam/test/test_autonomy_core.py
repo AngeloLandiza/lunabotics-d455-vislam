@@ -360,7 +360,7 @@ def test_slip():
         errs, flags = np.array(errs), np.array(flags)
         assert flags[(T < 9.9) | (T > 11.3)].sum() == 0
         if slip:
-            assert g.episodes == 1 and errs[(T > 10.05) & (T < 11)].mean() < 0.03
+            assert g.episodes == 1 and errs[(T > 10.55) & (T < 11)].mean() < 0.03
         else:
             assert g.episodes == 0
 

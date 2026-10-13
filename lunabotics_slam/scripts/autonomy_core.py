@@ -120,6 +120,10 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'slip_gate': pr.P(0.10, 'm/s', 'Assumed', 'calibrated encoder speed this far above the IMU-consistent speed '
                       'means the wheels are turning faster than the body moves (arena.sh run 10 bag: 0.3-0.6 m/s '
                       'encoder rise while the body moved 0.08-0.28 m/s at t 54.5-55.5 s)'),
+    'slip_gate_rel': pr.P(0.35, '', 'Inferred', 'and at least this fraction of the encoder speed (run 15: at 0.6-0.7 m/s '
+                          'the integrated IMU speed drifted 0.1-0.2 below a correct encoder, a false slip fed 0.09 m/s '
+                          'for 2 s and left the pose 80 cm behind; run 10 slip: encoder 0.3-0.6 vs body 0.08-0.28)'),
+    'slip_persist': pr.P(0.5, 's', 'Assumed', 'the gap must last this long before the IMU speed is used'),
     'slip_max_s': pr.P(3.0, 's', 'Assumed', 'longest slip episode trusted to the IMU alone before the encoder is '
                        'taken again (an accelerometer integrates to speed error quickly)'),
     'slip_acc_sd': pr.P(0.3, 'm/s^2', 'Assumed', 'forward accelerometer noise and tilt error after gravity removal '
@@ -158,6 +162,9 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
     'dig_open': pr.P(0.15, 'm', 'Assumed', 'dig spots with less turning clearance than this are tried after the open '
                      'ones, and a dig goal this tight is moved before the first attempt (run 13: 541 deg of pivots and '
                      '3 stalled back-outs at the seed 0 goal by the west wall)'),
+    'pinned_s': pr.P(3.0, 's', 'Assumed', 'turning in place commanded this long with under 0.1 rad of yaw change '
+                     'means the rover is pinned: back straight out (run 15: wedged between the west berm poles, 35 s '
+                     'of a 1.67 rad/s pivot command at a constant true yaw until STUCK)'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
     'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
@@ -503,6 +510,7 @@ class SlipGuard:
         self.P = np.diag([0.01, 0.1])
         self.t = None
         self.t_slip0 = None
+        self.t_over0 = None                # when the encoder first ran ahead of the IMU speed by the gate
         self.slipping = False
         self.episodes = 0
         self.slip_s = 0.0
@@ -543,14 +551,23 @@ class SlipGuard:
         q = np.diag([val('slip_acc_sd') ** 2 * dt ** 2, val('slip_bias_rw') ** 2 * dt])
         self.P = F @ self.P @ F.T + q
         z = self.scale * v_enc
-        over = abs(z) - abs(self.x[0]) > val('slip_gate') and (z * self.x[0] >= 0 or abs(self.x[0]) < 0.02)
-        if over and (self.t_slip0 is None or t - self.t_slip0 < val('slip_max_s')):
+        gap = max(val('slip_gate'), val('slip_gate_rel') * abs(z))
+        over = abs(z) - abs(self.x[0]) > gap and (z * self.x[0] >= 0 or abs(self.x[0]) < 0.02)
+        if over:
+            self.t_over0 = t if self.t_over0 is None else self.t_over0
+        else:
+            self.t_over0 = None
+        if over and t - self.t_over0 >= val('slip_persist') and \
+                (self.t_slip0 is None or t - self.t_slip0 < val('slip_max_s')):
             if self.t_slip0 is None:
                 self.t_slip0 = t
                 self.episodes += 1
             self.slipping = True
             self.slip_s += dt
             return self.x[0] / self.scale
+        if over and t - self.t_over0 < val('slip_persist'):
+            self.slipping = False
+            return v_enc                    # not yet a slip, but do not pull the IMU speed toward a suspect encoder
         if not over:
             self.t_slip0 = None
         self.slipping = False
@@ -1215,6 +1232,7 @@ class MissionRunner:
         self.spun_goal = 0.0                # in-place turn for the current goal, rad
         self.yaw_prev = None
         self.settle_until = None
+        self.pin = None                     # (t, yaw) when the current in-place turn began
         self.log = []                       # (t, message) for the node to print
 
     def _go(self, state, t):
@@ -1298,6 +1316,17 @@ class MissionRunner:
                         return self._stuck(t, 'two goals in a row skipped')
                 self.t_state = t
                 return self._cmd(0.0, 0.0, dt) + (None,)
+        if self.state in ('drive', 'retrace') and self._still_xy(pose):
+            if self.pin is None:
+                self.pin = (t, float(pose[2]))
+            elif t - self.pin[0] > val('pinned_s') and abs(wrap(float(pose[2]) - self.pin[1])) < 0.1:
+                self.log.append((t, f'goal {self.k + 1} {kind}: cannot turn (pinned), backing straight out'))
+                self.pin, self.back, self.pinned = None, None, True
+                self.retreat_from = xy.copy()
+                self._go('retreat', t)
+                return self._cmd(0.0, 0.0, dt) + (None,)
+        else:
+            self.pin = None
         if self.yaw_prev is not None and self._still_xy(pose):
             turn = abs(wrap(float(pose[2]) - self.yaw_prev))
             self.spun += turn
@@ -1368,6 +1397,9 @@ class MissionRunner:
         if self.state == 'retreat':
             if self.escape is None:
                 self.escape = escape_move(make_world(hazards), pose, self.retreat_m)
+                if getattr(self, 'pinned', False) and abs(self.escape) < 0.1:
+                    self.escape = -0.3              # the map says it can turn here, the wheels say not: reverse out
+                self.pinned = False
                 self.log.append((t, f'goal {self.k + 1} {kind}: escape move {self.escape:+.2f} m'))
             gone = math.hypot(*(np.asarray(pose[:2]) - self.retreat_from))
             left = abs(self.escape) - gone
