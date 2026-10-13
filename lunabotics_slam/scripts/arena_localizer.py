@@ -40,7 +40,8 @@ class ArenaLocalizer(Node):
         p('cloud_topic', '/l1/points')
         p('tag_topic', '/autonomy/tag_fix')
         p('lidar_odom_topic', '')
-        p('wheel_scale', 0.95)          # 1 - nominal mean slip (sim/realism.py Slip, Inferred); calibrate on BP-1
+        p('wheel_scale', 0.84)          # arena.sh: true / encoder speed 0.84 while driving (run 10 bag, Inferred:
+                                        # rigid-wheel physics plus 5 % realism slip); calibrate on BP-1
         p('calib_s', 2.0)
         p('initial_pose', [0.0])        # [x, y, yaw_deg] to start without tags (testing)
         p('arena_frame', 'arena')
@@ -88,7 +89,9 @@ class ArenaLocalizer(Node):
         w = msg.angular_velocity
         wz = float((T[:3, :3] @ np.array([w.x, w.y, w.z]))[2])      # yaw rate in base_link
         if self.bias is None:
-            if self.t_wheel is None or abs(self.v_wheel) > 0.005:
+            # still means wheels AND gyro: a tag-search pivot has zero wheel speed (run 10 replay calibrated on one:
+            # 3.6 deg/s bias, 35 deg of yaw per 10 s)
+            if self.t_wheel is None or abs(self.v_wheel) > 0.005 or abs(wz) > math.radians(2.0):
                 self.calib, self.t_calib0 = [], None                 # moving: restart the average
                 return
             self.t_calib0 = self.t_calib0 or t

@@ -117,6 +117,10 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
                        'bag analysis of the team URDF in arena.sh)'),
     'tag_trust': pr.P((0.6, 20.0), 'm, deg', 'Assumed', 'start-zone tag fixes this close to the estimate are always '
                       'taken (tags 1.1 cm median in the Isaac check)'),
+    'wall_lam_use': pr.P(0.02, '', 'Inferred', 'weakest-direction information per point below which a wall fit is '
+                         'skipped (drift.py wall_lam_min 0.15). Above it the fit updates through its own covariance, so '
+                         'a one-wall fit corrects only the axis that wall constrains (run 10: 40 of 76 true-pose fits '
+                         'under 0.15, one wall in view from most of the dig area)'),
     'wall_gate': pr.P(0.2, 'm', 'Inferred', 'wall-fit points within this of a wall face (localize.icp used 0.5)'),
     'wall_behind': pr.P(0.05, 'm', 'Inferred', 'points more than this behind a wall face are not wall points (run 10: '
                         'enclosure rail 8 cm behind the face)'),
@@ -591,7 +595,7 @@ class WallFilter:
         o = np.array([self.off, self.off, 0.0])
         Lw, Ww = self.L + 2 * self.off, self.W + 2 * self.off
         pose, lam, n_used = wall_icp(Pl, self.x + o, Lw, Ww)
-        if not (lam is not None and lam > _P('wall_lam_min') and n_used >= _P('wall_min_pts')):
+        if not (lam is not None and lam > val('wall_lam_use') and n_used >= _P('wall_min_pts')):
             self.stats['wall_weak'] += 1
             return 'weak'
         rr, Jw = localize.wall_residuals(Pl, pose, Lw, Ww)
