@@ -53,6 +53,7 @@ class HazardDetector(Node):
         self.busy_s = []
         self.pending = []                   # frames waiting for a pose after their stamp
         self.n_turning = 0
+        self.last_swept = None
         latched = QoSProfile(depth=1, durability=DurabilityPolicy.TRANSIENT_LOCAL)
         self.create_subscription(PoseStamped, g('pose_topic'), self.on_pose, 50)
         self.create_subscription(PointCloud2, g('cloud_topic'), self.on_cloud, 2)
@@ -71,6 +72,11 @@ class HazardDetector(Node):
 
     def on_pose(self, msg):
         self.poses.add(msg)
+        q = np.array(self.poses.h[-1][1:])
+        if self.last_swept is None or np.hypot(*(q[:2] - self.last_swept[:2])) > 0.03 or \
+                abs(ac.wrap(q[2] - self.last_swept[2])) > 0.05:
+            self.map.drove(q)
+            self.last_swept = q
         if self.pending:
             todo, self.pending = self.pending, []
             for f in todo:

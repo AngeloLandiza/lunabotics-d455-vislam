@@ -107,6 +107,9 @@ PARAMS = {   # new numbers this file adds (P(value, unit, status, source), as el
                            'pass the wide crater_depth rule (the first pair): the false crater on the far side of a '
                            'boulder in the arena.sh seed 0 bag had 5-6 cells 5 cm down but at most 7 at 3 cm (true '
                            'crater 11-14). A real crater there is mostly inside the boulder\'s planning inflation anyway'),
+    'sweep_shrink': pr.P(0.10, 'm', 'Assumed', 'the footprint is shrunk by this before marking ground as driven '
+                         'over, so a few cm of pose error does not erase a real hazard beside the track (run 7 '
+                         'localizer: 8 cm median error)'),
     'column_margin': pr.P(0.15, 'm', 'Assumed', 'detections this close to the known column box are the column'),
     'tag_ids': pr.P((0, 1), '', 'Assumed', 'tag on the y = 0 wall, tag on the x = 0 wall'),
     'tag_xy': pr.P(((1.0, -A27.DUCT_D, 90.0), (-A27.DUCT_D, 1.0, 0.0)), 'm, m, deg facing', 'Assumed',
@@ -229,6 +232,7 @@ class HazardMap:
         self.g = np.zeros(shape)
         self.frames = 0
         self.dropped = []                   # oversized blobs objects() split or dropped (for logs)
+        self.swept = np.zeros(shape, bool)  # ground the robot's footprint (shrunk by sweep_shrink) has driven over
         self.shallow = []                   # crater blobs with no real depression under them (for logs)
 
     def refit(self):
@@ -263,6 +267,9 @@ class HazardMap:
                     continue
                 if any(math.hypot(d['x'] - px, d['y'] - py) < val('pole_margin') for px, py in A27.POLES):
                     continue
+                ci, cj, cin = self.grid.idx(np.array([d['x']]), np.array([d['y']]))
+                if cin[0] and self.swept[ci[0], cj[0]]:
+                    continue
                 r = math.sqrt(d['cells'] * cell * cell / math.pi) + cell / 2
                 if r < val('min_radius'):
                     continue
@@ -289,6 +296,20 @@ class HazardMap:
                                 'r': r, 'evidence': e['evidence'], 'sensor': sensor})
             self.dropped.append((d['kind'], round(d['x'], 2), round(d['y'], 2), d['cells']))
         return merge_discs(out)
+
+    def drove(self, pose):
+        """Mark the ground under the footprint, shrunk by sweep_shrink, as driven over: no boulder or crater can be
+        there. arena.sh run 7 put three false boulders 0.46-0.51 m off the south duct face, along the robot's own
+        track to the berm (its rut berms, Inferred)."""
+        x0, x1, y0, y1 = v(a2.PARAMS, 'footprint')
+        m = val('sweep_shrink')
+        g, c = self.grid, self.grid.cell
+        ux, uy = np.meshgrid(np.arange(x0 + m, x1 - m + 1e-9, c / 2), np.arange(y0 + m, y1 - m + 1e-9, c / 2))
+        cs, sn = math.cos(pose[2]), math.sin(pose[2])
+        X = pose[0] + cs * ux - sn * uy
+        Y = pose[1] + sn * ux + cs * uy
+        i, j, inside = g.idx(X.ravel(), Y.ravel())
+        self.swept[i[inside], j[inside]] = True
 
     def depression(self, x, y, r):
         """True when the returns inside the disc show a real hole: for one of the crater_depth (d, n) pairs, n cells (2+ returns
@@ -749,7 +770,7 @@ def dump_spots(w):
     return north + west
 
 
-def relocate_goal(kind, g, hazards, robot=None, step=0.1, n_plan=6):
+def relocate_goal(kind, g, hazards, robot=None, step=0.1, n_plan=6, prefer=()):
     """A goal near g the robot can reach and turn at, or None. Dig goals: free poses anywhere in the dig box (g's
     heading, else the four axis headings), nearest first; dump goals: the other dump_spots, nearest first. With robot
     given, the first n_plan candidates are planned from the robot's pose and only a reachable one is returned
@@ -769,6 +790,10 @@ def relocate_goal(kind, g, hazards, robot=None, step=0.1, n_plan=6):
                         cands.append(c)
                         break
     cands.sort(key=lambda c: math.hypot(c[0] - g[0], c[1] - g[1]))
+    # spots the robot already reached for this kind come first: they had a route before (run 7: the second dump was
+    # moved to an unreachable north spot instead of the west-end spot the first dump had used)
+    cands = [tuple(c) for c in prefer if math.hypot(c[0] - g[0], c[1] - g[1]) > 1e-6
+             and a2.clearance(w, c, berm=kind != 'dump') > 0.05] + cands
     if robot is None:
         return cands[0] if cands else None
     for c in cands[:n_plan]:
@@ -781,18 +806,18 @@ def path_len(P):
     return float(np.hypot(*np.diff(P, axis=0).T).sum()) if len(P) > 1 else 0.0
 
 
-def retrace_points(w, pose, trail, max_back=1.2):
+def retrace_points(w, pose, trail, max_back=1.2, need=0.0):
     """The way the robot came, reversed, as poses (x, y, yaw), up to the first trail pose where it could turn in place
     again (or at most max_back of travel). None if the robot can already turn where it is, or there is no trail. A
     robot that drove into a pocket (arena.sh run 6: wall on one side, a crater seen late ahead, a boulder behind the
     turn circle) cannot turn there, and a straight move does not get it out; its own trail is space it has just
     driven, in those headings."""
-    if len(trail) < 2 or a2.turn_clearance(w, pose[:2]) >= ex.CHECK_MARGIN:
+    if len(trail) < 2 or a2.turn_clearance(w, pose[:2]) >= max(need, ex.CHECK_MARGIN):
         return None
     P = [np.asarray(pose, float)]
     for q in reversed(trail):
         P.append(np.asarray(q, float))
-        if a2.turn_clearance(w, q[:2]) >= 0.0 or path_len(np.array(P)[:, :2]) >= max_back:
+        if a2.turn_clearance(w, q[:2]) >= need or path_len(np.array(P)[:, :2]) >= max_back:
             break
     return np.array(P) if len(P) > 1 else None
 
@@ -913,6 +938,7 @@ class MissionRunner:
         self.moved_at = None                # (t, xy) of the last time the robot had moved stuck_m
         self.why_stuck = None
         self.trail = []                     # xy every 5 cm while driving, for backing out the way the robot came
+        self.reached = {}                   # kind -> goals reached, tried first when a goal of that kind is moved
         self.back = None                    # (points to reverse through, end index) while retracing
         self.log = []                       # (t, message) for the node to print
 
@@ -952,20 +978,23 @@ class MissionRunner:
             else:
                 self.log.append((t, f'goal {self.k + 1} {kind}: no route ({self.leg.info["fail"]})'))
                 if self.tries == 2:
-                    g2 = relocate_goal(kind, g, hazards, self.r)
+                    g2 = relocate_goal(kind, g, hazards, self.r, prefer=self.reached.get(kind, []))
                     if g2 is not None:
                         self.goals[self.k] = (kind, g2)
                         self.log.append((t, f'goal {self.k + 1} {kind}: moved to x {g2[0]:.2f} y {g2[1]:.2f}'))
                         self.t_state = t - self.retry_s
                         return self._cmd(0.0, 0.0, dt) + (None,)
-                if self.tries == 1:
-                    self.back = retrace_points(make_world(hazards), pose, self.trail)
+                if self.tries in (1, 3):
+                    # first time back to where it can turn at all; second time on to where it turns with margin
+                    self.back = retrace_points(make_world(hazards), pose, self.trail,
+                                               need=0.0 if self.tries == 1 else ex.CHECK_MARGIN)
                     if self.back is not None:
                         self.back_state = {}
                         self.log.append((t, f'goal {self.k + 1} {kind}: backing {path_len(self.back[:, :2]):.2f} m along '
                                             'the way it came, to where it can turn'))
                         self._go('retrace', t)
                         return self._cmd(0.0, 0.0, dt) + (None,)
+                if self.tries == 1:
                     self.retreat_from = np.asarray(pose, float)[:2].copy()
                     self.log.append((t, f'goal {self.k + 1} {kind}: backing out to plan again'))
                     self._go('retreat', t)
@@ -991,6 +1020,7 @@ class MissionRunner:
                 if done:
                     self.skips_in_row = 0
                     self.log.append((t, f'goal {self.k + 1} {kind}: arrived'))
+                    self.reached.setdefault(kind, []).append(tuple(g))
                     self._go('work', t)
                     return self._cmd(0.0, 0.0, dt) + ((kind, g),)
                 return self._cmd(cv, cw, dt) + (None,)
@@ -1002,8 +1032,8 @@ class MissionRunner:
             cv, cw, done = reverse_pursuit(pose, self.back, self.back_state)
             if done or t - self.t_state > 4 * path_len(self.back[:, :2]) / 0.12 + 20.0:
                 if self._still():
+                    self.trail = self.trail[:max(len(self.trail) - (len(self.back) - 1), 0)]
                     self.back = None
-                    self.trail = []
                     self._go('plan', t - self.retry_s)
                 return self._cmd(0.0, 0.0, dt) + (None,)
             return self._cmd(cv, cw, dt) + (None,)
