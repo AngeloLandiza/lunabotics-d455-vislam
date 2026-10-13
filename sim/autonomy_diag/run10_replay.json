@@ -1,0 +1,55 @@
+{
+ "live": {
+  "samples": 68,
+  "median_cm": 37.73783721040262,
+  "p95_cm": 99.7950018409522,
+  "max_cm": 100.42270325177785
+ },
+ "now": {
+  "samples": 68,
+  "median_cm": 86.962972968161,
+  "p95_cm": 401.7523618157032,
+  "max_cm": 426.19926284402385,
+  "counts": {
+   "tag used": 2,
+   "weak": 47,
+   "gated": 20,
+   "tag gated": 37
+  },
+  "overrides": {}
+ },
+ "no_scrub": {
+  "samples": 68,
+  "median_cm": 87.41120257588723,
+  "p95_cm": 402.1155469103829,
+  "max_cm": 426.55460542087746,
+  "counts": {
+   "tag used": 2,
+   "weak": 47,
+   "gated": 20,
+   "tag gated": 37
+  },
+  "overrides": {
+   "turn_scrub": 0.0
+  }
+ },
+ "runs1_7": {
+  "samples": 68,
+  "median_cm": 88.15539597817232,
+  "p95_cm": 402.713160462004,
+  "max_cm": 427.1391088713075,
+  "counts": {
+   "tag used": 2,
+   "weak": 47,
+   "gated": 20,
+   "tag gated": 37
+  },
+  "overrides": {
+   "turn_scrub": 0.0,
+   "pose_sd_min": [
+    0.0,
+    0.0
+   ]
+  }
+ }
+}

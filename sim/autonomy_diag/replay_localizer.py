@@ -1,0 +1,121 @@
+"""(b) Replay arena_localizer.py's WallFilter offline from an arena.sh --autonomy bag, in variants.
+
+Same event logic as lunabotics_slam/scripts/arena_localizer.py: gyro bias from calib_s of standstill, first tag fix
+initialises, later tag fixes while standing in the start zone update, prediction at the IMU rate from the encoder
+speed (x wheel_scale) and the gyro yaw rate in base_link, L1 wall-band points buffered per cloud, a wall fix every
+wall_every s. Variants change autonomy_core PARAMS before each replay:
+  now        as committed
+  no_scrub   turn_scrub = 0 (sd floor only)
+  runs1_7    turn_scrub = 0 and pose_sd_min = (0, 0)
+Reports xy error vs /ground_truth/base_pose (sampled at 1 Hz) and the fix / gated / relock / weak counts.
+
+Usage: python3 sim/autonomy_diag/replay_localizer.py ~/bags/run10 [out.json]
+"""
+import json
+import math
+import os
+import sys
+
+import numpy as np
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+REPO = os.path.dirname(os.path.dirname(HERE))
+sys.path.insert(0, os.path.join(REPO, 'lunabotics_slam', 'scripts'))
+sys.path.insert(0, HERE)
+import autonomy_core as ac          # noqa: E402
+import bag_io                       # noqa: E402
+
+VARIANTS = {'now': {}, 'no_scrub': {'turn_scrub': 0.0}, 'runs1_7': {'turn_scrub': 0.0, 'pose_sd_min': (0.0, 0.0)}}
+
+
+def replay(d, overrides, wheel_scale=0.95, calib_s=2.0):
+    import dataclasses
+    saved = {k: ac.PARAMS[k] for k in overrides}
+    for k, v in overrides.items():
+        ac.PARAMS[k] = dataclasses.replace(ac.PARAMS[k], value=v)
+    try:
+        f = ac.WallFilter(scale=wheel_scale)
+        R_imu = d['T_base'][d['imu_frame']][:3, :3]
+        T_cl = d['T_base'][d['cloud_frame']]
+        ev = ([(t, 0, i) for i, t in enumerate(d['wheel'][:, 0])] + [(t, 1, i) for i, t in enumerate(d['imu'][:, 0])]
+              + [(t, 2, i) for i, t in enumerate(d['tags'][:, 0])] + [(c[0], 3, i) for i, c in enumerate(d['clouds'])])
+        ev.sort()
+        v_wheel, t_wheel, calib, t_c0, bias, t_last, counts, track = 0.0, None, [], None, None, None, {}, []
+        x0, x1, y0, y1 = ac.v(ac.pr.ARENA, 'start_zone')
+        every = ac.drift.v(ac.drift.PARAMS, 'wall_every')
+        for t, kind, i in ev:
+            if kind == 0:
+                v_wheel, t_wheel = d['wheel'][i, 1], t
+            elif kind == 1:
+                wz = float((R_imu @ d['imu'][i, 1:4])[2])
+                if bias is None:
+                    if t_wheel is None or abs(v_wheel) > 0.005:
+                        calib, t_c0 = [], None
+                        continue
+                    t_c0 = t_c0 or t
+                    calib.append(wz)
+                    if t - t_c0 >= calib_s:
+                        bias = float(np.mean(calib))
+                    continue
+                if not f.ready:
+                    continue
+                f.predict(v_wheel, wz - bias, t)
+                track.append((t, *f.x))
+                t_last = t_last if t_last is not None else t
+                if t - t_last >= every:
+                    t_last = t
+                    r = f.wall_fix()
+                    if r:
+                        counts[r] = counts.get(r, 0) + 1
+            elif kind == 2:
+                if bias is None:
+                    continue
+                z = d['tags'][i, 1:4]
+                if not f.ready:
+                    f.init(z, t)
+                    continue
+                if x0 <= f.x[0] <= x1 and y0 <= f.x[1] <= y1 and abs(v_wheel) < 0.005:
+                    ok = f.pose_update(z)
+                    k = 'tag ' + ('used' if ok else 'gated')
+                    counts[k] = counts.get(k, 0) + 1
+            else:
+                if not f.ready:
+                    continue
+                P = d['clouds'][i][1]
+                Pb = P @ T_cl[:3, :3].T + T_cl[:3, 3]
+                f.add_wall_points(Pb[~ac.body_mask(Pb)], t)
+        track = np.array(track)
+        return track, counts
+    finally:
+        for k, v in saved.items():
+            ac.PARAMS[k] = v
+
+
+def score(track, gt, est_live=None):
+    ts = np.arange(max(track[0, 0], gt[0, 0]), min(track[-1, 0], gt[-1, 0]), 1.0)
+    k = np.clip(np.searchsorted(track[:, 0], ts), 0, len(track) - 1)
+    E = track[k, 1:3]
+    G = bag_io.interp_pose(gt, ts)[:, :2]
+    e = np.hypot(*(E - G).T)
+    return {'samples': len(ts), 'median_cm': 100 * float(np.median(e)), 'p95_cm': 100 * float(np.percentile(e, 95)),
+            'max_cm': 100 * float(e.max())}
+
+
+def main():
+    bag = os.path.expanduser(sys.argv[1])
+    d = bag_io.load(bag)
+    out = {}
+    if len(d['est']):
+        out['live'] = score(d['est'], d['gt'])
+        print('live /autonomy/pose:', out['live'])
+    for name, ov in VARIANTS.items():
+        track, counts = replay(d, ov)
+        out[name] = {**score(track, d['gt']), 'counts': counts, 'overrides': {k: list(v) if isinstance(v, tuple) else v
+                                                                               for k, v in ov.items()}}
+        print(name, out[name])
+    if len(sys.argv) > 2:
+        json.dump(out, open(sys.argv[2], 'w'), indent=1)
+
+
+if __name__ == '__main__':
+    main()
