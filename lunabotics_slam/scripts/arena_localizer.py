@@ -78,8 +78,14 @@ class ArenaLocalizer(Node):
 
     # ---------------------------------------------------------------- inputs
     def on_wheel(self, msg):
-        self.v_wheel = msg.twist.twist.linear.x
-        self.t_wheel = ar.stamp_s(msg.header.stamp)
+        # the body cannot speed up faster than the drive's ramp (a_wheel_max): a faster rise in encoder speed is the
+        # wheels spinning in the soil, not distance travelled (run 10 bag)
+        t = ar.stamp_s(msg.header.stamp)
+        v = msg.twist.twist.linear.x
+        if self.t_wheel is not None and t > self.t_wheel:
+            dv = 1.5 * ac.v(ac.a2.PARAMS, 'a_wheel_max') * (t - self.t_wheel)
+            v = float(np.clip(v, self.v_wheel - dv, self.v_wheel + dv))
+        self.v_wheel, self.t_wheel = v, t
 
     def on_imu(self, msg):
         t = ar.stamp_s(msg.header.stamp)

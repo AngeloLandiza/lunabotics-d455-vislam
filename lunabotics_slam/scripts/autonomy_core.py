@@ -1124,5 +1124,7 @@ class MissionRunner:
         return self._cmd(0.0, 0.0, 0.05) + (None,)
 
     def _cmd(self, cv, cw, dt):
-        self.r.command(cv, cw, dt)
-        return (float(cv), float(cw))
+        """Send the ramped command, not the raw one: the raw step to 0.75 m/s spun the wheels on BP-1 in arena.sh
+        (run 10 bag: 0.53 m of encoder distance over 1.5 s that the body did not travel)."""
+        v, w = self.r.command(cv, cw, dt)
+        return (float(v), float(w))
